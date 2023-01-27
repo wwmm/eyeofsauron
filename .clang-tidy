@@ -1,0 +1,13 @@
+Checks: 'boost-*,bugprone-*,cert-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,
+ -clang-analyzer-osx*,
+-cppcoreguidelines-pro-type-cstyle-cast,
+-cppcoreguidelines-pro-type-vararg,
+-cppcoreguidelines-non-private-member-variables-in-classes,
+-cppcoreguidelines-avoid-magic-numbers,
+-cppcoreguidelines-owning-memory,
+-cppcoreguidelines-avoid-non-const-global-variables,
+-cppcoreguidelines-pro-bounds-constant-array-index,
+-readability-magic-numbers,
+-readability-function-cognitive-complexity,
+-readability-identifier-length,
+-bugprone-easily-swappable-parameters'

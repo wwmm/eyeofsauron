@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="com.github.wwmm.eyeofsauron" path="/com/github/wwmm/eyeofsauron/">
+    <key name="window-maximized" type="b">
+      <default>false</default>
+    </key>
+    <key name="window-fullscreen" type="b">
+      <default>false</default>
+    </key>
+    <key name="window-width" type="i">
+      <default>0</default>
+    </key>
+    <key name="window-height" type="i">
+      <default>0</default>
+    </key>
+    <key name="use-dark-theme" type="b">
+      <default>false</default>
+    </key>
+
+    <key name="tracker-draw-vec-r" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-draw-vec-v" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-draw-vec-a" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-vec-v-scaling" type="d">
+      <default>1.0</default>
+    </key>
+    <key name="tracker-vec-a-scaling" type="d">
+      <default>1.0</default>
+    </key>
+    <key name="tracker-plot-npoints" type="i">
+      <default>100</default>
+    </key>
+    <key name="tracker-plot-rx" type="b">
+      <default>true</default>
+    </key>
+    <key name="tracker-plot-ry" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-plot-vx" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-plot-vy" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-plot-ax" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-plot-ay" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-plot-v" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-plot-a" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-plot-xy" type="b">
+      <default>false</default>
+    </key>
+    <key name="tracker-stddev-r" type="d">
+      <default>1.0</default>
+    </key>
+    <key name="tracker-stddev-a" type="d">
+      <default>1.0</default>
+    </key>
+
+    <key name="sound-time-window" type="d">
+      <default>50.0</default>
+    </key>
+    <key name="sound-volume" type="d">
+      <default>0.5</default>
+    </key>
+
+    <key name="arduino-plot-npoints" type="i">
+      <default>100</default>
+    </key>
+    <key name="arduino-plot-sonar" type="b">
+      <default>false</default>
+    </key>
+    <key name="arduino-plot-pressure" type="b">
+      <default>false</default>
+    </key>
+    <key name="arduino-plot-temperature" type="b">
+      <default>false</default>
+    </key>
+  </schema>
+</schemalist>

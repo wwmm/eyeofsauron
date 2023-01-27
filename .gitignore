@@ -1,0 +1,37 @@
+__pycache__
+_build
+build
+build-dir
+locale
+gschemas.compiled
+obj-*-linux-gnu
+.vscode
+node_modules
+package-lock.json
+compile_commands.json
+.clangd
+.cache
+
+# Compiled python modules.
+*.pyc
+
+# binary language files
+*.mo
+
+# patches
+*.patch
+
+\.python-version
+
+# Dolphin file manager creates the file .directory to save some folder-specific settings
+*.directory
+
+# exclude flatpak build directories
+build-dir
+util/flatpak/repo
+.flatpak
+.flatpak-builder
+
+# explictly include flatpak patch/shared-modules directory which includes usually ignored patch files
+!util/flatpak/patch/**/*.patch
+!util/flatpak/shared-modules/linux-audio/**/*.patch

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="com.github.wwmm.eyeofsauron.tracker" path="/com/github/wwmm/eyeofsauron/tracker/">
+    <key name="n-points" type="i">
+      <default>300</default>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="/com/github/wwmm/eyeofsauron">
+        <file>ui/custom.css</file>
+        <file>ui/application_window.ui</file>
+        <file>ui/chart.ui</file>
+        <file>ui/preferences_general.ui</file>
+        <file>ui/preferences_window.ui</file>
+        <file>ui/shortcuts.ui</file>
+        <file>ui/tracker.ui</file>
+        <file>ui/webcam.ui</file>
+        <file>ui/sound_wave.glade</file>
+        <file>icons/about_icon.png</file>
+        <file>icons/offline.png</file>
+        <file>icons/eye-of-sauron-arduino-symbolic.svg</file>
+        <file>icons/eye-of-sauron-x-symbolic.svg</file>
+        <file>icons/eye-of-sauron-y-symbolic.svg</file>
+        <file>icons/eye-of-sauron-histogram-symbolic.svg</file>
+        <file>icons/eye-of-sauron-plot-symbolic.svg</file>
+        <file>icons/eye-of-sauron-rx-symbolic.svg</file>
+        <file>icons/eye-of-sauron-ry-symbolic.svg</file>
+        <file>icons/eye-of-sauron-sine-symbolic.svg</file>
+        <file>icons/eye-of-sauron-waveform-symbolic.svg</file>
+        <file>icons/eye-of-sauron-xy-symbolic.svg</file>
+    </gresource>
+</gresources>

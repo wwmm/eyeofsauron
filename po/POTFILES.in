@@ -1,0 +1,8 @@
+data/ui/application_window.ui
+data/ui/chart.ui
+data/ui/preferences_general.ui
+data/ui/preferences_window.ui
+data/ui/shortcuts.ui
+data/ui/tracker.ui
+data/ui/webcam.ui
+data/com.github.wwmm.eyeofsauron.desktop.in
