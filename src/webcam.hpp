@@ -3,14 +3,8 @@
 #include <gst/gst.h>
 #include <sigc++/sigc++.h>
 #include <cstring>
+#include <filesystem>
 #include "util.hpp"
-
-// #include <iostream>
-// #include <string>
-// #include <thread>
-// #include <vector>
-// #include "gst/gstelement.h"
-// #include "gst/gstpad.h"
 
 class Webcam {
  public:
@@ -40,4 +34,8 @@ class Webcam {
   GstBus* bus = nullptr;
 
   GstClockTime state_check_timeout = 5 * GST_SECOND;
+
+  std::vector<std::string> devices;
+
+  void find_devices();
 };

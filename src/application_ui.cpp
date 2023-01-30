@@ -7,8 +7,6 @@ using namespace std::string_literals;
 
 struct Data {
  public:
-  ~Data() { util::debug("data struct destroyed"); }
-
   int width = 0, height = 0;
 
   bool maximized = false, fullscreen = false;
@@ -21,15 +19,15 @@ struct Data {
 };
 
 struct _ApplicationWindow {
-  AdwWindow parent_instance;
+  AdwWindow parent_instance{};
 
-  AdwViewStack* stack;
+  AdwViewStack* stack{};
 
-  GSettings* settings;
+  GSettings* settings{};
 
   ui::tracker::Tracker* tracker = nullptr;
 
-  Data* data;
+  Data* data{};
 };
 
 G_DEFINE_TYPE(ApplicationWindow, application_window, ADW_TYPE_APPLICATION_WINDOW)
@@ -253,41 +251,3 @@ auto create(GApplication* gapp) -> ApplicationWindow* {
 }
 
 }  // namespace ui::application_window
-
-// ApplicationUi::ApplicationUi(BaseObjectType* cobject,
-//                              const Glib::RefPtr<Gtk::Builder>& builder,
-//                              Application* application)
-//     : Gtk::ApplicationWindow(cobject), app(application), settings(app->settings) {
-//   Gtk::IconTheme::get_default()->add_resource_path("/com/github/wwmm/wwlab/icons");
-
-//   // loading glade widgets
-
-//   builder->get_widget("stack", stack);
-//   builder->get_widget("headerbar", headerbar);
-//   builder->get_widget("theme_switch", theme_switch);
-
-//   // add widgets to the stack
-
-//   Tracker::add_to_stack(stack);
-//   SoundWave::add_to_stack(stack);
-
-//   // signals
-
-//   stack->connect_property_changed("visible-child",
-//                                   sigc::mem_fun(*this, &ApplicationUi::on_stack_visible_child_changed));
-
-// }
-
-// void ApplicationUi::on_stack_visible_child_changed() {
-//   auto name = stack->get_visible_child_name();
-
-//   if (name == "tracker") {
-//     headerbar->set_subtitle("Object Tracker");
-//   } else if (name == "sound_wave") {
-//     headerbar->set_subtitle("Sound Wave Visualizer");
-//   } else if (name == "tone") {
-//     headerbar->set_subtitle("Tone Generator");
-//   } else if (name == "arduino") {
-//     headerbar->set_subtitle("Arduino Sensors");
-//   }
-// }

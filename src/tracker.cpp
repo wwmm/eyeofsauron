@@ -319,7 +319,7 @@ void tracker_init(Tracker* self) {
 
     auto tracker = cv::legacy::TrackerMOSSE::create();
 
-    trackers.emplace_back(std::make_tuple(tracker, new_roi, false));
+    trackers.emplace_back(tracker, new_roi, false);
   });
 
   ui::webcam::remove_roi.connect([=](const int& x, const int& y) {

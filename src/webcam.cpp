@@ -146,6 +146,8 @@ Webcam::~Webcam() {
   gst_object_unref(pipeline);
 }
 
+void Webcam::find_devices() {}
+
 void Webcam::start() {
   gst_element_set_state(pipeline, GST_STATE_PLAYING);
 }
