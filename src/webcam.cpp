@@ -82,6 +82,13 @@ Webcam::Webcam() {
   util::debug("videoconvert plugin will use " + std::to_string(n_cpu_cores) + " cpu cores");
 
   find_devices();
+
+  if (devices.empty()) {
+    util::warning("could not find a suitable camera");
+
+    return;
+  }
+
   find_devices_frame_sizes();
   find_devices_frame_intervals();
   find_best_resolution();
@@ -126,12 +133,6 @@ Webcam::Webcam() {
   g_object_set(source, "extra-controls", controls, nullptr);
 
   util::debug(gst_structure_to_string(controls));
-
-  if (devices.empty()) {
-    util::warning("could not find a suitable camera");
-
-    return;
-  }
 
   auto* caps = gst_caps_from_string(
       ("image/jpeg,framerate=" + util::to_string(devices[0].denominator) + "/" + util::to_string(devices[0].numerator) +
