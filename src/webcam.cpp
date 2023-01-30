@@ -191,6 +191,10 @@ void Webcam::find_devices() {
             msg.append(device).append(" supports the compressed ").append(description).append(" format");
 
             util::debug(msg);
+
+            fmtdesc.index++;
+
+            break;
           }
 
           fmtdesc.index++;
@@ -285,10 +289,6 @@ void Webcam::find_devices_frame_intervals() {
       while (0 == ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &vframeinterval)) {
         device.resolutions.emplace_back(width, height, vframeinterval.discrete.numerator,
                                         vframeinterval.discrete.denominator);
-
-        // util::debug(util::to_string(width) + " x " + util::to_string(height) + " -> " +
-        //             util::to_string(vframeinterval.discrete.numerator) + "/" +
-        //             util::to_string(vframeinterval.discrete.denominator));
 
         vframeinterval.index++;
       }
