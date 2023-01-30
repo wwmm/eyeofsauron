@@ -121,7 +121,6 @@ Webcam::Webcam() {
   g_object_set(source, "device", devices[0].path.c_str(), nullptr);
   g_object_set(source, "do-timestamp", 1, nullptr);
   g_object_set(videoconvertscale, "n-threads", n_cpu_cores, nullptr);
-  g_object_set(videoconvertscale, "method", 4, nullptr);  // Bilinear (multi-tap)
   g_object_set(videoconvertscale, "add-borders", 0, nullptr);
 
   // disabling variable exposure because it leads to variable framerate
@@ -324,7 +323,9 @@ void Webcam::find_best_resolution() {
       double a_frac = static_cast<double>(a_numerator) / static_cast<double>(a_denominator);
       double b_frac = static_cast<double>(b_numerator) / static_cast<double>(b_denominator);
 
-      return a_frac < b_frac;
+      auto a_area = a_width * a_height;
+
+      return a_frac < b_frac && a_area >= 640 * 480;
     });
 
     device.width = w;
