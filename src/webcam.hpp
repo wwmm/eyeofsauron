@@ -24,7 +24,7 @@ class Webcam {
   void pause();
   void stop();
   void get_latency();
-  void set_resolution(const int& width, const int& height);
+  void set_output_resolution(const int& width = 640, const int& height = 480);
 
   sigc::signal<void(float)> new_framerate;
   sigc::signal<void(uint, uint)> new_frame_size;
@@ -46,6 +46,8 @@ class Webcam {
     std::vector<v4l2_frmsizeenum> frame_sizes;
 
     std::vector<std::tuple<int, int, int, int>> resolutions;  // width, height, numerator, denominator
+
+    int width, height, numerator, denominator;
   };
 
   std::vector<Devices> devices;

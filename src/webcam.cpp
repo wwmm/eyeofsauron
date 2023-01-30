@@ -125,7 +125,10 @@ Webcam::Webcam() {
 
   util::debug(gst_structure_to_string(controls));
 
-  auto* caps = gst_caps_from_string("image/jpeg,framerate=30/1");
+  auto* caps = gst_caps_from_string(
+      ("image/jpeg,framerate=" + util::to_string(devices[0].denominator) + "/" + util::to_string(devices[0].numerator) +
+       ",width=" + std::to_string(devices[0].width) + ",height=" + std::to_string(devices[0].height))
+          .c_str());
 
   g_object_set(capsfilter_in, "caps", caps, nullptr);
 
@@ -143,6 +146,10 @@ Webcam::Webcam() {
   gst_pad_add_probe(sinkpad, GST_PAD_PROBE_TYPE_BUFFER, on_probe_buffer, this, nullptr);
 
   g_object_unref(sinkpad);
+
+  // setting frame size and fps
+
+  set_output_resolution();
 }
 
 Webcam::~Webcam() {
@@ -258,6 +265,10 @@ void Webcam::find_devices_frame_intervals() {
         device.resolutions.emplace_back(width, height, vframeinterval.discrete.numerator,
                                         vframeinterval.discrete.denominator);
 
+        util::debug(util::to_string(width) + " x " + util::to_string(height) + " -> " +
+                    util::to_string(vframeinterval.discrete.numerator) + "/" +
+                    util::to_string(vframeinterval.discrete.denominator));
+
         vframeinterval.index++;
       }
     }
@@ -283,8 +294,13 @@ void Webcam::find_best_resolution() {
       double a_area = a_width * a_height;
       double b_area = b_width * b_height;
 
-      return a_frac < b_frac && a_area > b_area;
+      return a_frac < b_frac;
     });
+
+    device.width = w;
+    device.height = h;
+    device.numerator = numerator;
+    device.denominator = denominator;
 
     util::debug("the best resolution for device " + device.path + " is: " + util::to_string(w) + " x " +
                 util::to_string(h) + " -> " + util::to_string(numerator) + "/" + util::to_string(denominator));
@@ -303,7 +319,7 @@ void Webcam::stop() {
   gst_element_set_state(pipeline, GST_STATE_NULL);
 }
 
-void Webcam::set_resolution(const int& width, const int& height) {
+void Webcam::set_output_resolution(const int& width, const int& height) {
   auto* caps = gst_caps_from_string(
       std::string("video/x-raw,format=RGB,width=" + std::to_string(width) + ",height=" + std::to_string(height))
           .c_str());

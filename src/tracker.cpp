@@ -308,7 +308,7 @@ void tracker_init(Tracker* self) {
 
   webcam_obj = std::make_unique<Webcam>();
 
-  webcam_obj->set_resolution(frame_width, frame_height);
+  webcam_obj->set_output_resolution(frame_width, frame_height);
 
   webcam_obj->new_frame.connect(
       [=](const std::vector<guint8>& frame, const guint64& timestamp) { on_new_frame(self, frame, timestamp); });
