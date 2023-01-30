@@ -154,9 +154,47 @@ void Webcam::find_devices() {
 
     if (std::filesystem::is_character_file(child_path)) {
       if (child_path.stem().string().starts_with("video")) {
-        util::debug("found video device: " + child_path.string());
+        auto device = child_path.string();
 
-        devices.emplace_back(child_path.string());
+        auto fd = open(device.c_str(), O_RDWR);
+
+        if (fd < 0) {
+          util::warning("could not open device: " + device);
+
+          continue;
+        }
+
+        struct v4l2_fmtdesc fmtdesc = {0};  // this initializes fmtdesc.index to 0
+
+        fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+        bool supports_mjpeg = false;
+
+        while (0 == ioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc)) {
+          if (fmtdesc.flags == V4L2_FMT_FLAG_COMPRESSED) {
+            std::string description(reinterpret_cast<char*>(fmtdesc.description));
+
+            if (description == "Motion-JPEG") {
+              std::string msg = "device ";
+
+              msg.append(device).append(" supports the compressed ").append(description).append(" format");
+
+              supports_mjpeg = true;
+
+              util::debug(msg);
+            }
+          }
+
+          fmtdesc.index++;
+        }
+
+        if (supports_mjpeg) {
+          devices.emplace_back(child_path.string());
+        } else {
+          util::debug("device " + device + " does not support the Motion-JPEG compressed format.");
+        }
+
+        close(fd);
       }
     }
   }

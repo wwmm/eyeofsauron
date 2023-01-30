@@ -25,6 +25,7 @@ eye_of_sauron_deps = [
 	dependency('boost', version: '>=1.72', modules:['system']),
 	dependency('opencv4', include_type: 'system'),
 	dependency('fmt', version: '>=8.0.0', include_type: 'system'),
+	dependency('libv4l2', include_type: 'system'),
 	dependency('threads'),
 	config_h
 ]

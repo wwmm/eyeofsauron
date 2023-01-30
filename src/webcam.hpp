@@ -1,7 +1,10 @@
 #pragma once
 
+#include <fcntl.h>
 #include <gst/gst.h>
+#include <linux/videodev2.h>
 #include <sigc++/sigc++.h>
+#include <sys/ioctl.h>
 #include <cstring>
 #include <filesystem>
 #include "util.hpp"
