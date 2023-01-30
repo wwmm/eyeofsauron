@@ -48,10 +48,10 @@ void on_output_type_changed(GstElement* typefind, guint probability, GstCaps* ca
 
   util::idle_add([=]() { wc->new_frame_size.emit(width, height); });
 
-  util::debug(wc->log_tag + "frame rate: " + std::to_string(framerate_numerator) + "/" +
+  util::debug(wc->log_tag + "acquisition frame rate: " + std::to_string(framerate_numerator) + "/" +
               std::to_string(framerate_denomimnator));
-  util::debug(wc->log_tag + "width: " + std::to_string(width));
-  util::debug(wc->log_tag + "height: " + std::to_string(height));
+  util::debug(wc->log_tag + "output width: " + std::to_string(width));
+  util::debug(wc->log_tag + "output height: " + std::to_string(height));
 }
 
 auto on_probe_buffer(GstPad* pad, GstPadProbeInfo* info, gpointer user_data) -> GstPadProbeReturn {
@@ -103,15 +103,16 @@ Webcam::Webcam() {
   //   gst_registry_scan_path(gst_registry_get(), PLUGINS_INSTALL_DIR);
 
   source = gst_element_factory_make("v4l2src", "video_src");
+  auto* queue = gst_element_factory_make("queue", nullptr);
   auto* capsfilter_in = gst_element_factory_make("capsfilter", nullptr);
   auto* jpegdec = gst_element_factory_make("jpegdec", nullptr);
-  auto* videoconvert = gst_element_factory_make("videoconvert", nullptr);
+  auto* videoconvertscale = gst_element_factory_make("videoconvertscale", nullptr);
   capsfilter_out = gst_element_factory_make("capsfilter", nullptr);
   auto* out_type = gst_element_factory_make("typefind", nullptr);
   sink = gst_element_factory_make("fakesink", "video_sink");
 
   g_object_set(source, "do-timestamp", 1, nullptr);
-  g_object_set(videoconvert, "n-threads", n_cpu_cores, nullptr);
+  g_object_set(videoconvertscale, "n-threads", n_cpu_cores, nullptr);
 
   // disabling variable exposure because it leads to variable framerate
   auto* controls = gst_structure_new_empty("extra_controls");
@@ -134,10 +135,11 @@ Webcam::Webcam() {
 
   gst_caps_unref(caps);
 
-  gst_bin_add_many(GST_BIN(pipeline), source, capsfilter_in, jpegdec, videoconvert, capsfilter_out, out_type, sink,
-                   nullptr);
+  gst_bin_add_many(GST_BIN(pipeline), source, queue, capsfilter_in, jpegdec, videoconvertscale, capsfilter_out,
+                   out_type, sink, nullptr);
 
-  gst_element_link_many(source, capsfilter_in, jpegdec, videoconvert, capsfilter_out, out_type, sink, nullptr);
+  gst_element_link_many(source, queue, capsfilter_in, jpegdec, videoconvertscale, capsfilter_out, out_type, sink,
+                        nullptr);
 
   g_signal_connect(out_type, "have-type", G_CALLBACK(on_output_type_changed), this);
 
@@ -312,10 +314,7 @@ void Webcam::find_best_resolution() {
       double a_frac = static_cast<double>(a_numerator) / static_cast<double>(a_denominator);
       double b_frac = static_cast<double>(b_numerator) / static_cast<double>(b_denominator);
 
-      double a_area = a_width * a_height;
-      double b_area = b_width * b_height;
-
-      return a_frac < b_frac && a_area < b_area;
+      return a_frac < b_frac;
     });
 
     device.width = w;
