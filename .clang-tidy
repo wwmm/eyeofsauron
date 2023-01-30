@@ -8,6 +8,7 @@ Checks: 'boost-*,bugprone-*,cert-*,cppcoreguidelines-*,modernize-*,performance-*
 -cppcoreguidelines-pro-bounds-constant-array-index,
 -cppcoreguidelines-prefer-member-initializer,
 -cppcoreguidelines-non-private-member-variables-in-classes,
+-cppcoreguidelines-pro-type-union-access,
 -readability-magic-numbers,
 -readability-function-cognitive-complexity,
 -readability-identifier-length,

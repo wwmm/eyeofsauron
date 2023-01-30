@@ -38,7 +38,17 @@ class Webcam {
 
   GstClockTime state_check_timeout = 5 * GST_SECOND;
 
-  std::vector<std::string> devices;
+  struct Devices {
+    std::string path;
+
+    __u32 pixel_format;
+
+    std::vector<std::pair<int, int>> frame_sizes;
+  };
+
+  std::vector<Devices> devices;
 
   void find_devices();
+
+  void find_devices_frame_sizes();
 };

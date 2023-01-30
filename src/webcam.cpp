@@ -82,6 +82,7 @@ Webcam::Webcam() {
   util::debug("videoconvert plugin will use " + std::to_string(n_cpu_cores) + " cpu cores");
 
   find_devices();
+  find_devices_frame_sizes();
 
   pipeline = gst_pipeline_new("pipeline");
 
@@ -156,7 +157,7 @@ void Webcam::find_devices() {
       if (child_path.stem().string().starts_with("video")) {
         auto device = child_path.string();
 
-        auto fd = open(device.c_str(), O_RDWR);
+        auto fd = open(device.c_str(), O_RDONLY);
 
         if (fd < 0) {
           util::warning("could not open device: " + device);
@@ -164,39 +165,86 @@ void Webcam::find_devices() {
           continue;
         }
 
-        struct v4l2_fmtdesc fmtdesc = {0};  // this initializes fmtdesc.index to 0
-
-        fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        v4l2_fmtdesc fmtdesc = {.index = 0, .type = V4L2_BUF_TYPE_VIDEO_CAPTURE};
 
         bool supports_mjpeg = false;
+
+        __u32 device_pixel_format = 0;
 
         while (0 == ioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc)) {
           if (fmtdesc.flags == V4L2_FMT_FLAG_COMPRESSED) {
             std::string description(reinterpret_cast<char*>(fmtdesc.description));
 
-            if (description == "Motion-JPEG") {
-              std::string msg = "device ";
+            std::string msg = "device ";
 
-              msg.append(device).append(" supports the compressed ").append(description).append(" format");
+            switch (fmtdesc.pixelformat) {
+              case V4L2_PIX_FMT_JPEG: {
+                supports_mjpeg = true;
 
-              supports_mjpeg = true;
+                device_pixel_format = V4L2_PIX_FMT_JPEG;
 
-              util::debug(msg);
+                break;
+              }
+              case V4L2_PIX_FMT_MJPEG: {
+                supports_mjpeg = true;
+
+                device_pixel_format = V4L2_PIX_FMT_MPEG;
+
+                break;
+              }
             }
+
+            msg.append(device).append(" supports the compressed ").append(description).append(" format");
+
+            util::debug(msg);
           }
 
           fmtdesc.index++;
         }
 
         if (supports_mjpeg) {
-          devices.emplace_back(child_path.string());
+          devices.emplace_back(Devices{.path = device, .pixel_format = device_pixel_format});
         } else {
-          util::debug("device " + device + " does not support the Motion-JPEG compressed format.");
+          util::debug("device " + device + " does not support the JPEG or Motion-JPEG compressed format.");
         }
 
         close(fd);
       }
     }
+  }
+}
+
+void Webcam::find_devices_frame_sizes() {
+  for (const auto& device : devices) {
+    auto fd = open(device.path.c_str(), O_RDONLY);
+
+    if (fd < 0) {
+      util::warning("could not open device: " + device.path);
+
+      continue;
+    }
+
+    util::debug("getting the frame sizes supported by device: " + device.path);
+
+    v4l2_frmsizeenum vframesize = {.index = 0, .pixel_format = device.pixel_format};
+
+    if (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &vframesize) == -1) {
+      util::warning("error getting " + device.path + " frame sizes");
+
+      close(fd);
+
+      continue;
+    }
+
+    util::warning(util::to_string(vframesize.discrete.width) + ", " + util::to_string(vframesize.discrete.height));
+
+    while (0 == ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &vframesize)) {
+      util::warning(util::to_string(vframesize.discrete.width) + ", " + util::to_string(vframesize.discrete.height));
+
+      vframesize.index++;
+    }
+
+    close(fd);
   }
 }
 
