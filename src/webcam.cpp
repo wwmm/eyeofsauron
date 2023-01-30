@@ -81,6 +81,8 @@ Webcam::Webcam() {
 
   util::debug("videoconvert plugin will use " + std::to_string(n_cpu_cores) + " cpu cores");
 
+  find_devices();
+
   pipeline = gst_pipeline_new("pipeline");
 
   bus = gst_element_get_bus(pipeline);
@@ -146,7 +148,19 @@ Webcam::~Webcam() {
   gst_object_unref(pipeline);
 }
 
-void Webcam::find_devices() {}
+void Webcam::find_devices() {
+  for (const auto& entry : std::filesystem::directory_iterator("/dev/")) {
+    auto child_path = std::filesystem::path(entry);
+
+    if (std::filesystem::is_character_file(child_path)) {
+      if (child_path.stem().string().starts_with("video")) {
+        util::debug("found video device: " + child_path.string());
+
+        devices.emplace_back(child_path.string());
+      }
+    }
+  }
+}
 
 void Webcam::start() {
   gst_element_set_state(pipeline, GST_STATE_PLAYING);
