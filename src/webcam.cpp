@@ -224,27 +224,27 @@ void Webcam::find_devices_frame_sizes() {
 
     std::string list = device.path + " frame sizes: ";
 
-    while (0 == ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &vframesize)) {
+    while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &vframesize) == 0) {
       switch (vframesize.type) {
         case V4L2_FRMSIZE_TYPE_DISCRETE: {
           list.append(util::to_string(vframesize.discrete.width) + "x" + util::to_string(vframesize.discrete.height) +
                       ",");
 
+          vframesize.index++;
+
           break;
         }
         case V4L2_FRMSIZE_TYPE_STEPWISE: {
-          util::warning("stepwise");
+          util::warning("stepwise frame type");
           break;
         }
         case V4L2_FRMSIZE_TYPE_CONTINUOUS: {
-          util::warning("continuous");
+          util::warning("continuous frame type");
           break;
         }
       }
 
       device.frame_sizes.push_back(vframesize);
-
-      vframesize.index++;
     }
 
     util::debug(list);
