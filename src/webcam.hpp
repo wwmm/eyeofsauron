@@ -41,9 +41,11 @@ class Webcam {
   struct Devices {
     std::string path;
 
-    __u32 pixel_format;
+    v4l2_fmtdesc format_description;
 
-    std::vector<std::pair<int, int>> frame_sizes;
+    std::vector<v4l2_frmsizeenum> frame_sizes;
+
+    std::vector<std::tuple<int, int, int, int>> resolutions;  // width, height, numerator, denominator
   };
 
   std::vector<Devices> devices;
@@ -51,4 +53,8 @@ class Webcam {
   void find_devices();
 
   void find_devices_frame_sizes();
+
+  void find_devices_frame_intervals();
+
+  void find_best_resolution();
 };

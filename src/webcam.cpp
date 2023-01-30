@@ -83,6 +83,8 @@ Webcam::Webcam() {
 
   find_devices();
   find_devices_frame_sizes();
+  find_devices_frame_intervals();
+  find_best_resolution();
 
   pipeline = gst_pipeline_new("pipeline");
 
@@ -169,29 +171,14 @@ void Webcam::find_devices() {
 
         bool supports_mjpeg = false;
 
-        __u32 device_pixel_format = 0;
-
         while (0 == ioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc)) {
           if (fmtdesc.flags == V4L2_FMT_FLAG_COMPRESSED) {
             std::string description(reinterpret_cast<char*>(fmtdesc.description));
 
             std::string msg = "device ";
 
-            switch (fmtdesc.pixelformat) {
-              case V4L2_PIX_FMT_JPEG: {
-                supports_mjpeg = true;
-
-                device_pixel_format = V4L2_PIX_FMT_JPEG;
-
-                break;
-              }
-              case V4L2_PIX_FMT_MJPEG: {
-                supports_mjpeg = true;
-
-                device_pixel_format = V4L2_PIX_FMT_MPEG;
-
-                break;
-              }
+            if (fmtdesc.pixelformat == V4L2_PIX_FMT_JPEG || fmtdesc.pixelformat == V4L2_PIX_FMT_MJPEG) {
+              supports_mjpeg = true;
             }
 
             msg.append(device).append(" supports the compressed ").append(description).append(" format");
@@ -203,7 +190,7 @@ void Webcam::find_devices() {
         }
 
         if (supports_mjpeg) {
-          devices.emplace_back(Devices{.path = device, .pixel_format = device_pixel_format});
+          devices.emplace_back(Devices{.path = device, .format_description = fmtdesc});
         } else {
           util::debug("device " + device + " does not support the JPEG or Motion-JPEG compressed format.");
         }
@@ -215,7 +202,7 @@ void Webcam::find_devices() {
 }
 
 void Webcam::find_devices_frame_sizes() {
-  for (const auto& device : devices) {
+  for (auto& device : devices) {
     auto fd = open(device.path.c_str(), O_RDONLY);
 
     if (fd < 0) {
@@ -226,25 +213,81 @@ void Webcam::find_devices_frame_sizes() {
 
     util::debug("getting the frame sizes supported by device: " + device.path);
 
-    v4l2_frmsizeenum vframesize = {.index = 0, .pixel_format = device.pixel_format};
-
-    if (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &vframesize) == -1) {
-      util::warning("error getting " + device.path + " frame sizes");
-
-      close(fd);
-
-      continue;
-    }
-
-    util::warning(util::to_string(vframesize.discrete.width) + ", " + util::to_string(vframesize.discrete.height));
+    v4l2_frmsizeenum vframesize = {.index = 0, .pixel_format = device.format_description.pixelformat};
 
     while (0 == ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &vframesize)) {
-      util::warning(util::to_string(vframesize.discrete.width) + ", " + util::to_string(vframesize.discrete.height));
+      device.frame_sizes.push_back(vframesize);
 
       vframesize.index++;
     }
 
+    if (device.frame_sizes.empty()) {
+      util::warning("error getting " + device.path + " frame sizes");
+    }
+
     close(fd);
+  }
+}
+
+void Webcam::find_devices_frame_intervals() {
+  for (auto& device : devices) {
+    auto fd = open(device.path.c_str(), O_RDONLY);
+
+    if (fd < 0) {
+      util::warning("could not open device: " + device.path);
+
+      continue;
+    }
+
+    util::debug("getting the frame intervals supported by device: " + device.path);
+
+    for (const auto& frame_size : device.frame_sizes) {
+      // for now we assume the discrete type
+
+      if (frame_size.type != V4L2_FRMSIZE_TYPE_DISCRETE) {
+        continue;
+      }
+
+      auto width = frame_size.discrete.width;
+      auto height = frame_size.discrete.height;
+
+      v4l2_frmivalenum vframeinterval = {
+          .index = 0, .pixel_format = device.format_description.pixelformat, .width = width, .height = height};
+
+      while (0 == ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &vframeinterval)) {
+        device.resolutions.emplace_back(width, height, vframeinterval.discrete.numerator,
+                                        vframeinterval.discrete.denominator);
+
+        vframeinterval.index++;
+      }
+    }
+
+    if (device.frame_sizes.empty()) {
+      util::warning("error getting " + device.path + " frame sizes");
+    }
+
+    close(fd);
+  }
+}
+
+void Webcam::find_best_resolution() {
+  for (auto& device : devices) {
+    auto [w, h, numerator, denominator] = *std::ranges::min_element(device.resolutions, [](auto a, auto b) {
+      auto& [a_width, a_height, a_numerator, a_denominator] = a;
+
+      auto& [b_width, b_height, b_numerator, b_denominator] = b;
+
+      double a_frac = static_cast<double>(a_numerator) / static_cast<double>(a_denominator);
+      double b_frac = static_cast<double>(b_numerator) / static_cast<double>(b_denominator);
+
+      double a_area = a_width * a_height;
+      double b_area = b_width * b_height;
+
+      return a_frac < b_frac && a_area > b_area;
+    });
+
+    util::debug("the best resolution for device " + device.path + " is: " + util::to_string(w) + " x " +
+                util::to_string(h) + " -> " + util::to_string(numerator) + "/" + util::to_string(denominator));
   }
 }
 
