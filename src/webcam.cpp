@@ -222,11 +222,32 @@ void Webcam::find_devices_frame_sizes() {
 
     v4l2_frmsizeenum vframesize = {.index = 0, .pixel_format = device.format_description.pixelformat};
 
+    std::string list = device.path + " frame sizes: ";
+
     while (0 == ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &vframesize)) {
+      switch (vframesize.type) {
+        case V4L2_FRMSIZE_TYPE_DISCRETE: {
+          list.append(util::to_string(vframesize.discrete.width) + "x" + util::to_string(vframesize.discrete.height) +
+                      ",");
+
+          break;
+        }
+        case V4L2_FRMSIZE_TYPE_STEPWISE: {
+          util::warning("stepwise");
+          break;
+        }
+        case V4L2_FRMSIZE_TYPE_CONTINUOUS: {
+          util::warning("continuous");
+          break;
+        }
+      }
+
       device.frame_sizes.push_back(vframesize);
 
       vframesize.index++;
     }
+
+    util::debug(list);
 
     if (device.frame_sizes.empty()) {
       util::warning("error getting " + device.path + " frame sizes");
@@ -265,9 +286,9 @@ void Webcam::find_devices_frame_intervals() {
         device.resolutions.emplace_back(width, height, vframeinterval.discrete.numerator,
                                         vframeinterval.discrete.denominator);
 
-        util::debug(util::to_string(width) + " x " + util::to_string(height) + " -> " +
-                    util::to_string(vframeinterval.discrete.numerator) + "/" +
-                    util::to_string(vframeinterval.discrete.denominator));
+        // util::debug(util::to_string(width) + " x " + util::to_string(height) + " -> " +
+        //             util::to_string(vframeinterval.discrete.numerator) + "/" +
+        //             util::to_string(vframeinterval.discrete.denominator));
 
         vframeinterval.index++;
       }
@@ -294,7 +315,7 @@ void Webcam::find_best_resolution() {
       double a_area = a_width * a_height;
       double b_area = b_width * b_height;
 
-      return a_frac < b_frac;
+      return a_frac < b_frac && a_area < b_area;
     });
 
     device.width = w;
