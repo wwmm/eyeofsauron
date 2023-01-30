@@ -111,6 +111,7 @@ Webcam::Webcam() {
   auto* out_type = gst_element_factory_make("typefind", nullptr);
   sink = gst_element_factory_make("fakesink", "video_sink");
 
+  g_object_set(source, "device", devices[0].path.c_str(), nullptr);
   g_object_set(source, "do-timestamp", 1, nullptr);
   g_object_set(videoconvertscale, "n-threads", n_cpu_cores, nullptr);
 
@@ -125,6 +126,12 @@ Webcam::Webcam() {
   g_object_set(source, "extra-controls", controls, nullptr);
 
   util::debug(gst_structure_to_string(controls));
+
+  if (devices.empty()) {
+    util::warning("could not find a suitable camera");
+
+    return;
+  }
 
   auto* caps = gst_caps_from_string(
       ("image/jpeg,framerate=" + util::to_string(devices[0].denominator) + "/" + util::to_string(devices[0].numerator) +
