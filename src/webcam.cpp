@@ -121,6 +121,8 @@ Webcam::Webcam() {
   g_object_set(source, "device", devices[0].path.c_str(), nullptr);
   g_object_set(source, "do-timestamp", 1, nullptr);
   g_object_set(videoconvertscale, "n-threads", n_cpu_cores, nullptr);
+  g_object_set(videoconvertscale, "method", 4, nullptr);  // Bilinear (multi-tap)
+  g_object_set(videoconvertscale, "add-borders", 0, nullptr);
 
   // disabling variable exposure because it leads to variable framerate
   auto* controls = gst_structure_new_empty("extra_controls");
