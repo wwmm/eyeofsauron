@@ -125,11 +125,11 @@ Webcam::Webcam() {
 
   // disabling variable exposure because it leads to variable framerate
   auto* controls = gst_structure_new_empty("extra_controls");
-  GValue auto_exposure = G_VALUE_INIT;
-  g_value_init(&auto_exposure, G_TYPE_INT);
-  g_value_set_int(&auto_exposure, 0);
+  GValue disable_camera_auto = G_VALUE_INIT;
+  g_value_init(&disable_camera_auto, G_TYPE_INT);
+  g_value_set_int(&disable_camera_auto, 0);
 
-  gst_structure_take_value(controls, "exposure_auto_priority", &auto_exposure);
+  gst_structure_take_value(controls, "exposure_dynamic_framerate", &disable_camera_auto);
 
   g_object_set(source, "extra-controls", controls, nullptr);
 
