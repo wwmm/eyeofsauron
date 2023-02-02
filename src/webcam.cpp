@@ -111,7 +111,7 @@ Webcam::Webcam() {
 
   source = gst_element_factory_make("v4l2src", "video_src");
   auto* queue = gst_element_factory_make("queue", nullptr);
-  auto* capsfilter_in = gst_element_factory_make("capsfilter", nullptr);
+  capsfilter_in = gst_element_factory_make("capsfilter", nullptr);
   auto* jpegdec = gst_element_factory_make("jpegdec", nullptr);
   auto* videoconvertscale = gst_element_factory_make("videoconvertscale", nullptr);
   capsfilter_out = gst_element_factory_make("capsfilter", nullptr);
@@ -404,4 +404,29 @@ auto Webcam::get_device_list() -> std::vector<std::string> {
   }
 
   return list;
+}
+
+void Webcam::set_device(const std::string& name) {
+  if (name.empty()) {
+    return;
+  }
+
+  stop();
+
+  for (const auto& device : devices) {
+    if (device.name == name) {
+      g_object_set(source, "device", device.path.c_str(), nullptr);
+
+      auto* caps = gst_caps_from_string(("image/jpeg,framerate=" + util::to_string(device.denominator) + "/" +
+                                         util::to_string(device.numerator) + ",width=" + std::to_string(device.width) +
+                                         ",height=" + std::to_string(device.height))
+                                            .c_str());
+
+      g_object_set(capsfilter_in, "caps", caps, nullptr);
+
+      gst_caps_unref(caps);
+    }
+  }
+
+  start();
 }

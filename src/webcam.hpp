@@ -26,6 +26,7 @@ class Webcam {
   void get_latency();
   void set_output_resolution(const int& width = 640, const int& height = 480);
   auto get_device_list() -> std::vector<std::string>;
+  void set_device(const std::string& name);
 
   sigc::signal<void(float)> new_framerate;
   sigc::signal<void(uint, uint)> new_frame_size;
@@ -33,7 +34,8 @@ class Webcam {
   sigc::signal<void(int)> new_latency;
 
  private:
-  GstElement *pipeline = nullptr, *source = nullptr, *sink = nullptr, *capsfilter_out = nullptr;
+  GstElement *pipeline = nullptr, *source = nullptr, *sink = nullptr, *capsfilter_out = nullptr,
+             *capsfilter_in = nullptr;
 
   GstBus* bus = nullptr;
 

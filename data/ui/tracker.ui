@@ -165,7 +165,7 @@
                         </child>
 
                         <child>
-                            <object class="GtkDropDown">
+                            <object class="GtkDropDown" id="dropdown_webcam">
                                 <property name="model">
                                     <object class="GtkStringList" id="device_list"> </object>
                                 </property>

@@ -29,6 +29,8 @@ struct Data {
 struct _Tracker {
   GtkBox parent_instance{};
 
+  GtkDropDown* dropdown_webcam;
+
   GtkStringList* device_list;
 
   ui::webcam::Webcam* webcam = nullptr;
@@ -292,6 +294,7 @@ void tracker_class_init(TrackerClass* klass) {
   gtk_widget_class_bind_template_child(widget_class, Tracker, webcam);
   gtk_widget_class_bind_template_child(widget_class, Tracker, chart_x);
   gtk_widget_class_bind_template_child(widget_class, Tracker, chart_y);
+  gtk_widget_class_bind_template_child(widget_class, Tracker, dropdown_webcam);
   gtk_widget_class_bind_template_child(widget_class, Tracker, device_list);
 
   gtk_widget_class_bind_template_callback(widget_class, on_start);
@@ -344,6 +347,16 @@ void tracker_init(Tracker* self) {
       }
     }
   });
+
+  g_signal_connect(self->dropdown_webcam, "notify::selected-item",
+                   G_CALLBACK(+[](GtkDropDown* dropdown, GParamSpec* pspec, Tracker* self) {
+                     if (auto selected_item = gtk_drop_down_get_selected_item(dropdown); selected_item != nullptr) {
+                       auto name = gtk_string_object_get_string(GTK_STRING_OBJECT(selected_item));
+
+                       webcam_obj->set_device(name);
+                     }
+                   }),
+                   self);
 
   for (const auto& name : webcam_obj->get_device_list()) {
     ui::append_to_string_list(self->device_list, name);
