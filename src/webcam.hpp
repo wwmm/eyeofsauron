@@ -25,6 +25,7 @@ class Webcam {
   void stop();
   void get_latency();
   void set_output_resolution(const int& width = 640, const int& height = 480);
+  auto get_device_list() -> std::vector<std::string>;
 
   sigc::signal<void(float)> new_framerate;
   sigc::signal<void(uint, uint)> new_frame_size;
@@ -39,7 +40,7 @@ class Webcam {
   GstClockTime state_check_timeout = 5 * GST_SECOND;
 
   struct Devices {
-    std::string path;
+    std::string path, name;
 
     v4l2_fmtdesc format_description;
 

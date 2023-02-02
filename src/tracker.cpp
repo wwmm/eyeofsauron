@@ -29,6 +29,8 @@ struct Data {
 struct _Tracker {
   GtkBox parent_instance{};
 
+  GtkStringList* device_list;
+
   ui::webcam::Webcam* webcam = nullptr;
 
   ui::chart::Chart *chart_x = nullptr, *chart_y = nullptr;
@@ -290,6 +292,7 @@ void tracker_class_init(TrackerClass* klass) {
   gtk_widget_class_bind_template_child(widget_class, Tracker, webcam);
   gtk_widget_class_bind_template_child(widget_class, Tracker, chart_x);
   gtk_widget_class_bind_template_child(widget_class, Tracker, chart_y);
+  gtk_widget_class_bind_template_child(widget_class, Tracker, device_list);
 
   gtk_widget_class_bind_template_callback(widget_class, on_start);
   gtk_widget_class_bind_template_callback(widget_class, on_pause);
@@ -342,7 +345,9 @@ void tracker_init(Tracker* self) {
     }
   });
 
-  // self->app_settings = g_settings_new(tags::app::id);
+  for (const auto& name : webcam_obj->get_device_list()) {
+    ui::append_to_string_list(self->device_list, name);
+  }
 }
 
 auto create() -> Tracker* {

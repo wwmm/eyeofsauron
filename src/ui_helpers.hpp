@@ -21,6 +21,10 @@ auto parse_spinbutton_input(GtkSpinButton* button, double* new_value) -> int;
 
 void save_widget_to_png(GtkWidget* widget, const std::string& path);
 
+void append_to_string_list(GtkStringList* string_list, const std::string& name);
+
+void remove_from_string_list(GtkStringList* string_list, const std::string& name);
+
 template <StringLiteralWrapper sl_wrapper>
 void prepare_spinbutton(GtkSpinButton* button) {
   if (button == nullptr) {

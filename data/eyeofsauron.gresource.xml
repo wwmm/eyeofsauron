@@ -4,6 +4,7 @@
         <file>ui/custom.css</file>
         <file>ui/application_window.ui</file>
         <file>ui/chart.ui</file>
+        <file>ui/factory_webcam_dropdown.ui</file>
         <file>ui/preferences_general.ui</file>
         <file>ui/preferences_window.ui</file>
         <file>ui/shortcuts.ui</file>

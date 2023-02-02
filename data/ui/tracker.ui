@@ -127,34 +127,53 @@
 
                 <child type="start">
                     <object class="GtkBox">
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
-
-                        <style>
-                            <class name="linked" />
-                        </style>
+                        <property name="spacing">6</property>
 
                         <child>
-                            <object class="GtkButton" id="start">
+                            <object class="GtkBox">
+                                <property name="halign">center</property>
                                 <property name="valign">center</property>
-                                <property name="icon_name">media-playback-start-symbolic</property>
-                                <signal name="clicked" handler="on_start" object="Tracker" />
+
+                                <style>
+                                    <class name="linked" />
+                                </style>
+
+                                <child>
+                                    <object class="GtkButton" id="start">
+                                        <property name="valign">center</property>
+                                        <property name="icon_name">media-playback-start-symbolic</property>
+                                        <signal name="clicked" handler="on_start" object="Tracker" />
+                                    </object>
+                                </child>
+
+                                <child>
+                                    <object class="GtkButton" id="pause">
+                                        <property name="valign">center</property>
+                                        <property name="icon_name">media-playback-pause-symbolic</property>
+                                        <signal name="clicked" handler="on_pause" object="Tracker" />
+                                    </object>
+                                </child>
+
+                                <child>
+                                    <object class="GtkButton" id="stop">
+                                        <property name="valign">center</property>
+                                        <property name="icon_name">media-playback-stop-symbolic</property>
+                                        <signal name="clicked" handler="on_stop" object="Tracker" />
+                                    </object>
+                                </child>
                             </object>
                         </child>
 
                         <child>
-                            <object class="GtkButton" id="pause">
-                                <property name="valign">center</property>
-                                <property name="icon_name">media-playback-pause-symbolic</property>
-                                <signal name="clicked" handler="on_pause" object="Tracker" />
-                            </object>
-                        </child>
-
-                        <child>
-                            <object class="GtkButton" id="stop">
-                                <property name="valign">center</property>
-                                <property name="icon_name">media-playback-stop-symbolic</property>
-                                <signal name="clicked" handler="on_stop" object="Tracker" />
+                            <object class="GtkDropDown">
+                                <property name="model">
+                                    <object class="GtkStringList" id="device_list"> </object>
+                                </property>
+                                <property name="factory">
+                                    <object class="GtkBuilderListItemFactory">
+                                        <property name="resource">/com/github/wwmm/eyeofsauron/ui/factory_webcam_dropdown.ui</property>
+                                    </object>
+                                </property>
                             </object>
                         </child>
                     </object>
