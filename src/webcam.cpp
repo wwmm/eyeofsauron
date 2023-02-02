@@ -48,10 +48,10 @@ void on_output_type_changed(GstElement* typefind, guint probability, GstCaps* ca
 
   util::idle_add([=]() { wc->new_frame_size.emit(width, height); });
 
-  util::debug(wc->log_tag + "acquisition frame rate: " + std::to_string(framerate_numerator) + "/" +
-              std::to_string(framerate_denomimnator));
-  util::debug(wc->log_tag + "output width: " + std::to_string(width));
-  util::debug(wc->log_tag + "output height: " + std::to_string(height));
+  util::debug(wc->log_tag + "acquisition frame rate: " + util::to_string(framerate_numerator) + "/" +
+              util::to_string(framerate_denomimnator));
+  util::debug(wc->log_tag + "output width: " + util::to_string(width));
+  util::debug(wc->log_tag + "output height: " + util::to_string(height));
 }
 
 auto on_probe_buffer(GstPad* pad, GstPadProbeInfo* info, gpointer user_data) -> GstPadProbeReturn {
@@ -79,7 +79,7 @@ Webcam::Webcam() {
 
   uint n_cpu_cores = std::thread::hardware_concurrency();
 
-  util::debug("videoconvert plugin will use " + std::to_string(n_cpu_cores) + " cpu cores");
+  util::debug("videoconvert plugin will use " + util::to_string(n_cpu_cores) + " cpu cores");
 
   find_devices();
 
@@ -137,7 +137,7 @@ Webcam::Webcam() {
 
   auto* caps = gst_caps_from_string(
       ("image/jpeg,framerate=" + util::to_string(devices[0].denominator) + "/" + util::to_string(devices[0].numerator) +
-       ",width=" + std::to_string(devices[0].width) + ",height=" + std::to_string(devices[0].height))
+       ",width=" + util::to_string(devices[0].width) + ",height=" + util::to_string(devices[0].height))
           .c_str());
 
   g_object_set(capsfilter_in, "caps", caps, nullptr);
@@ -366,7 +366,7 @@ void Webcam::stop() {
 
 void Webcam::set_output_resolution(const int& width, const int& height) {
   auto* caps = gst_caps_from_string(
-      std::string("video/x-raw,format=RGB,width=" + std::to_string(width) + ",height=" + std::to_string(height))
+      std::string("video/x-raw,format=RGB,width=" + util::to_string(width) + ",height=" + util::to_string(height))
           .c_str());
 
   g_object_set(capsfilter_out, "caps", caps, nullptr);
@@ -386,7 +386,7 @@ void Webcam::get_latency() {
 
     int latency = GST_TIME_AS_MSECONDS(min);
 
-    util::debug(log_tag + "total latency: " + std::to_string(latency) + " ms");
+    util::debug(log_tag + "total latency: " + util::to_string(latency) + " ms");
 
     util::idle_add([=, this]() { new_latency.emit(latency); });
   }
@@ -418,8 +418,8 @@ void Webcam::set_device(const std::string& name) {
       g_object_set(source, "device", device.path.c_str(), nullptr);
 
       auto* caps = gst_caps_from_string(("image/jpeg,framerate=" + util::to_string(device.denominator) + "/" +
-                                         util::to_string(device.numerator) + ",width=" + std::to_string(device.width) +
-                                         ",height=" + std::to_string(device.height))
+                                         util::to_string(device.numerator) + ",width=" + util::to_string(device.width) +
+                                         ",height=" + util::to_string(device.height))
                                             .c_str());
 
       g_object_set(capsfilter_in, "caps", caps, nullptr);
@@ -429,4 +429,24 @@ void Webcam::set_device(const std::string& name) {
   }
 
   start();
+}
+
+auto Webcam::get_configured_fps() -> std::string {
+  std::string fps;
+
+  gchar* strval = nullptr;
+
+  g_object_get(source, "device", &strval, nullptr);
+
+  if (strval != nullptr) {
+    for (const auto& device : devices) {
+      if (device.name == strval) {
+        fps = util::to_string(device.numerator) + "/" + util::to_string(device.denominator);
+      }
+    }
+  }
+
+  g_free(strval);
+
+  return fps;
 }

@@ -176,6 +176,14 @@
                                 </property>
                             </object>
                         </child>
+
+                        <child>
+                            <object class="GtkLabel" id="fps_label">
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="label" translatable="yes"></property>
+                            </object>
+                        </child>
                     </object>
                 </child>
             </object>

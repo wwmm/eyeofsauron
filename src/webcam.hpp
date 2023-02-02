@@ -21,12 +21,20 @@ class Webcam {
   std::string log_tag = "webcam: ";
 
   void start();
+
   void pause();
+
   void stop();
+
   void get_latency();
+
   void set_output_resolution(const int& width = 640, const int& height = 480);
+
   auto get_device_list() -> std::vector<std::string>;
+
   void set_device(const std::string& name);
+
+  auto get_configured_fps() -> std::string;
 
   sigc::signal<void(float)> new_framerate;
   sigc::signal<void(uint, uint)> new_frame_size;

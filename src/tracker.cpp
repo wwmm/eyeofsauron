@@ -29,9 +29,11 @@ struct Data {
 struct _Tracker {
   GtkBox parent_instance{};
 
-  GtkDropDown* dropdown_webcam;
+  GtkDropDown* dropdown_webcam{};
 
-  GtkStringList* device_list;
+  GtkLabel* fps_label{};
+
+  GtkStringList* device_list{};
 
   ui::webcam::Webcam* webcam = nullptr;
 
@@ -296,6 +298,7 @@ void tracker_class_init(TrackerClass* klass) {
   gtk_widget_class_bind_template_child(widget_class, Tracker, chart_y);
   gtk_widget_class_bind_template_child(widget_class, Tracker, dropdown_webcam);
   gtk_widget_class_bind_template_child(widget_class, Tracker, device_list);
+  gtk_widget_class_bind_template_child(widget_class, Tracker, fps_label);
 
   gtk_widget_class_bind_template_callback(widget_class, on_start);
   gtk_widget_class_bind_template_callback(widget_class, on_pause);
