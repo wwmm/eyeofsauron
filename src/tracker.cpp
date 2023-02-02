@@ -351,19 +351,25 @@ void tracker_init(Tracker* self) {
     }
   });
 
+  auto device_list = webcam_obj->get_device_list();
+
+  for (const auto& name : device_list) {
+    ui::append_to_string_list(self->device_list, name);
+  }
+
+  gtk_label_set_text(self->fps_label, webcam_obj->get_configured_fps().c_str());
+
   g_signal_connect(self->dropdown_webcam, "notify::selected-item",
                    G_CALLBACK(+[](GtkDropDown* dropdown, GParamSpec* pspec, Tracker* self) {
                      if (auto selected_item = gtk_drop_down_get_selected_item(dropdown); selected_item != nullptr) {
                        auto name = gtk_string_object_get_string(GTK_STRING_OBJECT(selected_item));
 
                        webcam_obj->set_device(name);
+
+                       gtk_label_set_text(self->fps_label, webcam_obj->get_configured_fps().c_str());
                      }
                    }),
                    self);
-
-  for (const auto& name : webcam_obj->get_device_list()) {
-    ui::append_to_string_list(self->device_list, name);
-  }
 }
 
 auto create() -> Tracker* {

@@ -440,8 +440,10 @@ auto Webcam::get_configured_fps() -> std::string {
 
   if (strval != nullptr) {
     for (const auto& device : devices) {
-      if (device.name == strval) {
+      if (device.path == strval) {
         fps = util::to_string(device.numerator) + "/" + util::to_string(device.denominator);
+
+        break;
       }
     }
   }
