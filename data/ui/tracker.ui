@@ -28,7 +28,7 @@
                             <object class="AdwViewStackPage">
                                 <property name="name">chart_x</property>
                                 <property name="title" translatable="yes">x</property>
-                                <property name="icon-name">wwlab-plot-symbolic</property>
+                                <property name="icon-name">eye-of-sauron-plot-symbolic</property>
                                 <property name="child">
                                     <object class="Chart" id="chart_x">
                                         <property name="valign">start</property>
@@ -42,7 +42,7 @@
                                 class="AdwViewStackPage">
                                 <property name="name">chart_y</property>
                                 <property name="title" translatable="yes">y</property>
-                                <property name="icon-name">wwlab-plot-symbolic</property>
+                                <property name="icon-name">eye-of-sauron-plot-symbolic</property>
                                 <property name="child">
                                     <object class="Chart" id="chart_y">
                                         <property name="valign">start</property>

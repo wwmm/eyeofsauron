@@ -13,15 +13,10 @@
         <file>ui/sound_wave.glade</file>
         <file>icons/about_icon.png</file>
         <file>icons/offline.png</file>
-        <file>icons/eye-of-sauron-arduino-symbolic.svg</file>
-        <file>icons/eye-of-sauron-x-symbolic.svg</file>
-        <file>icons/eye-of-sauron-y-symbolic.svg</file>
-        <file>icons/eye-of-sauron-histogram-symbolic.svg</file>
-        <file>icons/eye-of-sauron-plot-symbolic.svg</file>
-        <file>icons/eye-of-sauron-rx-symbolic.svg</file>
-        <file>icons/eye-of-sauron-ry-symbolic.svg</file>
-        <file>icons/eye-of-sauron-sine-symbolic.svg</file>
-        <file>icons/eye-of-sauron-waveform-symbolic.svg</file>
-        <file>icons/eye-of-sauron-xy-symbolic.svg</file>
+        <file>icons/scalable/emblems/eye-of-sauron-arduino-symbolic.svg</file>
+        <file>icons/scalable/emblems/eye-of-sauron-histogram-symbolic.svg</file>
+        <file>icons/scalable/emblems/eye-of-sauron-plot-symbolic.svg</file>
+        <file>icons/scalable/emblems/eye-of-sauron-sine-symbolic.svg</file>
+        <file>icons/scalable/emblems/eye-of-sauron-waveform-symbolic.svg</file>
     </gresource>
 </gresources>
