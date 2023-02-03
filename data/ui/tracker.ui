@@ -7,19 +7,20 @@
         <property name="margin-bottom">6</property>
         <property name="spacing">6</property>
         <property name="orientation">vertical</property>
+
         <child>
             <object class="GtkBox">
                 <property name="spacing">6</property>
 
                 <child>
-                    <object class="Webcam" id="webcam"></object>
+                    <object class="Webcam" id="webcam">
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                    </object>
                 </child>
 
                 <child>
                     <object class="AdwViewStack" id="stack_chart">
-                        <property name="hexpand">1</property>
-                        <property name="vexpand">1</property>
-
                         <signal name="notify::visible-child"
                             handler="on_stack_visible_child_changed"
                             object="Tracker" />
@@ -30,9 +31,7 @@
                                 <property name="title" translatable="yes">x</property>
                                 <property name="icon-name">eye-of-sauron-plot-symbolic</property>
                                 <property name="child">
-                                    <object class="Chart" id="chart_x">
-                                        <property name="valign">start</property>
-                                    </object>
+                                    <object class="Chart" id="chart_x"> </object>
                                 </property>
                             </object>
                         </child>
@@ -44,9 +43,7 @@
                                 <property name="title" translatable="yes">y</property>
                                 <property name="icon-name">eye-of-sauron-plot-symbolic</property>
                                 <property name="child">
-                                    <object class="Chart" id="chart_y">
-                                        <property name="valign">start</property>
-                                    </object>
+                                    <object class="Chart" id="chart_y"> </object>
                                 </property>
                             </object>
                         </child>

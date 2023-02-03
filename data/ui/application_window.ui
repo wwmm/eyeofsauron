@@ -34,6 +34,7 @@
         <property name="content">
             <object class="GtkBox">
                 <property name="orientation">vertical</property>
+
                 <child>
                     <object class="AdwHeaderBar">
                         <property name="centering-policy">strict</property>
@@ -59,10 +60,7 @@
                 </child>
 
                 <child>
-                    <object class="AdwViewStack" id="stack">
-                        <property name="hexpand">1</property>
-                        <property name="vexpand">1</property>
-                    </object>
+                    <object class="AdwViewStack" id="stack"> </object>
                 </child>
 
                 <accessibility>
