@@ -99,6 +99,10 @@ void on_new_frame(Tracker* self, const std::vector<guint8>& vector_frame, const 
     double yc = roi_n.y + roi_n.height * 0.5;
     double t = static_cast<double>(timestamp - initial_time) / 1000000000.0;
 
+    // changing the coordinate system origin to the bottom left corner
+
+    yc = frame_height - yc;
+
     ui::chart::add_point(self->chart_x, static_cast<int>(n), t, xc);
     ui::chart::update(self->chart_x);
 
