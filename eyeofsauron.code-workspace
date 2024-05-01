@@ -11,6 +11,13 @@
       "--buildtype=debugoptimized",
       "--cpp_std=c++17"
     ],
+    "C_Cpp.clang_format_sortIncludes": true,
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.intelliSenseMode": "clang-x64",
+    "C_Cpp.clang_format_path": "/usr/bin/clang-format",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.enhancedColorization": "Enabled",
+    "C_Cpp.updateChannel": "Insiders",
     "editor.formatOnSave": true,
     "editor.rulers": [120],
     "files.associations": {
@@ -81,10 +88,15 @@
       "memory_resource": "cpp",
       "random": "cpp",
       "cfenv": "cpp",
-      "cinttypes": "cpp"
+      "cinttypes": "cpp",
+      "scoped_allocator": "cpp",
+      "filesystem": "cpp"
     },
-    "xml.format.joinContentLines": true,
-    "clangd.arguments": ["--header-insertion=never"],
+    "clangd.arguments": [
+      "--header-insertion=never",
+      "--enable-config",
+      "--clang-tidy"
+    ],
     "xml.format.maxLineWidth": 150
   }
 }

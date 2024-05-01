@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/ui">
+        <file alias="main.qml">contents/ui/main.qml</file>
+        <file alias="Common.js">contents/ui/Common.js</file>
+    </qresource>
+</RCC>

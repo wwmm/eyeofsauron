@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<interface domain="eye_of_sauron">
-    <template class="Webcam" parent="GtkWidget">
-        <property name="width-request">640</property>
-        <property name="height-request">480</property>
-    </template>
-</interface>
