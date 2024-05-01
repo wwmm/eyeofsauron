@@ -18,7 +18,7 @@ sha512sums=('SKIP')
 pkgver() {
   cd eyeofsauron
   # git describe --long | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
-  git describe --long | sed 's/^v//;s/^heads\///;s/\([^-]*-g\)/r\1/;s/-/./g'
+  git describe --long --all | sed 's/^v//;s/^heads\///;s/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 build() {
