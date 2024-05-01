@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.28)
 project(eyeofsauron VERSION 0.0.1 LANGUAGES CXX C)
 
 set(APPLICATION_DOMAIN "eyeofsauron")
-set(APPLICATION_NAME "eyeofsauron")
+set(APPLICATION_NAME "eye of sauron")
 set(COMPONENT_NAME "eyeofsauron")
 set(ORGANIZATION_NAME "WWMM")
 set(ORGANIZATION_DOMAIN "com.github.wwmm")

@@ -1,0 +1,168 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://github.com/wwmm/eyeofsauron/issues\n"
+"POT-Creation-Date: 2024-05-01 20:07-0300\n"
+"PO-Revision-Date: 2024-04-23 14:42-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.2\n"
+
+#: src/contents/ui/main.qml:17
+msgctxt "@title:window"
+msgid "Eye Of Sauron"
+msgstr ""
+
+#: src/contents/ui/main.qml:92 src/contents/ui/main.qml:161
+msgid "Quit"
+msgstr "Sair"
+
+#: src/contents/ui/main.qml:145
+msgid "Preferences"
+msgstr "Preferências"
+
+#: src/contents/ui/main.qml:153
+msgid "About Eye Of Sauron"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:6
+msgid "General"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:13
+msgid "Show Tray Icon"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:9
+msgid "Sound Wave"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:15 src/contents/ui/Tracker.qml:15
+msgctxt "@action:button"
+msgid "Play"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:19 src/contents/ui/Tracker.qml:19
+msgctxt "@action:button"
+msgid "Pause"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:23 src/contents/ui/Tracker.qml:23
+msgctxt "@action:button"
+msgid "Stop"
+msgstr ""
+
+#: src/contents/ui/Tracker.qml:9
+msgid "Tracker"
+msgstr ""
+
+#: src/main.cpp:56 com.github.wwmm.eyeofsauron.desktop.template.h:3
+msgid "Using webcams and the power of the Middle-earth in your Physics classes"
+msgstr ""
+
+#: src/main.cpp:57
+msgid "(c) 2024"
+msgstr ""
+
+#: src/main.cpp:60
+msgctxt "@info:credit"
+msgid "Wellington Wallace"
+msgstr ""
+
+#: src/main.cpp:60
+msgctxt "@info:credit"
+msgid "Developer"
+msgstr "Desenvolvedor"
+
+#. i18n: file: src/contents/kcfg/cfg_window.kcfg:8
+#. i18n: ectx: label, entry (width), group (Window)
+#: rc.cpp:3
+msgid "Width of the main window."
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/cfg_window.kcfg:12
+#. i18n: ectx: label, entry (height), group (Window)
+#: rc.cpp:6
+msgid "Height of the main window."
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/cfg_window.kcfg:16
+#. i18n: ectx: label, entry (showTrayIcon), group (Window)
+#: rc.cpp:9
+msgid "Show the tray icon."
+msgstr ""
+
+#: com.github.wwmm.eyeofsauron.desktop.template.h:1
+msgid "Eye Of Sauron"
+msgstr ""
+
+#: com.github.wwmm.eyeofsauron.desktop.template.h:2
+msgid "Object Tracker"
+msgstr ""
+
+#~ msgid "Disk"
+#~ msgstr "Disco"
+
+#~ msgid "Name"
+#~ msgstr "Nome"
+
+#~ msgid "Value"
+#~ msgstr "Valor"
+
+#, fuzzy
+#~ msgid "Preset: "
+#~ msgstr "Predefinições"
+
+#~ msgid "Apply"
+#~ msgstr "Aplicar"
+
+#~ msgid "Presets"
+#~ msgstr "Predefinições"
+
+#~ msgid "Executable Name"
+#~ msgstr "Nome do Executável"
+
+#~ msgid "Memory"
+#~ msgstr "Memória"
+
+#~ msgid "Enabled"
+#~ msgstr "Habilitado"
+
+#~ msgid "Virtual"
+#~ msgstr "Virtual"
+
+#~ msgid "Mode"
+#~ msgstr "Modo"
+
+#~ msgid "Create Preset"
+#~ msgstr "Criar Predefinição"
+
+#~ msgid "Search"
+#~ msgstr "Busca"
+
+#, fuzzy
+#~ msgid "Preset:    "
+#~ msgstr "Última Predefinição Utilizada: "
+
+#, fuzzy
+#~ msgid "Last used preset."
+#~ msgstr "Última Predefinição Utilizada: "
+
+#~ msgid "FastGame"
+#~ msgstr "FastGame"
+
+#~ msgid "System Settings Tweak"
+#~ msgstr "Ajustador de Configurações do Sistema"
+
+#~ msgid "Tweak system performance for games"
+#~ msgstr "Ajustar a Performance do Sistema para Jogos"

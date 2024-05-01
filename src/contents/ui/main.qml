@@ -1,6 +1,5 @@
-import AboutFG
+import AboutEoS
 import CfgWindow
-import FGPresetsBackend
 import Qt.labs.platform
 import QtQuick
 import QtQuick.Controls as Controls
@@ -13,9 +12,9 @@ Kirigami.ApplicationWindow {
 
     width: CfgWindow.width
     height: CfgWindow.height
-    pageStack.initialPage: environmentVariables
+    pageStack.initialPage: tracker
     pageStack.globalToolBar.style: Kirigami.Settings.isMobile ? Kirigami.ApplicationHeaderStyle.Titles : Kirigami.ApplicationHeaderStyle.Auto
-    title: i18nc("@title:window", "FastGame")
+    title: i18nc("@title:window", "Eye Of Sauron")
     onWidthChanged: {
         CfgWindow.width = applicationWindow().width;
     }
@@ -28,47 +27,15 @@ Kirigami.ApplicationWindow {
 
     }
 
-    EnvironmentVariables {
-        id: environmentVariables
+    Tracker {
+        id: tracker
 
         visible: true
     }
 
-    CommandLineArguments {
-        id: cmdArguments
+    SoundWave {
+        id: soundWave
 
-        visible: false
-    }
-
-    Cpu {
-        id: cpu
-
-        visible: false
-    }
-
-    Memory {
-        id: memory
-
-        visible: false
-    }
-
-    Disk {
-        id: disk
-
-        visible: false
-    }
-
-    Amdgpu {
-        id: amdgpu
-
-        title: i18n("AMDGPU")
-        visible: false
-    }
-
-    Nvidia {
-        id: nvidia
-
-        title: i18n("Nvidia")
         visible: false
     }
 
@@ -78,13 +45,9 @@ Kirigami.ApplicationWindow {
         Kirigami.AboutPage {
             implicitWidth: Kirigami.Units.gridUnit * 24
             implicitHeight: Kirigami.Units.gridUnit * 21
-            aboutData: AboutFG
+            aboutData: AboutEoS
         }
 
-    }
-
-    PresetsMenu {
-        id: presetsMenu
     }
 
     Kirigami.OverlayDrawer {
@@ -111,7 +74,7 @@ Kirigami.ApplicationWindow {
         id: tray
 
         visible: CfgWindow.showTrayIcon
-        icon.name: "fastgame"
+        icon.name: "eyeofsauron"
         onActivated: {
             if (!root.visible) {
                 root.show();
@@ -124,14 +87,6 @@ Kirigami.ApplicationWindow {
 
         menu: Menu {
             visible: false
-
-            MenuItem {
-                text: i18n("Preset: " + CfgWindow.lastUsedPreset)
-                enabled: false
-            }
-
-            MenuSeparator {
-            }
 
             MenuItem {
                 text: i18n("Quit")
@@ -150,14 +105,6 @@ Kirigami.ApplicationWindow {
 
     }
 
-    Connections {
-        function onSettingsApplied() {
-            progressBottomDrawer.close();
-        }
-
-        target: FGPresetsBackend
-    }
-
     globalDrawer: Kirigami.GlobalDrawer {
         id: globalDrawer
 
@@ -167,83 +114,24 @@ Kirigami.ApplicationWindow {
         modal: Kirigami.Settings.isMobile ? true : false
         actions: [
             Kirigami.Action {
-                text: environmentVariables.title
+                text: tracker.title
                 icon.name: "document-properties-symbolic"
-                checked: environmentVariables.visible
+                checked: tracker.visible
                 onTriggered: {
-                    if (!environmentVariables.visible) {
+                    if (!tracker.visible) {
                         while (pageStack.depth > 0)pageStack.pop()
-                        pageStack.push(environmentVariables);
+                        pageStack.push(tracker);
                     }
                 }
             },
             Kirigami.Action {
-                text: cmdArguments.title
+                text: soundWave.title
                 icon.name: "dialog-scripts"
-                checked: cmdArguments.visible
+                checked: soundWave.visible
                 onTriggered: {
-                    if (!cmdArguments.visible) {
+                    if (!soundWave.visible) {
                         while (pageStack.depth > 0)pageStack.pop()
-                        pageStack.push(cmdArguments);
-                    }
-                }
-            },
-            Kirigami.Action {
-                text: cpu.title
-                icon.name: "show-gpu-effects-symbolic"
-                checked: cpu.visible
-                onTriggered: {
-                    if (!cpu.visible) {
-                        while (pageStack.depth > 0)pageStack.pop()
-                        pageStack.push(cpu);
-                    }
-                }
-            },
-            Kirigami.Action {
-                text: memory.title
-                icon.name: "media-flash-memory-stick"
-                checked: memory.visible
-                onTriggered: {
-                    if (!memory.visible) {
-                        while (pageStack.depth > 0)pageStack.pop()
-                        pageStack.push(memory);
-                    }
-                }
-            },
-            Kirigami.Action {
-                text: disk.title
-                icon.name: "drive-harddisk"
-                checked: disk.visible
-                onTriggered: {
-                    if (!disk.visible) {
-                        while (pageStack.depth > 0)pageStack.pop()
-                        pageStack.push(disk);
-                    }
-                }
-            },
-            Kirigami.Action {
-                text: amdgpu.title
-                icon.name: "show-gpu-effects-symbolic"
-                checked: amdgpu.visible
-                enabled: amdgpu.available
-                visible: amdgpu.available
-                onTriggered: {
-                    if (!amdgpu.visible) {
-                        while (pageStack.depth > 0)pageStack.pop()
-                        pageStack.push(amdgpu);
-                    }
-                }
-            },
-            Kirigami.Action {
-                text: nvidia.title
-                icon.name: "show-gpu-effects-symbolic"
-                checked: nvidia.visible
-                enabled: nvidia.available
-                visible: nvidia.available
-                onTriggered: {
-                    if (!nvidia.visible) {
-                        while (pageStack.depth > 0)pageStack.pop()
-                        pageStack.push(nvidia);
+                        pageStack.push(soundWave);
                     }
                 }
             }
@@ -254,23 +142,6 @@ Kirigami.ApplicationWindow {
             contentItem: Kirigami.ActionToolBar {
                 actions: [
                     Kirigami.Action {
-                        text: i18n("Apply")
-                        icon.name: "dialog-ok-apply-symbolic"
-                        displayHint: Kirigami.DisplayHint.KeepVisible
-                        onTriggered: {
-                            progressBottomDrawer.open();
-                            FGPresetsBackend.applySettings();
-                        }
-                    },
-                    Kirigami.Action {
-                        text: i18n("Presets")
-                        icon.name: "bookmarks-symbolic"
-                        displayHint: Kirigami.DisplayHint.KeepVisible
-                        onTriggered: {
-                            presetsMenu.open();
-                        }
-                    },
-                    Kirigami.Action {
                         text: i18n("Preferences")
                         icon.name: "gtk-preferences"
                         displayHint: Kirigami.DisplayHint.AlwaysHide
@@ -279,8 +150,8 @@ Kirigami.ApplicationWindow {
                         }
                     },
                     Kirigami.Action {
-                        text: i18n("About FastGame")
-                        icon.name: "fastgame"
+                        text: i18n("About Eye Of Sauron")
+                        icon.name: "eyeofsauron"
                         displayHint: Kirigami.DisplayHint.AlwaysHide
                         onTriggered: {
                             aboutDialog.open();
@@ -301,43 +172,6 @@ Kirigami.ApplicationWindow {
                     leftMargin: Kirigami.Units.smallSpacing
                     right: parent.right
                     rightMargin: Kirigami.Units.smallSpacing
-                }
-
-            }
-
-        }
-
-        footer: Controls.ToolBar {
-
-            contentItem: RowLayout {
-                Kirigami.ActionTextField {
-                    id: executableName
-
-                    visible: !globalDrawer.collapsed
-                    Layout.fillWidth: true
-                    placeholderText: i18n("Executable Name")
-                    text: FGPresetsBackend.executableName
-                    onTextChanged: {
-                        if (text !== FGPresetsBackend.executableName)
-                            FGPresetsBackend.executableName = text;
-
-                    }
-                    rightActions: [
-                        Kirigami.Action {
-                            icon.name: "edit-clear"
-                            onTriggered: {
-                                executableName.text = "";
-                                executableName.accepted();
-                            }
-                        }
-                    ]
-
-                    Binding {
-                        target: executableName
-                        property: "text"
-                        value: FGPresetsBackend.executableName
-                    }
-
                 }
 
             }

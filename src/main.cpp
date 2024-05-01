@@ -63,8 +63,8 @@ void construct_about_window() {
   // Set aboutData as information about the app
   KAboutData::setApplicationData(aboutData);
 
-  qmlRegisterSingletonType("AboutEOS",  // How the import statement should look like
-                           VERSION_MAJOR, VERSION_MINOR, "AboutEOS", [](QQmlEngine* engine, QJSEngine*) -> QJSValue {
+  qmlRegisterSingletonType("AboutEoS",  // How the import statement should look like
+                           VERSION_MAJOR, VERSION_MINOR, "AboutEoS", [](QQmlEngine* engine, QJSEngine*) -> QJSValue {
                              return engine->toScriptValue(KAboutData::applicationData());
                            });
 }
