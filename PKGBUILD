@@ -1,7 +1,7 @@
 # Maintainer: Wellington <wellingtonwallace@gmail.com>
 
 pkgname=eyeofsauron-git
-pkgver=1.0.0.r0.g33d7979
+pkgver=eosqt.r0.g137e67c
 pkgrel=1
 pkgdesc='Optimize system performance for games'
 arch=(x86_64 i686)
@@ -17,7 +17,8 @@ sha512sums=('SKIP')
 
 pkgver() {
   cd eyeofsauron
-  git describe --long | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+  # git describe --long | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+  git describe --long | sed 's/^v//;s/^heads\///;s/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 build() {
