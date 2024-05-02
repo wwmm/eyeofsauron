@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/wwmm/eyeofsauron/issues\n"
-"POT-Creation-Date: 2024-05-01 20:07-0300\n"
+"POT-Creation-Date: 2024-05-01 23:02-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,15 +22,15 @@ msgctxt "@title:window"
 msgid "Eye Of Sauron"
 msgstr ""
 
-#: src/contents/ui/main.qml:92 src/contents/ui/main.qml:161
+#: src/contents/ui/main.qml:92 src/contents/ui/main.qml:175
 msgid "Quit"
 msgstr ""
 
-#: src/contents/ui/main.qml:145
+#: src/contents/ui/main.qml:159
 msgid "Preferences"
 msgstr ""
 
-#: src/contents/ui/main.qml:153
+#: src/contents/ui/main.qml:167
 msgid "About Eye Of Sauron"
 msgstr ""
 
@@ -46,23 +46,40 @@ msgstr ""
 msgid "Sound Wave"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:15 src/contents/ui/Tracker.qml:15
+#: src/contents/ui/SoundWave.qml:15 src/contents/ui/Tracker.qml:17
 msgctxt "@action:button"
 msgid "Play"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:19 src/contents/ui/Tracker.qml:19
+#: src/contents/ui/SoundWave.qml:19 src/contents/ui/Tracker.qml:21
 msgctxt "@action:button"
 msgid "Pause"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:23 src/contents/ui/Tracker.qml:23
+#: src/contents/ui/SoundWave.qml:23 src/contents/ui/Tracker.qml:25
 msgctxt "@action:button"
 msgid "Stop"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:9
-msgid "Tracker"
+#: src/contents/ui/SoundWave.qml:30 src/contents/ui/Tracker.qml:106
+msgid "Points"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:35 src/contents/ui/Tracker.qml:111
+msgid "points"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:45 src/contents/ui/Tracker.qml:121
+msgid "Save Chart"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:49 src/contents/ui/Tracker.qml:125
+msgid "Save Table"
+msgstr ""
+
+#: src/contents/ui/Tracker.qml:11
+#: com.github.wwmm.eyeofsauron.desktop.template.h:2
+msgid "Object Tracker"
 msgstr ""
 
 #: src/main.cpp:56 com.github.wwmm.eyeofsauron.desktop.template.h:3
@@ -103,8 +120,4 @@ msgstr ""
 
 #: com.github.wwmm.eyeofsauron.desktop.template.h:1
 msgid "Eye Of Sauron"
-msgstr ""
-
-#: com.github.wwmm.eyeofsauron.desktop.template.h:2
-msgid "Object Tracker"
 msgstr ""

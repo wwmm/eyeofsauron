@@ -4,7 +4,7 @@ _GenericName=Object Tracker
 _Comment=Using webcams and the power of the Middle-earth in your Physics classes
 Keywords=opencv;object;tracker;image;vision;
 Categories=GTK;AudioVideo;Video;Audio;
-Exec=wwplot
+Exec=eyeofsauron
 # Translators: This is an icon name, don't translate!
 Icon=eye_of_sauron
 StartupNotify=true
