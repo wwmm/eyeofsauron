@@ -115,7 +115,7 @@ Kirigami.ApplicationWindow {
         actions: [
             Kirigami.Action {
                 text: tracker.title
-                icon.name: "document-properties-symbolic"
+                icon.name: "camera-web-symbolic"
                 checked: tracker.visible
                 onTriggered: {
                     if (!tracker.visible) {
@@ -126,7 +126,7 @@ Kirigami.ApplicationWindow {
             },
             Kirigami.Action {
                 text: soundWave.title
-                icon.name: "dialog-scripts"
+                icon.name: "waveform-symbolic"
                 checked: soundWave.visible
                 onTriggered: {
                     if (!soundWave.visible) {
@@ -139,39 +139,47 @@ Kirigami.ApplicationWindow {
 
         header: Kirigami.AbstractApplicationHeader {
 
-            contentItem: Kirigami.ActionToolBar {
-                actions: [
-                    Kirigami.Action {
-                        text: i18n("Preferences")
-                        icon.name: "gtk-preferences"
-                        displayHint: Kirigami.DisplayHint.AlwaysHide
-                        onTriggered: {
-                            root.pageStack.layers.push(preferencesPage);
-                        }
-                    },
-                    Kirigami.Action {
-                        text: i18n("About Eye Of Sauron")
-                        icon.name: "eyeofsauron"
-                        displayHint: Kirigami.DisplayHint.AlwaysHide
-                        onTriggered: {
-                            aboutDialog.open();
-                        }
-                    },
-                    Kirigami.Action {
-                        text: i18n("Quit")
-                        icon.name: "gtk-quit"
-                        displayHint: Kirigami.DisplayHint.AlwaysHide
-                        onTriggered: {
-                            Qt.quit();
-                        }
-                    }
-                ]
-
+            contentItem: RowLayout {
                 anchors {
                     left: parent.left
                     leftMargin: Kirigami.Units.smallSpacing
                     right: parent.right
                     rightMargin: Kirigami.Units.smallSpacing
+                }
+
+                Kirigami.Icon {
+                    Layout.alignment: Qt.AlignHCenter
+                    source: "image-red-eye-symbolic"
+                    visible: !globalDrawer.collapsed
+                }
+
+                Kirigami.ActionToolBar {
+                    actions: [
+                        Kirigami.Action {
+                            text: i18n("Preferences")
+                            icon.name: "gtk-preferences"
+                            displayHint: Kirigami.DisplayHint.AlwaysHide
+                            onTriggered: {
+                                root.pageStack.layers.push(preferencesPage);
+                            }
+                        },
+                        Kirigami.Action {
+                            text: i18n("About Eye Of Sauron")
+                            icon.name: "eyeofsauron"
+                            displayHint: Kirigami.DisplayHint.AlwaysHide
+                            onTriggered: {
+                                aboutDialog.open();
+                            }
+                        },
+                        Kirigami.Action {
+                            text: i18n("Quit")
+                            icon.name: "gtk-quit"
+                            displayHint: Kirigami.DisplayHint.AlwaysHide
+                            onTriggered: {
+                                Qt.quit();
+                            }
+                        }
+                    ]
                 }
 
             }

@@ -23,4 +23,33 @@ Kirigami.ScrollablePage {
             text: i18nc("@action:button", "Stop")
         }
     ]
+
+    footer: Kirigami.ActionToolBar {
+        actions: [
+            Kirigami.Action {
+                text: i18n("Points")
+
+                displayComponent: EoSSpinBox {
+                    id: nPoints
+
+                    unit: i18n("points")
+                    decimals: 0
+                    stepSize: 1
+                    from: 2
+                    to: 1000
+                    value: 100
+                }
+
+            },
+            Kirigami.Action {
+                text: i18n("Save Chart")
+                icon.name: "folder-chart-symbolic"
+            },
+            Kirigami.Action {
+                text: i18n("Save Table")
+                icon.name: "folder-table-symbolic"
+            }
+        ]
+    }
+
 }

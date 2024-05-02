@@ -8,4 +8,8 @@
         <file alias="PreferencesPage.qml">contents/ui/PreferencesPage.qml</file>
         <file alias="Common.js">contents/ui/Common.js</file>
     </qresource>
+
+    <qresource prefix="/images">
+        <file alias="offline">contents/images/offline.png</file>
+    </qresource>
 </RCC>

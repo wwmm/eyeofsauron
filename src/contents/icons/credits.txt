@@ -4,3 +4,5 @@ eyeofsauron.svg
 
 - Icons that were made by other people and I have applied some modifications:
 
+kde breeze "redeyes" -> eyeofsauron.svg
+
