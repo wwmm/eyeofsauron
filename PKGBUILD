@@ -7,7 +7,7 @@ pkgdesc='Optimize system performance for games'
 arch=(x86_64 i686)
 url='https://github.com/wwmm/eyeofsauron'
 license=('GPL3')
-depends=('boost-libs' 'kirigami' 'kirigami-addons' 'qqc2-desktop-style' 'breeze-icons' 'qt6-base')
+depends=('boost-libs' 'kirigami' 'kirigami-addons' 'qqc2-desktop-style' 'breeze-icons' 'qt6-base' 'qt6-multimedia' 'qt6-charts')
 makedepends=('boost' 'cmake' 'extra-cmake-modules' 'git' 'ninja' 'intltool' 'appstream-glib')
 optdepends=('libxnvctrl' 'libx11')
 source=("git+https://github.com/wwmm/eyeofsauron.git#branch=eosqt")
