@@ -10,6 +10,6 @@
     </qresource>
 
     <qresource prefix="/images">
-        <file alias="offline">contents/images/offline.png</file>
+        <file alias="offline.png">contents/images/offline.png</file>
     </qresource>
 </RCC>

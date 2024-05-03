@@ -1,3 +1,4 @@
+import EoSTrackerBackend
 import QtCharts
 import QtMultimedia
 import QtQuick
@@ -11,18 +12,19 @@ Kirigami.ScrollablePage {
     title: i18n("Object Tracker")
     actions: [
         Kirigami.Action {
-            // onTriggered: CppModelEnvVars.append("", "")
-
             icon.name: "media-playback-start-symbolic"
             text: i18nc("@action:button", "Play")
+            onTriggered: EoSTrackerBackend.start()
         },
         Kirigami.Action {
             icon.name: "media-playback-pause-symbolic"
             text: i18nc("@action:button", "Pause")
+            onTriggered: EoSTrackerBackend.pause()
         },
         Kirigami.Action {
             icon.name: "media-playback-stop-symbolic"
             text: i18nc("@action:button", "Stop")
+            onTriggered: EoSTrackerBackend.stop()
         }
     ]
 
@@ -32,20 +34,14 @@ Kirigami.ScrollablePage {
         VideoOutput {
             id: videoOutput
 
-            implicitWidth: 640
-            implicitHeight: 480
-            Layout.maximumWidth: 640
-            Layout.maximumHeight: 480
-            fillMode: VideoOutput.Stretch
-        }
-
-        MediaPlayer {
-            id: player
-
-            // source: "file:///home/wallace/Videos/viewpca.webm"
-            // source: "qrc:/images/offline.png"
-            videoOutput: videoOutput
-            autoPlay: true
+            implicitWidth: EoSTrackerBackend.frameWidth
+            implicitHeight: EoSTrackerBackend.frameHeight
+            // Layout.maximumWidth: EoSTrackerBackend.frameWidth
+            // Layout.maximumHeight: EoSTrackerBackend.frameHeight
+            // fillMode: VideoOutput.Stretch
+            Component.onCompleted: {
+                EoSTrackerBackend.videoSink = videoOutput.videoSink;
+            }
         }
 
         ChartView {

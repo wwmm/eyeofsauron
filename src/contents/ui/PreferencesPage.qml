@@ -10,7 +10,7 @@ FormCard.FormCardPage {
         EoSSwitch {
             id: showTrayIcon
 
-            label: i18n("Show Tray Icon")
+            label: i18n("Show the Tray Icon")
             isChecked: CfgWindow.showTrayIcon
             onCheckedChanged: {
                 if (isChecked !== CfgWindow.showTrayIcon)

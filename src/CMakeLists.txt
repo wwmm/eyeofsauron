@@ -8,6 +8,7 @@ kde_target_enable_exceptions(eyeofsauron PRIVATE)
 
 target_sources(eyeofsauron PRIVATE
     main.cpp
+    tracker.cpp
     util.cpp
     resources.qrc
 )
@@ -20,6 +21,7 @@ target_link_libraries(eyeofsauron PRIVATE
     Qt${QT_MAJOR_VERSION}::QuickControls2
     Qt${QT_MAJOR_VERSION}::Widgets
     Qt${QT_MAJOR_VERSION}::Charts
+    Qt${QT_MAJOR_VERSION}::Multimedia
     KF${QT_MAJOR_VERSION}::I18n
     KF${QT_MAJOR_VERSION}::CoreAddons
     KF${QT_MAJOR_VERSION}::ConfigCore

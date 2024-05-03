@@ -16,6 +16,7 @@
 #include <memory>
 #include "cfg_window.h"
 #include "config.h"
+#include "tracker.hpp"
 #include "util.hpp"
 
 auto get_lock_file() -> std::unique_ptr<QLockFile> {
@@ -94,6 +95,10 @@ int main(int argc, char* argv[]) {
   auto cfgWindow = cfg::Window::self();
 
   qmlRegisterSingletonInstance("CfgWindow", VERSION_MAJOR, VERSION_MINOR, "CfgWindow", cfgWindow);
+
+  // loading classes
+
+  tracker::Backend tracker;
 
   QQmlApplicationEngine engine;
 
