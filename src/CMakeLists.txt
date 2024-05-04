@@ -13,6 +13,8 @@ target_sources(eyeofsauron PRIVATE
     resources.qrc
 )
 
+target_include_directories(eyeofsauron PRIVATE ${OpenCV_INCLUDE_DIRS})
+
 target_link_libraries(eyeofsauron PRIVATE
     Qt${QT_MAJOR_VERSION}::Core
     Qt${QT_MAJOR_VERSION}::Quick
@@ -26,6 +28,7 @@ target_link_libraries(eyeofsauron PRIVATE
     KF${QT_MAJOR_VERSION}::CoreAddons
     KF${QT_MAJOR_VERSION}::ConfigCore
     KF${QT_MAJOR_VERSION}::ConfigGui
+    ${OpenCV_LIBS}
 )
 
 kconfig_add_kcfg_files(eyeofsauron GENERATE_MOC ${KCFGC_FILES})

@@ -4,6 +4,7 @@
 #include <QMediaCaptureSession>
 #include <QPainter>
 #include <QVideoFrame>
+#include <opencv2/core/types.hpp>
 #include "config.h"
 #include "util.hpp"
 
@@ -78,8 +79,10 @@ void Backend::draw_offline_image() {
 void Backend::process_frame(const QVideoFrame& input_frame) {
   auto input_image = input_frame.toImage();
 
+  // creating the output qvideoframe
+
   auto video_format =
-      QVideoFrameFormat(QSize(input_image.width(), input_image.height()), QVideoFrameFormat::Format_RGBA8888);
+      QVideoFrameFormat(QSize(input_image.width(), input_image.height()), QVideoFrameFormat::Format_BGRA8888);
 
   video_format.setColorRange(QVideoFrameFormat::ColorRange_Full);
 
@@ -91,59 +94,57 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
     return;
   }
 
-  QImage output_image(video_frame.bits(0), video_frame.width(), video_frame.height(), QImage::Format_RGBA8888);
+  // creating the qimage that will set the output qvideoframe data
+
+  QImage output_image(video_frame.bits(0), video_frame.width(), video_frame.height(),
+                      QVideoFrameFormat::imageFormatFromPixelFormat(video_frame.pixelFormat()));
 
   QPainter painter(&output_image);
 
   painter.drawImage(output_image.rect(), input_image);
+
+  // opencv stuff
+
+  cv::Mat cv_frame(output_image.height(), output_image.width(), CV_8UC4, output_image.bits());
+
+  initial_time = (initial_time == 0) ? timestamp : initial_time;
+
+  std::vector<cv::Rect> roi_list;
+
+  for (size_t n = 0; n < trackers.size(); n++) {
+    auto& [tracker, roi_n, initialized] = trackers[n];
+
+    if (!initialized) {
+      tracker->init(cv_frame, roi_n);
+
+      initialized = true;
+    } else {
+      tracker->update(cv_frame, roi_n);
+    }
+
+    double xc = roi_n.x + roi_n.width * 0.5;
+    double yc = roi_n.y + roi_n.height * 0.5;
+    double t = static_cast<double>(timestamp - initial_time) / 1000000000.0;
+
+    // changing the coordinate system origin to the bottom left corner
+
+    yc = output_image.height() - yc;
+
+    // ui::chart::add_point(self->chart_x, static_cast<int>(n), t, xc);
+    // ui::chart::update(self->chart_x);
+
+    // ui::chart::add_point(self->chart_y, static_cast<int>(n), t, yc);
+    // ui::chart::update(self->chart_y);
+
+    roi_list.emplace_back(roi_n);
+  }
+
+  // drawing the detected rois
+
   painter.drawText(output_image.rect(), Qt::AlignCenter, QDateTime::currentDateTime().toString());
   painter.end();
 
-  video_frame.unmap();
-
-  _videoSink->setVideoFrame(video_frame);
-}
-
-void Backend::create_qvideo_frame(const QImage& main_frame) {
-  if (_videoSink == nullptr) {
-    util::warning("Invalid videoSink pointer!");
-  }
-
-  auto video_format = QVideoFrameFormat(QSize(_frameWidth, _frameHeight), QVideoFrameFormat::Format_RGBA8888);
-
-  video_format.setColorRange(QVideoFrameFormat::ColorRange_Full);
-
-  QVideoFrame video_frame(video_format);
-
-  if (!video_frame.isValid() || !video_frame.map(QVideoFrame::WriteOnly)) {
-    util::warning("QVideoFrame is not valid or not writable");
-
-    return;
-  }
-
-  QImage::Format image_format = QVideoFrameFormat::imageFormatFromPixelFormat(video_frame.pixelFormat());
-
-  if (image_format == QImage::Format_Invalid) {
-    util::warning("It is not possible to obtain image format from the pixel format of the videoframe");
-
-    return;
-  }
-
-  QImage image(video_frame.bits(0), video_frame.width(), video_frame.height(), image_format);
-
-  if (image.isNull()) {
-    util::warning("The created QImage object is null!");
-
-    return;
-  }
-
-  // image.fill(QColorConstants::White);
-
-  QPainter painter(&image);
-
-  painter.drawImage(image.rect(), main_frame);
-  painter.drawText(image.rect(), Qt::AlignCenter, QDateTime::currentDateTime().toString());
-  painter.end();
+  // sending the output qvideoframe to the video sink
 
   video_frame.unmap();
 

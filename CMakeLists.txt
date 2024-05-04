@@ -44,9 +44,10 @@ find_package(KF${QT_MAJOR_VERSION} REQUIRED COMPONENTS
     ConfigWidgets
 )
 
-ki18n_install(po)
-
 find_package(Threads REQUIRED)
+find_package(OpenCV REQUIRED )
+
+ki18n_install(po)
 
 file(GLOB KCFG_FILES ${PROJECT_SOURCE_DIR}/src/contents/kcfg/*.kcfg)
 file(GLOB KCFGC_FILES ${PROJECT_SOURCE_DIR}/src/contents/kcfg/*.kcfgc)

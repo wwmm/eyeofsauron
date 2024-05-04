@@ -4,6 +4,8 @@
 #include <qobject.h>
 #include <QCamera>
 #include <QVideoSink>
+#include <opencv2/tracking.hpp>
+#include <opencv2/tracking/tracking_legacy.hpp>
 
 namespace tracker {
 
@@ -34,6 +36,8 @@ class Backend : public QObject {
  private:
   int _frameWidth = 640;
   int _frameHeight = 480;
+  int64_t initial_time = 0;
+  int64_t timestamp = 0;
 
   QVideoSink* _videoSink = nullptr;
 
@@ -41,9 +45,10 @@ class Backend : public QObject {
   std::unique_ptr<QVideoSink> camera_video_sink;
   std::unique_ptr<QMediaCaptureSession> capture_session;
 
+  std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMOSSE>, cv::Rect2d, bool>> trackers;
+
   void draw_offline_image();
   void process_frame(const QVideoFrame& input_frame);
-  void create_qvideo_frame(const QImage& main_frame);
 };
 
 }  // namespace tracker
