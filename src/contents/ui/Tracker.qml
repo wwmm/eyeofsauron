@@ -17,11 +17,6 @@ Kirigami.ScrollablePage {
             onTriggered: EoSTrackerBackend.start()
         },
         Kirigami.Action {
-            icon.name: "media-playback-pause-symbolic"
-            text: i18nc("@action:button", "Pause")
-            onTriggered: EoSTrackerBackend.pause()
-        },
-        Kirigami.Action {
             icon.name: "media-playback-stop-symbolic"
             text: i18nc("@action:button", "Stop")
             onTriggered: EoSTrackerBackend.stop()

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <memory.h>
 #include <qobject.h>
+#include <QCamera>
 #include <QVideoSink>
 
 namespace tracker {
@@ -22,7 +24,6 @@ class Backend : public QObject {
   // [[nodiscard]] QVideoSink* videoSink() const;
 
   Q_INVOKABLE void start();
-  Q_INVOKABLE void pause();
   Q_INVOKABLE void stop();
 
  signals:
@@ -36,7 +37,13 @@ class Backend : public QObject {
 
   QVideoSink* _videoSink = nullptr;
 
-  void create_qvideo_frame();
+  std::unique_ptr<QCamera> camera;
+  std::unique_ptr<QVideoSink> camera_video_sink;
+  std::unique_ptr<QMediaCaptureSession> capture_session;
+
+  void draw_offline_image();
+  void process_frame(const QVideoFrame& input_frame);
+  void create_qvideo_frame(const QImage& main_frame);
 };
 
 }  // namespace tracker
