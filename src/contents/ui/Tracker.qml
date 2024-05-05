@@ -5,6 +5,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import org.kde.kirigamiaddons.formcard as FormCard
 
 Kirigami.ScrollablePage {
     id: tracker
@@ -157,11 +158,45 @@ Kirigami.ScrollablePage {
     footer: Kirigami.ActionToolBar {
         actions: [
             Kirigami.Action {
-                text: i18n("Points")
+
+                displayComponent: FormCard.FormComboBoxDelegate {
+                    id: cameraIndex
+
+                    text: i18n("Source")
+                    displayMode: FormCard.FormComboBoxDelegate.ComboBox
+                    currentIndex: EoSTrackerBackend.cameraIndex
+                    editable: false
+                    onActivated: (idx) => {
+                        if (idx !== EoSTrackerBackend.cameraIndex)
+                            EoSTrackerBackend.cameraIndex = idx;
+
+                    }
+                    Component.onCompleted: {
+                        let devices = EoSTrackerBackend.listCameraDevice;
+                        let formats = EoSTrackerBackend.listCameraFormat;
+                        for (let n = 0; n < devices.length; n++) {
+                            let description = devices[n].description;
+                            let width = formats[n].resolution.width.toString();
+                            let height = formats[n].resolution.height.toString();
+                            let fps = formats[n].maxFrameRate.toString();
+                            model.append({
+                                "device": devices[n].description + " (" + width + "x" + height + ":" + fps + ")"
+                            });
+                        }
+                    }
+
+                    model: ListModel {
+                    }
+
+                }
+
+            },
+            Kirigami.Action {
 
                 displayComponent: EoSSpinBox {
                     id: nPoints
 
+                    label: i18n("Chart")
                     unit: i18n("points")
                     decimals: 0
                     stepSize: 1

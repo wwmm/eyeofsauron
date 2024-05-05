@@ -1,5 +1,5 @@
 import CfgWindow
-import org.kde.kirigamiaddons.formcard 1.0 as FormCard
+import org.kde.kirigamiaddons.formcard as FormCard
 
 FormCard.FormCardPage {
     FormCard.FormHeader {
@@ -19,6 +19,13 @@ FormCard.FormCardPage {
             }
         }
 
+    }
+
+    FormCard.FormHeader {
+        title: i18n("Camera")
+    }
+
+    FormCard.FormCard {
     }
 
 }

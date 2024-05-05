@@ -1,10 +1,14 @@
 #include "tracker.hpp"
 #include <qqml.h>
 #include <qsize.h>
+#include <QCameraDevice>
 #include <QMediaCaptureSession>
+#include <QMediaDevices>
 #include <QPainter>
 #include <QVideoFrame>
+#include <algorithm>
 #include <opencv2/core/types.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include "config.h"
 #include "util.hpp"
 
@@ -16,6 +20,11 @@ Backend::Backend(QObject* parent)
       camera_video_sink(std::make_unique<QVideoSink>()),
       capture_session(std::make_unique<QMediaCaptureSession>()) {
   qmlRegisterSingletonInstance<Backend>("EoSTrackerBackend", VERSION_MAJOR, VERSION_MINOR, "EoSTrackerBackend", this);
+
+  find_best_camera_resolution();
+
+  camera->setCameraDevice(_listCameraDevice.front());
+  camera->setCameraFormat(_listCameraFormat.front());
 
   capture_session->setCamera(camera.get());
   capture_session->setVideoSink(camera_video_sink.get());
@@ -36,6 +45,43 @@ void Backend::start() {
 
 void Backend::stop() {
   camera->stop();
+}
+
+void Backend::find_best_camera_resolution() {
+  _listCameraDevice.clear();
+  _listCameraFormat.clear();
+
+  for (const QCameraDevice& cameraDevice : QMediaDevices::videoInputs()) {
+    auto formats = cameraDevice.videoFormats();
+
+    if (!formats.empty()) {
+      std::ranges::sort(formats, [](QCameraFormat a, QCameraFormat b) {
+        if (a.maxFrameRate() > b.maxFrameRate()) {
+          return true;
+        } else if (a.maxFrameRate() == b.maxFrameRate()) {
+          auto area_a = a.resolution().width() * a.resolution().height();
+          auto area_b = b.resolution().width() * b.resolution().height();
+
+          return area_a > area_b;
+        }
+
+        return false;
+      });
+
+      auto resolution = util::to_string(formats.front().resolution().width()) + "x" +
+                        util::to_string(formats.front().resolution().height()) + ":" +
+                        util::to_string(formats.begin()->maxFrameRate());
+
+      _listCameraDevice.append(cameraDevice);
+      _listCameraFormat.append(formats.front());
+
+      util::debug(cameraDevice.description().toStdString() + " -> " + resolution);
+
+      // for (const auto& f : formats) {
+      //   qDebug() << f.resolution() << f.maxFrameRate() << f.pixelFormat();
+      // }
+    }
+  }
 }
 
 void Backend::draw_offline_image() {
@@ -68,7 +114,7 @@ void Backend::draw_offline_image() {
   QPainter painter(&image);
 
   painter.drawImage(image.rect(), QImage(":/images/offline.png"));
-  painter.drawText(image.rect(), Qt::AlignCenter, QDateTime::currentDateTime().toString());
+  painter.drawText(image.rect(), Qt::AlignLeft | Qt::AlignTop, QDateTime::currentDateTime().toString());
   painter.end();
 
   video_frame.unmap();
@@ -89,12 +135,12 @@ void Backend::onNewRoiSelection(double x, double y, double width, double height)
 }
 
 void Backend::process_frame(const QVideoFrame& input_frame) {
-  auto input_image = input_frame.toImage();
+  auto input_image = input_frame.toImage().convertedTo(QImage::Format_BGR888);
 
   // creating the output qvideoframe
 
   auto video_format =
-      QVideoFrameFormat(QSize(input_image.width(), input_image.height()), QVideoFrameFormat::Format_BGRA8888);
+      QVideoFrameFormat(QSize(input_image.width(), input_image.height()), QVideoFrameFormat::Format_BGRX8888);
 
   video_format.setColorRange(QVideoFrameFormat::ColorRange_Full);
 
@@ -117,7 +163,9 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
 
   // opencv stuff
 
-  cv::Mat cv_frame(output_image.height(), output_image.width(), CV_8UC4, output_image.bits());
+  cv::Mat cv_frame(output_image.height(), output_image.width(), CV_8UC3, input_image.bits());
+
+  cv::imwrite("test.jpg", cv_frame);
 
   initial_time = (initial_time == 0) ? input_frame.startTime() : initial_time;
 
@@ -127,11 +175,13 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
     auto& [tracker, roi_n, initialized] = trackers[n];
 
     if (!initialized) {
-      // tracker->init(cv_frame, roi_n);
+      tracker->init(cv_frame, roi_n);
 
       initialized = true;
     } else {
-      // tracker->update(cv_frame, roi_n);
+      tracker->update(cv_frame, roi_n);
+
+      painter.drawRect(QRectF{roi_n.x, roi_n.y, roi_n.width, roi_n.height});
     }
 
     double xc = roi_n.x + roi_n.width * 0.5;
@@ -154,7 +204,7 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
   // drawing the detected rois
 
   painter.drawRect(rect_selection);
-  painter.drawText(output_image.rect(), Qt::AlignCenter, QDateTime::currentDateTime().toString());
+  painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignTop, QDateTime::currentDateTime().toString());
   painter.end();
 
   // sending the output qvideoframe to the video sink
