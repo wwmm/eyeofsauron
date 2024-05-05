@@ -37,6 +37,69 @@ Kirigami.ScrollablePage {
             Component.onCompleted: {
                 EoSTrackerBackend.videoSink = videoOutput.videoSink;
             }
+
+            MouseArea {
+                id: mouseArea
+
+                property real x0: 0
+                property real y0: 0
+
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                preventStealing: true
+                onClicked: (event) => {
+                    if (event.button == Qt.RightButton)
+                        console.log("mouse clicked");
+
+                }
+                onReleased: (event) => {
+                    if (event.button == Qt.LeftButton) {
+                        let width = event.x - x0;
+                        let height = event.y - y0;
+                        if (Math.abs(width) === 0 || Math.abs(height) === 0)
+                            return ;
+
+                        if (width < 0) {
+                            x0 = width + x0;
+                            width *= -1;
+                        }
+                        if (height < 0) {
+                            y0 = height + y0;
+                            height *= -1;
+                        }
+                        EoSTrackerBackend.onNewRoi(x0, y0, width, height);
+                        event.accepted = true;
+                    }
+                }
+                onPositionChanged: (event) => {
+                    if (event.buttons & Qt.LeftButton) {
+                        let x = x0;
+                        let y = y0;
+                        let width = event.x - x;
+                        let height = event.y - y;
+                        if (Math.abs(width) === 0 || Math.abs(height) === 0)
+                            return ;
+
+                        if (width < 0) {
+                            x = width + x;
+                            width *= -1;
+                        }
+                        if (height < 0) {
+                            y = height + y;
+                            height *= -1;
+                        }
+                        EoSTrackerBackend.onNewRoiSelection(x, y, width, height);
+                    }
+                }
+                onPressed: (event) => {
+                    if (event.button == Qt.LeftButton) {
+                        x0 = event.x;
+                        y0 = event.y;
+                        event.accepted = true;
+                    }
+                }
+            }
+
         }
 
         ChartView {

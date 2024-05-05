@@ -76,6 +76,18 @@ void Backend::draw_offline_image() {
   _videoSink->setVideoFrame(video_frame);
 }
 
+void Backend::onNewRoi(double x, double y, double width, double height) {
+  cv::Rect2d roi = {x, y, width, height};  // region of interest that is being created
+
+  auto tracker = cv::legacy::TrackerMOSSE::create();
+
+  trackers.emplace_back(tracker, roi, false);
+}
+
+void Backend::onNewRoiSelection(double x, double y, double width, double height) {
+  rect_selection.setRect(x, y, width, height);
+}
+
 void Backend::process_frame(const QVideoFrame& input_frame) {
   auto input_image = input_frame.toImage();
 
@@ -107,7 +119,7 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
 
   cv::Mat cv_frame(output_image.height(), output_image.width(), CV_8UC4, output_image.bits());
 
-  initial_time = (initial_time == 0) ? timestamp : initial_time;
+  initial_time = (initial_time == 0) ? input_frame.startTime() : initial_time;
 
   std::vector<cv::Rect> roi_list;
 
@@ -115,16 +127,16 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
     auto& [tracker, roi_n, initialized] = trackers[n];
 
     if (!initialized) {
-      tracker->init(cv_frame, roi_n);
+      // tracker->init(cv_frame, roi_n);
 
       initialized = true;
     } else {
-      tracker->update(cv_frame, roi_n);
+      // tracker->update(cv_frame, roi_n);
     }
 
     double xc = roi_n.x + roi_n.width * 0.5;
     double yc = roi_n.y + roi_n.height * 0.5;
-    double t = static_cast<double>(timestamp - initial_time) / 1000000000.0;
+    double t = static_cast<double>(input_frame.startTime() - initial_time) / 1000000.0;
 
     // changing the coordinate system origin to the bottom left corner
 
@@ -141,6 +153,7 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
 
   // drawing the detected rois
 
+  painter.drawRect(rect_selection);
   painter.drawText(output_image.rect(), Qt::AlignCenter, QDateTime::currentDateTime().toString());
   painter.end();
 

@@ -27,6 +27,8 @@ class Backend : public QObject {
 
   Q_INVOKABLE void start();
   Q_INVOKABLE void stop();
+  Q_INVOKABLE void onNewRoi(double x, double y, double width, double height);
+  Q_INVOKABLE void onNewRoiSelection(double x, double y, double width, double height);
 
  signals:
   void videoSinkChanged();
@@ -36,10 +38,12 @@ class Backend : public QObject {
  private:
   int _frameWidth = 640;
   int _frameHeight = 480;
-  int64_t initial_time = 0;
-  int64_t timestamp = 0;
+
+  qint64 initial_time = 0;
 
   QVideoSink* _videoSink = nullptr;
+
+  QRectF rect_selection = {0.0, 0.0, 0.0, 0.0};
 
   std::unique_ptr<QCamera> camera;
   std::unique_ptr<QVideoSink> camera_video_sink;
