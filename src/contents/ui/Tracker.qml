@@ -15,6 +15,11 @@ Kirigami.ScrollablePage {
     title: i18n("Object Tracker")
     actions: [
         Kirigami.Action {
+            text: i18n("Video Source")
+            icon.name: "camera-web-symbolic"
+            onTriggered: sourceMenu.open()
+        },
+        Kirigami.Action {
             icon.name: "media-playback-start-symbolic"
             text: i18nc("@action:button", "Play")
             onTriggered: EoSTrackerBackend.start()
@@ -25,6 +30,13 @@ Kirigami.ScrollablePage {
             onTriggered: EoSTrackerBackend.stop()
         }
     ]
+
+    SourceMenu {
+        id: sourceMenu
+
+        backend: EoSTrackerBackend
+        model: EosTrackerSourceModel
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -160,44 +172,11 @@ Kirigami.ScrollablePage {
     footer: Kirigami.ActionToolBar {
         actions: [
             Kirigami.Action {
-                // comboBoxDelegate: Delegates.RoundedItemDelegate {
-                //     implicitWidth: Kirigami.Units.gridUnit * 16
-                //     text: value
-                //     highlighted: sourceIndex.currentIndex === index
-                //     icon.name: sourceIcon
-                // }
-                // displayComponent: FormCard.FormComboBoxDelegate {
-                //     id: sourceIndex
-                //     text: i18n("Source")
-                //     displayMode: FormCard.FormComboBoxDelegate.ComboBox
-                //     currentIndex: EoSTrackerBackend.sourceIndex
-                //     editable: false
-                //     textRole: "value"
-                //     onActivated: (idx) => {
-                //         if (idx !== EoSTrackerBackend.sourceIndex)
-                //             EoSTrackerBackend.sourceIndex = idx;
-
-                //     }
-                //     model: EosTrackerSourceModel
-                // }
-                displayComponent: EoSComboBox {
-                    id: sourceIndex
-
-                    text: i18n("Source")
-                    textRole: "value"
-                    iconRole: "sourceIcon"
-                    editable: false
-                    currentIndex: EoSTrackerBackend.sourceIndex
-                    model: EosTrackerSourceModel
-                }
-
-            },
-            Kirigami.Action {
 
                 displayComponent: EoSSpinBox {
                     id: nPoints
 
-                    label: i18n("Chart")
+                    label: i18n("Data Size")
                     unit: i18n("points")
                     decimals: 0
                     stepSize: 1

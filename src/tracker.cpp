@@ -19,7 +19,8 @@ int SourceModel::rowCount(const QModelIndex& /*parent*/) const {
 }
 
 QHash<int, QByteArray> SourceModel::roleNames() const {
-  return {{Roles::Value, "value"}, {Roles::SourceIcon, "sourceIcon"}};
+  return {
+      {Roles::SourceType, "sourceType"}, {Roles::Name, "name"}, {Roles::Subtitle, "subtitle"}, {Roles::Icon, "icon"}};
 }
 
 QVariant SourceModel::data(const QModelIndex& index, int role) const {
@@ -30,16 +31,12 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
   const auto it = std::next(list.begin(), index.row());
 
   switch (role) {
-    case Roles::Value: {
+    case Roles::SourceType: {
       QString value;
 
-      switch (it->sourceType) {
+      switch (it->get()->source_type) {
         case Camera: {
-          auto resolution = util::to_string(it->cameraFormat.resolution().width()) + "x" +
-                            util::to_string(it->cameraFormat.resolution().height()) + ":" +
-                            util::to_string(it->cameraFormat.maxFrameRate());
-
-          value = it->cameraDevice.description() + " (" + QString::fromStdString(resolution) + ")";
+          value = "camera";
 
           break;
         }
@@ -52,10 +49,52 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
 
       return value;
     }
-    case Roles::SourceIcon: {
+    case Roles::Name: {
+      QString value;
+
+      switch (it->get()->source_type) {
+        case Camera: {
+          value = dynamic_cast<const CameraSource*>(it->get())->device.description();
+
+          break;
+        }
+        case VideoFile: {
+          value = dynamic_cast<const VideoFileSource*>(it->get())->url.fileName();
+
+          break;
+        }
+      }
+
+      return value;
+    }
+    case Roles::Subtitle: {
+      QString value;
+
+      switch (it->get()->source_type) {
+        case Camera: {
+          auto format = dynamic_cast<const CameraSource*>(it->get())->format;
+
+          auto resolution = util::to_string(format.resolution().width()) + "x" +
+                            util::to_string(format.resolution().height()) + "  " +
+                            util::to_string(format.maxFrameRate()) + " fps";
+
+          value = QString::fromStdString(resolution);
+
+          break;
+        }
+        case VideoFile: {
+          value = "";
+
+          break;
+        }
+      }
+
+      return value;
+    }
+    case Roles::Icon: {
       QString name;
 
-      switch (it->sourceType) {
+      switch (it->get()->source_type) {
         case Camera: {
           name = "camera-web-symbolic";
 
@@ -75,20 +114,27 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
   }
 }
 
-auto SourceModel::getValue(const int& id) -> TrackerSource {
-  return list[id];
-}
-
-auto SourceModel::getList() -> QList<TrackerSource> {
+auto SourceModel::getList() -> QList<std::shared_ptr<Source>> {
   return list;
 }
 
-void SourceModel::append(const struct TrackerSource& source) {
+auto SourceModel::get_source(const int& rowIndex) -> std::shared_ptr<Source> {
+  return list[rowIndex];
+}
+
+void SourceModel::append(std::shared_ptr<Source> source) {
   int pos = list.empty() ? 0 : list.size() - 1;
 
   beginInsertRows(QModelIndex(), pos, pos);
 
-  list.append(source);
+  switch (source->source_type) {
+    case Camera:
+      list.insert(0, source);
+      break;
+    case VideoFile:
+      list.append(source);
+      break;
+  }
 
   endInsertRows();
 
@@ -103,7 +149,7 @@ void SourceModel::reset() {
   endResetModel();
 }
 
-void SourceModel::remove(const int& rowIndex) {
+void SourceModel::removeSource(const int& rowIndex) {
   beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
 
   list.remove(rowIndex);
@@ -127,10 +173,10 @@ Backend::Backend(QObject* parent)
 
   if (auto source_list = sourceModel.getList(); !source_list.empty()) {
     for (const auto& source : source_list) {
-      if (source.sourceType == SourceModel::TrackerSourceType::Camera) {
-        camera->setCameraDevice(source.cameraDevice);
-        camera->setCameraFormat(source.cameraFormat);
-      } else if (source.sourceType == SourceModel::TrackerSourceType::VideoFile) {
+      if (source->source_type == SourceType::Camera) {
+        camera->setCameraDevice(dynamic_cast<const CameraSource*>(source.get())->device);
+        camera->setCameraFormat(dynamic_cast<const CameraSource*>(source.get())->format);
+      } else if (source->source_type == SourceType::VideoFile) {
       }
     }
   }
@@ -154,6 +200,31 @@ void Backend::start() {
 
 void Backend::stop() {
   camera->stop();
+}
+
+void Backend::append(const QUrl& videoUrl) {
+  if (videoUrl.isLocalFile()) {
+    util::warning(videoUrl.toString().toStdString());
+
+    sourceModel.append(std::make_shared<VideoFileSource>(videoUrl));
+  }
+}
+
+void Backend::selectSource(const int& index) {
+  auto source = sourceModel.get_source(index);
+
+  switch (source->source_type) {
+    case Camera: {
+      auto device = dynamic_cast<const CameraSource*>(source.get())->device;
+      util::warning(device.description().toStdString());
+      break;
+    }
+    case VideoFile: {
+      auto url = dynamic_cast<const VideoFileSource*>(source.get())->url;
+      util::warning(url.toString().toStdString());
+      break;
+    }
+  }
 }
 
 void Backend::find_best_camera_resolution() {
@@ -180,7 +251,7 @@ void Backend::find_best_camera_resolution() {
                         util::to_string(formats.front().resolution().height()) + ":" +
                         util::to_string(formats.begin()->maxFrameRate());
 
-      sourceModel.append({SourceModel::TrackerSourceType::Camera, cameraDevice, formats.front(), ""});
+      sourceModel.append(std::make_shared<CameraSource>(cameraDevice, formats.front()));
 
       util::debug(cameraDevice.description().toStdString() + " -> " + resolution);
 
