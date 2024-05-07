@@ -14,6 +14,105 @@
 
 namespace tracker {
 
+int SourceModel::rowCount(const QModelIndex& /*parent*/) const {
+  return list.size();
+}
+
+QHash<int, QByteArray> SourceModel::roleNames() const {
+  return {{Roles::Value, "value"}, {Roles::SourceIcon, "sourceIcon"}};
+}
+
+QVariant SourceModel::data(const QModelIndex& index, int role) const {
+  if (list.empty()) {
+    return "";
+  }
+
+  const auto it = std::next(list.begin(), index.row());
+
+  switch (role) {
+    case Roles::Value: {
+      QString value;
+
+      switch (it->sourceType) {
+        case Camera: {
+          auto resolution = util::to_string(it->cameraFormat.resolution().width()) + "x" +
+                            util::to_string(it->cameraFormat.resolution().height()) + ":" +
+                            util::to_string(it->cameraFormat.maxFrameRate());
+
+          value = it->cameraDevice.description() + " (" + QString::fromStdString(resolution) + ")";
+
+          break;
+        }
+        case VideoFile: {
+          value = "video_file";
+
+          break;
+        }
+      }
+
+      return value;
+    }
+    case Roles::SourceIcon: {
+      QString name;
+
+      switch (it->sourceType) {
+        case Camera: {
+          name = "camera-web-symbolic";
+
+          break;
+        }
+        case VideoFile: {
+          name = "video-symbolic";
+
+          break;
+        }
+      }
+
+      return name;
+    }
+    default:
+      return {};
+  }
+}
+
+auto SourceModel::getValue(const int& id) -> TrackerSource {
+  return list[id];
+}
+
+auto SourceModel::getList() -> QList<TrackerSource> {
+  return list;
+}
+
+void SourceModel::append(const struct TrackerSource& source) {
+  int pos = list.empty() ? 0 : list.size() - 1;
+
+  beginInsertRows(QModelIndex(), pos, pos);
+
+  list.append(source);
+
+  endInsertRows();
+
+  emit dataChanged(index(0), index(list.size() - 1));
+}
+
+void SourceModel::reset() {
+  beginResetModel();
+
+  list.clear();
+
+  endResetModel();
+}
+
+void SourceModel::remove(const int& rowIndex) {
+  beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
+
+  list.remove(rowIndex);
+
+  endRemoveRows();
+
+  emit dataChanged(index(0), index(list.size() - 1));
+}
+
 Backend::Backend(QObject* parent)
     : QObject(parent),
       camera(std::make_unique<QCamera>()),
@@ -21,10 +120,20 @@ Backend::Backend(QObject* parent)
       capture_session(std::make_unique<QMediaCaptureSession>()) {
   qmlRegisterSingletonInstance<Backend>("EoSTrackerBackend", VERSION_MAJOR, VERSION_MINOR, "EoSTrackerBackend", this);
 
+  qmlRegisterSingletonInstance<SourceModel>("EosTrackerSourceModel", VERSION_MAJOR, VERSION_MINOR,
+                                            "EosTrackerSourceModel", &sourceModel);
+
   find_best_camera_resolution();
 
-  camera->setCameraDevice(_listCameraDevice.front());
-  camera->setCameraFormat(_listCameraFormat.front());
+  if (auto source_list = sourceModel.getList(); !source_list.empty()) {
+    for (const auto& source : source_list) {
+      if (source.sourceType == SourceModel::TrackerSourceType::Camera) {
+        camera->setCameraDevice(source.cameraDevice);
+        camera->setCameraFormat(source.cameraFormat);
+      } else if (source.sourceType == SourceModel::TrackerSourceType::VideoFile) {
+      }
+    }
+  }
 
   capture_session->setCamera(camera.get());
   capture_session->setVideoSink(camera_video_sink.get());
@@ -48,8 +157,7 @@ void Backend::stop() {
 }
 
 void Backend::find_best_camera_resolution() {
-  _listCameraDevice.clear();
-  _listCameraFormat.clear();
+  sourceModel.reset();
 
   for (const QCameraDevice& cameraDevice : QMediaDevices::videoInputs()) {
     auto formats = cameraDevice.videoFormats();
@@ -72,8 +180,7 @@ void Backend::find_best_camera_resolution() {
                         util::to_string(formats.front().resolution().height()) + ":" +
                         util::to_string(formats.begin()->maxFrameRate());
 
-      _listCameraDevice.append(cameraDevice);
-      _listCameraFormat.append(formats.front());
+      sourceModel.append({SourceModel::TrackerSourceType::Camera, cameraDevice, formats.front(), ""});
 
       util::debug(cameraDevice.description().toStdString() + " -> " + resolution);
 

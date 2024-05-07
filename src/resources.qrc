@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/ui">
         <file alias="main.qml">contents/ui/main.qml</file>
+        <file alias="EoSComboBox.qml">contents/ui/EoSComboBox.qml</file>
         <file alias="EoSSpinBox.qml">contents/ui/EoSSpinBox.qml</file>
         <file alias="EoSSwitch.qml">contents/ui/EoSSwitch.qml</file>
         <file alias="Tracker.qml">contents/ui/Tracker.qml</file>

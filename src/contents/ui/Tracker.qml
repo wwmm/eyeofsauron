@@ -1,10 +1,12 @@
 import EoSTrackerBackend
+import EosTrackerSourceModel
 import QtCharts
 import QtMultimedia
 import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import org.kde.kirigamiaddons.delegates as Delegates
 import org.kde.kirigamiaddons.formcard as FormCard
 
 Kirigami.ScrollablePage {
@@ -158,36 +160,35 @@ Kirigami.ScrollablePage {
     footer: Kirigami.ActionToolBar {
         actions: [
             Kirigami.Action {
+                // comboBoxDelegate: Delegates.RoundedItemDelegate {
+                //     implicitWidth: Kirigami.Units.gridUnit * 16
+                //     text: value
+                //     highlighted: sourceIndex.currentIndex === index
+                //     icon.name: sourceIcon
+                // }
+                // displayComponent: FormCard.FormComboBoxDelegate {
+                //     id: sourceIndex
+                //     text: i18n("Source")
+                //     displayMode: FormCard.FormComboBoxDelegate.ComboBox
+                //     currentIndex: EoSTrackerBackend.sourceIndex
+                //     editable: false
+                //     textRole: "value"
+                //     onActivated: (idx) => {
+                //         if (idx !== EoSTrackerBackend.sourceIndex)
+                //             EoSTrackerBackend.sourceIndex = idx;
 
-                displayComponent: FormCard.FormComboBoxDelegate {
-                    id: cameraIndex
+                //     }
+                //     model: EosTrackerSourceModel
+                // }
+                displayComponent: EoSComboBox {
+                    id: sourceIndex
 
                     text: i18n("Source")
-                    displayMode: FormCard.FormComboBoxDelegate.ComboBox
-                    currentIndex: EoSTrackerBackend.cameraIndex
+                    textRole: "value"
+                    iconRole: "sourceIcon"
                     editable: false
-                    onActivated: (idx) => {
-                        if (idx !== EoSTrackerBackend.cameraIndex)
-                            EoSTrackerBackend.cameraIndex = idx;
-
-                    }
-                    Component.onCompleted: {
-                        let devices = EoSTrackerBackend.listCameraDevice;
-                        let formats = EoSTrackerBackend.listCameraFormat;
-                        for (let n = 0; n < devices.length; n++) {
-                            let description = devices[n].description;
-                            let width = formats[n].resolution.width.toString();
-                            let height = formats[n].resolution.height.toString();
-                            let fps = formats[n].maxFrameRate.toString();
-                            model.append({
-                                "device": devices[n].description + " (" + width + "x" + height + ":" + fps + ")"
-                            });
-                        }
-                    }
-
-                    model: ListModel {
-                    }
-
+                    currentIndex: EoSTrackerBackend.sourceIndex
+                    model: EosTrackerSourceModel
                 }
 
             },
