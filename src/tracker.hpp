@@ -3,42 +3,14 @@
 #include <memory.h>
 #include <qabstractitemmodel.h>
 #include <qobject.h>
-#include <qurl.h>
 #include <QCamera>
+#include <QMediaPlayer>
 #include <QVideoSink>
 #include <opencv2/tracking.hpp>
 #include <opencv2/tracking/tracking_legacy.hpp>
-#include <utility>
+#include "frame_source.hpp"
 
 namespace tracker {
-
-enum SourceType { Camera, VideoFile };
-
-class Source {
- public:
-  virtual ~Source() = default;
-
-  SourceType source_type;
-
- protected:
-  Source(SourceType source_type) : source_type(source_type) {}
-};
-
-class CameraSource : public Source {
- public:
-  CameraSource(QCameraDevice dev, QCameraFormat fmt) : Source(SourceType::Camera), device(dev), format(fmt) {}
-
-  QCameraDevice device;
-
-  QCameraFormat format;
-};
-
-class VideoFileSource : public Source {
- public:
-  VideoFileSource(QUrl file_url) : Source(SourceType::VideoFile), url(std::move(file_url)) {}
-
-  QUrl url;
-};
 
 class SourceModel : public QAbstractListModel {
   Q_OBJECT;
@@ -102,6 +74,8 @@ class Backend : public QObject {
 
   qint64 initial_time = 0;
 
+  SourceType current_source_type = SourceType::Camera;
+
   QVideoSink* _videoSink = nullptr;
 
   QRectF rect_selection = {0.0, 0.0, 0.0, 0.0};
@@ -111,6 +85,8 @@ class Backend : public QObject {
   std::unique_ptr<QCamera> camera;
   std::unique_ptr<QVideoSink> camera_video_sink;
   std::unique_ptr<QMediaCaptureSession> capture_session;
+  std::unique_ptr<QMediaPlayer> media_player;
+  std::unique_ptr<QVideoSink> media_player_video_sink;
 
   std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMOSSE>, cv::Rect2d, bool>> trackers;
 

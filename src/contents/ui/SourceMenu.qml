@@ -22,6 +22,7 @@ Kirigami.OverlaySheet {
         clip: true
         model: control.model
         delegate: listDelegate
+        reuseItems: true
 
         Kirigami.PlaceholderMessage {
             anchors.centerIn: parent
@@ -36,6 +37,8 @@ Kirigami.OverlaySheet {
         id: listDelegate
 
         Controls.ItemDelegate {
+            // backend.selectSource(index);
+
             id: listItemDelegate
 
             property string sourceType: model.sourceType
@@ -47,12 +50,16 @@ Kirigami.OverlaySheet {
             property bool selected: listItemDelegate.highlighted || listItemDelegate.down
             property color color: selected ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
 
-            highlighted: ListView.isCurrentItem
+            highlighted: sourcesListView.currentIndex === index
             hoverEnabled: true
             width: parent ? parent.width : implicitWidth
             onClicked: {
                 sourcesListView.currentIndex = index;
-                backend.selectSource(index);
+            }
+            onHighlightedChanged: {
+                if (highlighted)
+                    backend.selectSource(index);
+
             }
 
             contentItem: Kirigami.ActionToolBar {
@@ -93,7 +100,6 @@ Kirigami.OverlaySheet {
                         visible: sourceType === "video_file"
                         displayHint: Kirigami.DisplayHint.AlwaysHide
                         onTriggered: {
-                            console.log(model.name);
                             control.model.removeSource(index);
                         }
                     }

@@ -176,7 +176,7 @@ Kirigami.ScrollablePage {
                 displayComponent: EoSSpinBox {
                     id: nPoints
 
-                    label: i18n("Data Size")
+                    label: i18n("History")
                     unit: i18n("points")
                     decimals: 0
                     stepSize: 1

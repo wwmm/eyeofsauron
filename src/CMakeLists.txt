@@ -7,6 +7,7 @@ add_executable(eyeofsauron)
 kde_target_enable_exceptions(eyeofsauron PRIVATE)
 
 target_sources(eyeofsauron PRIVATE
+    frame_source.cpp
     main.cpp
     tracker.cpp
     util.cpp

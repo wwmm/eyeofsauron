@@ -8,7 +8,6 @@
 #include <QVideoFrame>
 #include <algorithm>
 #include <opencv2/core/types.hpp>
-#include <opencv2/imgcodecs.hpp>
 #include "config.h"
 #include "util.hpp"
 
@@ -163,7 +162,9 @@ Backend::Backend(QObject* parent)
     : QObject(parent),
       camera(std::make_unique<QCamera>()),
       camera_video_sink(std::make_unique<QVideoSink>()),
-      capture_session(std::make_unique<QMediaCaptureSession>()) {
+      capture_session(std::make_unique<QMediaCaptureSession>()),
+      media_player(std::make_unique<QMediaPlayer>()),
+      media_player_video_sink(std::make_unique<QVideoSink>()) {
   qmlRegisterSingletonInstance<Backend>("EoSTrackerBackend", VERSION_MAJOR, VERSION_MINOR, "EoSTrackerBackend", this);
 
   qmlRegisterSingletonInstance<SourceModel>("EosTrackerSourceModel", VERSION_MAJOR, VERSION_MINOR,
@@ -171,22 +172,21 @@ Backend::Backend(QObject* parent)
 
   find_best_camera_resolution();
 
-  if (auto source_list = sourceModel.getList(); !source_list.empty()) {
-    for (const auto& source : source_list) {
-      if (source->source_type == SourceType::Camera) {
-        camera->setCameraDevice(dynamic_cast<const CameraSource*>(source.get())->device);
-        camera->setCameraFormat(dynamic_cast<const CameraSource*>(source.get())->format);
-      } else if (source->source_type == SourceType::VideoFile) {
-      }
-    }
-  }
-
   capture_session->setCamera(camera.get());
   capture_session->setVideoSink(camera_video_sink.get());
+
+  media_player->setVideoSink(media_player_video_sink.get());
+
+  camera->setExposureMode(QCamera::ExposureAction);
+  camera->setFocusMode(QCamera::FocusModeAutoFar);
+  camera->setWhiteBalanceMode(QCamera::WhiteBalanceAuto);
 
   connect(this, &Backend::videoSinkChanged, [this]() { draw_offline_image(); });
 
   connect(camera_video_sink.get(), &QVideoSink::videoFrameChanged,
+          [this](const QVideoFrame& frame) { process_frame(frame); });
+
+  connect(media_player_video_sink.get(), &QVideoSink::videoFrameChanged,
           [this](const QVideoFrame& frame) { process_frame(frame); });
 }
 
@@ -195,11 +195,28 @@ Backend::~Backend() {
 }
 
 void Backend::start() {
-  camera->start();
+  switch (current_source_type) {
+    case Camera: {
+      camera->start();
+    } break;
+    case VideoFile: {
+      media_player->play();
+      break;
+    }
+  }
 }
 
 void Backend::stop() {
   camera->stop();
+  switch (current_source_type) {
+    case Camera: {
+      camera->stop();
+    } break;
+    case VideoFile: {
+      media_player->stop();
+      break;
+    }
+  }
 }
 
 void Backend::append(const QUrl& videoUrl) {
@@ -213,15 +230,30 @@ void Backend::append(const QUrl& videoUrl) {
 void Backend::selectSource(const int& index) {
   auto source = sourceModel.get_source(index);
 
+  media_player->stop();
+  camera->stop();
+  trackers.clear();
+
   switch (source->source_type) {
     case Camera: {
+      current_source_type = SourceType::Camera;
+
       auto device = dynamic_cast<const CameraSource*>(source.get())->device;
-      util::warning(device.description().toStdString());
+
+      camera->setCameraDevice(dynamic_cast<const CameraSource*>(source.get())->device);
+      camera->setCameraFormat(dynamic_cast<const CameraSource*>(source.get())->format);
+      camera->start();
+
       break;
     }
     case VideoFile: {
+      current_source_type = SourceType::VideoFile;
+
       auto url = dynamic_cast<const VideoFileSource*>(source.get())->url;
-      util::warning(url.toString().toStdString());
+
+      media_player->setSource(url);
+      media_player->play();
+
       break;
     }
   }
@@ -313,14 +345,19 @@ void Backend::onNewRoiSelection(double x, double y, double width, double height)
 }
 
 void Backend::process_frame(const QVideoFrame& input_frame) {
-  auto input_image = input_frame.toImage().convertedTo(QImage::Format_BGR888);
+  if (!input_frame.isValid()) {
+    util::warning("QVideoFrame is not valid or not writable");
+
+    return;
+  }
+
+  auto input_image = input_frame.toImage()
+                         .scaled(_frameWidth, _frameHeight, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
+                         .convertedTo(QImage::Format_BGR888);
 
   // creating the output qvideoframe
 
-  auto video_format =
-      QVideoFrameFormat(QSize(input_image.width(), input_image.height()), QVideoFrameFormat::Format_BGRX8888);
-
-  video_format.setColorRange(QVideoFrameFormat::ColorRange_Full);
+  auto video_format = QVideoFrameFormat(QSize(_frameWidth, _frameHeight), QVideoFrameFormat::Format_BGRX8888);
 
   QVideoFrame video_frame(video_format);
 
@@ -335,19 +372,24 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
   QImage output_image(video_frame.bits(0), video_frame.width(), video_frame.height(),
                       QVideoFrameFormat::imageFormatFromPixelFormat(video_frame.pixelFormat()));
 
+  if (output_image.isNull()) {
+    util::warning("The QImage is null");
+    return;
+  }
+
   QPainter painter(&output_image);
+
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
   painter.drawImage(output_image.rect(), input_image);
 
   // opencv stuff
+  // https://docs.opencv.org/3.4/d3/d63/classcv_1_1Mat.html#a51615ebf17a64c968df0bf49b4de6a3a
 
-  cv::Mat cv_frame(output_image.height(), output_image.width(), CV_8UC3, input_image.bits());
-
-  cv::imwrite("test.jpg", cv_frame);
+  cv::Mat cv_frame(_frameHeight, _frameWidth, CV_8UC3, input_image.bits(), input_image.bytesPerLine());
 
   initial_time = (initial_time == 0) ? input_frame.startTime() : initial_time;
-
-  std::vector<cv::Rect> roi_list;
 
   for (size_t n = 0; n < trackers.size(); n++) {
     auto& [tracker, roi_n, initialized] = trackers[n];
@@ -358,9 +400,9 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
       initialized = true;
     } else {
       tracker->update(cv_frame, roi_n);
-
-      painter.drawRect(QRectF{roi_n.x, roi_n.y, roi_n.width, roi_n.height});
     }
+
+    painter.drawRect(QRectF{roi_n.x, roi_n.y, roi_n.width, roi_n.height});
 
     double xc = roi_n.x + roi_n.width * 0.5;
     double yc = roi_n.y + roi_n.height * 0.5;
@@ -375,8 +417,6 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
 
     // ui::chart::add_point(self->chart_y, static_cast<int>(n), t, yc);
     // ui::chart::update(self->chart_y);
-
-    roi_list.emplace_back(roi_n);
   }
 
   // drawing the detected rois
