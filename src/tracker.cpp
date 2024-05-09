@@ -1,4 +1,27 @@
-#include "tracker.hpp"
+#include <opencv2/core/hal/interface.h>
+#include <qabstractitemmodel.h>
+#include <qbytearray.h>
+#include <qdatetime.h>
+#include <qhash.h>
+#include <qimage.h>
+#include <qlist.h>
+#include <qmediaplayer.h>
+#include <qnamespace.h>
+#include <qobject.h>
+#include <qrect.h>
+#include <qstring.h>
+#include <qtmetamacros.h>
+#include <qurl.h>
+#include <qvariant.h>
+#include <qvideoframeformat.h>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <opencv2/core/mat.hpp>
+#include "frame_source.hpp"
+#define FMT_HEADER_ONLY
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <qqml.h>
 #include <qsize.h>
 #include <QCameraDevice>
@@ -9,6 +32,7 @@
 #include <algorithm>
 #include <opencv2/core/types.hpp>
 #include "config.h"
+#include "tracker.hpp"
 #include "util.hpp"
 
 namespace tracker {
@@ -178,6 +202,8 @@ Backend::Backend(QObject* parent)
   media_player->setVideoSink(media_player_video_sink.get());
 
   camera->setExposureMode(QCamera::ExposureAction);
+  // camera->setExposureMode(QCamera::ExposureManual);
+  // camera->setManualExposureTime(0.0167);
   camera->setFocusMode(QCamera::FocusModeAutoFar);
   camera->setWhiteBalanceMode(QCamera::WhiteBalanceAuto);
 
@@ -191,6 +217,9 @@ Backend::Backend(QObject* parent)
 }
 
 Backend::~Backend() {
+  camera->stop();
+  media_player->stop();
+
   _videoSink = nullptr;
 }
 
@@ -279,17 +308,16 @@ void Backend::find_best_camera_resolution() {
         return false;
       });
 
-      auto resolution = util::to_string(formats.front().resolution().width()) + "x" +
-                        util::to_string(formats.front().resolution().height()) + ":" +
-                        util::to_string(formats.begin()->maxFrameRate());
+      auto resolution = fmt::format("{0}x{1}:{2}", formats.front().resolution().width(),
+                                    formats.front().resolution().height(), formats.begin()->maxFrameRate());
 
       sourceModel.append(std::make_shared<CameraSource>(cameraDevice, formats.front()));
 
       util::debug(cameraDevice.description().toStdString() + " -> " + resolution);
 
-      // for (const auto& f : formats) {
-      //   qDebug() << f.resolution() << f.maxFrameRate() << f.pixelFormat();
-      // }
+      auto dev_path = util::v4l2_find_device(cameraDevice.description().toStdString());
+
+      util::v4l2_disable_dynamic_fps(dev_path);
     }
   }
 }
@@ -336,6 +364,9 @@ void Backend::onNewRoi(double x, double y, double width, double height) {
   cv::Rect2d roi = {x, y, width, height};  // region of interest that is being created
 
   auto tracker = cv::legacy::TrackerMOSSE::create();
+  // cv::TrackerVit::Params params;
+  // params.net = "vitTracker.onnx";
+  // auto tracker = cv::TrackerVit::create(params);
 
   trackers.emplace_back(tracker, roi, false);
 }
@@ -418,6 +449,10 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
     // ui::chart::add_point(self->chart_y, static_cast<int>(n), t, yc);
     // ui::chart::update(self->chart_y);
   }
+
+  painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignBottom,
+                   QString::fromStdString(
+                       fmt::format("{0:.0f} fps", 1000000.0 / (input_frame.endTime() - input_frame.startTime()))));
 
   // drawing the detected rois
 

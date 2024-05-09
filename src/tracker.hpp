@@ -2,12 +2,22 @@
 
 #include <memory.h>
 #include <qabstractitemmodel.h>
+#include <qhash.h>
+#include <qlist.h>
+#include <qnamespace.h>
 #include <qobject.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 #include <QCamera>
 #include <QMediaPlayer>
 #include <QVideoSink>
+#include <memory>
+#include <opencv2/core/cvstd_wrapper.hpp>
+#include <opencv2/core/types.hpp>
 #include <opencv2/tracking.hpp>
-#include <opencv2/tracking/tracking_legacy.hpp>
+#include <opencv2/tracking/tracking_legacy.hpp>  // IWYU pragma: export
+#include <tuple>
+#include <vector>
 #include "frame_source.hpp"
 
 namespace tracker {
@@ -43,8 +53,6 @@ class Backend : public QObject {
 
   Q_PROPERTY(QVideoSink* videoSink MEMBER _videoSink NOTIFY videoSinkChanged)
 
-  Q_PROPERTY(int sourceIndex MEMBER _sourceIndex NOTIFY sourceIndexChanged)
-
   Q_PROPERTY(int frameWidth MEMBER _frameWidth NOTIFY frameWidthChanged)
 
   Q_PROPERTY(int frameHeight MEMBER _frameHeight NOTIFY frameHeightChanged)
@@ -70,7 +78,6 @@ class Backend : public QObject {
  private:
   int _frameWidth = 640;
   int _frameHeight = 480;
-  int _sourceIndex = 0;
 
   qint64 initial_time = 0;
 
@@ -89,6 +96,7 @@ class Backend : public QObject {
   std::unique_ptr<QVideoSink> media_player_video_sink;
 
   std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMOSSE>, cv::Rect2d, bool>> trackers;
+  // std::vector<std::tuple<cv::Ptr<cv::TrackerVit>, cv::Rect, bool>> trackers;
 
   void find_best_camera_resolution();
   void draw_offline_image();

@@ -7,7 +7,6 @@
 #include <source_location>
 #include <string>
 #include <system_error>
-#include <vector>
 
 namespace util {
 
@@ -22,6 +21,10 @@ void critical(const std::string& s, source_location location = source_location::
 void warning(const std::string& s, source_location location = source_location::current());
 
 void info(const std::string& s, source_location location = source_location::current());
+
+auto v4l2_find_device(const std::string& description) -> std::string;
+
+void v4l2_disable_dynamic_fps(const std::string& device_path);
 
 template <typename T>
 auto to_string(const T& num, const std::string def = "0") -> std::string {
