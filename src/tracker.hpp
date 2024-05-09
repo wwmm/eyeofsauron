@@ -63,19 +63,24 @@ class Backend : public QObject {
   ~Backend() override;
 
   Q_INVOKABLE void start();
+  Q_INVOKABLE void pause();
   Q_INVOKABLE void stop();
-  Q_INVOKABLE void onNewRoi(double x, double y, double width, double height);
-  Q_INVOKABLE void onNewRoiSelection(double x, double y, double width, double height);
   Q_INVOKABLE void append(const QUrl& videoUrl);
   Q_INVOKABLE void selectSource(const int& index);
+  Q_INVOKABLE void drawRoiSelection(const bool& state);
+  Q_INVOKABLE void createNewRoi(double x, double y, double width, double height);
+  Q_INVOKABLE void newRoiSelection(double x, double y, double width, double height);
+  Q_INVOKABLE void removeRoi(double x, double y);
 
  signals:
   void videoSinkChanged();
-  void sourceIndexChanged();
   void frameWidthChanged();
   void frameHeightChanged();
 
  private:
+  bool draw_roi_selection = false;
+  bool pause_camera = false;
+
   int _frameWidth = 640;
   int _frameHeight = 480;
 
@@ -96,7 +101,7 @@ class Backend : public QObject {
   std::unique_ptr<QVideoSink> media_player_video_sink;
 
   std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMOSSE>, cv::Rect2d, bool>> trackers;
-  // std::vector<std::tuple<cv::Ptr<cv::TrackerVit>, cv::Rect, bool>> trackers;
+  // std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMedianFlow>, cv::Rect2d, bool>> trackers;
 
   void find_best_camera_resolution();
   void draw_offline_image();

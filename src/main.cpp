@@ -14,8 +14,8 @@
 #include <QApplication>
 #include <QtQml>
 #include <memory>
-#include "cfg_window.h"
 #include "config.h"
+#include "eyeofsauron_db.h"
 #include "tracker.hpp"
 #include "util.hpp"
 
@@ -92,9 +92,9 @@ int main(int argc, char* argv[]) {
 
   // Registering kcfg settings
 
-  auto cfgWindow = cfg::Window::self();
+  auto db = db::Main::self();
 
-  qmlRegisterSingletonInstance("CfgWindow", VERSION_MAJOR, VERSION_MINOR, "CfgWindow", cfgWindow);
+  qmlRegisterSingletonInstance("EoSdb", VERSION_MAJOR, VERSION_MINOR, "EoSdb", db);
 
   // loading classes
 
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  QObject::connect(&app, &QApplication::aboutToQuit, [=]() { cfgWindow->save(); });
+  QObject::connect(&app, &QApplication::aboutToQuit, [=]() { db->save(); });
 
   return QApplication::exec();
 }

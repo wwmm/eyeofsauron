@@ -5,15 +5,25 @@
     <kcfgfile name="eyeofsauronrc" />
     <group name="Window">
         <entry name="width" type="Int">
-            <label>Width of the main window.</label>
+            <label>Width of the main window</label>
             <default>800</default>
         </entry>
         <entry name="height" type="Int">
-            <label>Height of the main window.</label>
+            <label>Height of the main window</label>
             <default>600</default>
         </entry>
         <entry name="showTrayIcon" type="Bool">
-            <label>Show the tray icon.</label>
+            <label>Show the tray icon</label>
+            <default>true</default>
+        </entry>
+    </group>
+    <group name="Tracker">
+        <entry name="showDateTime" type="Bool">
+            <label>Show Date and Time</label>
+            <default>true</default>
+        </entry>
+        <entry name="showFps" type="Bool">
+            <label>Show FPS</label>
             <default>true</default>
         </entry>
     </group>

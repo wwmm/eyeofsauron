@@ -12,7 +12,7 @@ import org.kde.kirigamiaddons.formcard as FormCard
 Kirigami.ScrollablePage {
     id: tracker
 
-    title: i18n("Object Tracker")
+    title: i18n("Tracker")
     actions: [
         Kirigami.Action {
             text: i18n("Video Source")
@@ -23,6 +23,11 @@ Kirigami.ScrollablePage {
             icon.name: "media-playback-start-symbolic"
             text: i18nc("@action:button", "Play")
             onTriggered: EoSTrackerBackend.start()
+        },
+        Kirigami.Action {
+            icon.name: "media-playback-pause-symbolic"
+            text: i18nc("@action:button", "Pause")
+            onTriggered: EoSTrackerBackend.pause()
         },
         Kirigami.Action {
             icon.name: "media-playback-stop-symbolic"
@@ -46,8 +51,6 @@ Kirigami.ScrollablePage {
 
             implicitWidth: EoSTrackerBackend.frameWidth
             implicitHeight: EoSTrackerBackend.frameHeight
-            // Layout.maximumWidth: EoSTrackerBackend.frameWidth
-            // Layout.maximumHeight: EoSTrackerBackend.frameHeight
             // fillMode: VideoOutput.Stretch
             Component.onCompleted: {
                 EoSTrackerBackend.videoSink = videoOutput.videoSink;
@@ -64,7 +67,7 @@ Kirigami.ScrollablePage {
                 preventStealing: true
                 onClicked: (event) => {
                     if (event.button == Qt.RightButton)
-                        console.log("mouse clicked");
+                        EoSTrackerBackend.removeRoi(event.x, event.y);
 
                 }
                 onReleased: (event) => {
@@ -82,7 +85,8 @@ Kirigami.ScrollablePage {
                             y0 = height + y0;
                             height *= -1;
                         }
-                        EoSTrackerBackend.onNewRoi(x0, y0, width, height);
+                        EoSTrackerBackend.createNewRoi(x0, y0, width, height);
+                        EoSTrackerBackend.drawRoiSelection(false);
                         event.accepted = true;
                     }
                 }
@@ -103,7 +107,7 @@ Kirigami.ScrollablePage {
                             y = height + y;
                             height *= -1;
                         }
-                        EoSTrackerBackend.onNewRoiSelection(x, y, width, height);
+                        EoSTrackerBackend.newRoiSelection(x, y, width, height);
                     }
                 }
                 onPressed: (event) => {
@@ -111,6 +115,7 @@ Kirigami.ScrollablePage {
                         x0 = event.x;
                         y0 = event.y;
                         event.accepted = true;
+                        EoSTrackerBackend.drawRoiSelection(true);
                     }
                 }
             }

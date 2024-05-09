@@ -37,8 +37,6 @@ Kirigami.OverlaySheet {
         id: listDelegate
 
         Controls.ItemDelegate {
-            // backend.selectSource(index);
-
             id: listItemDelegate
 
             property string sourceType: model.sourceType

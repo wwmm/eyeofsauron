@@ -1,6 +1,7 @@
 #include <opencv2/core/hal/interface.h>
 #include <qabstractitemmodel.h>
 #include <qbytearray.h>
+#include <qcolor.h>
 #include <qdatetime.h>
 #include <qhash.h>
 #include <qimage.h>
@@ -18,6 +19,8 @@
 #include <iterator>
 #include <memory>
 #include <opencv2/core/mat.hpp>
+#include <vector>
+#include "eyeofsauron_db.h"
 #include "frame_source.hpp"
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
@@ -194,6 +197,17 @@ Backend::Backend(QObject* parent)
   qmlRegisterSingletonInstance<SourceModel>("EosTrackerSourceModel", VERSION_MAJOR, VERSION_MINOR,
                                             "EosTrackerSourceModel", &sourceModel);
 
+  connect(this, &Backend::videoSinkChanged, [this]() { draw_offline_image(); });
+
+  connect(camera_video_sink.get(), &QVideoSink::videoFrameChanged, [this](const QVideoFrame& frame) {
+    if (!pause_camera) {
+      process_frame(frame);
+    }
+  });
+
+  connect(media_player_video_sink.get(), &QVideoSink::videoFrameChanged,
+          [this](const QVideoFrame& frame) { process_frame(frame); });
+
   find_best_camera_resolution();
 
   capture_session->setCamera(camera.get());
@@ -202,34 +216,35 @@ Backend::Backend(QObject* parent)
   media_player->setVideoSink(media_player_video_sink.get());
 
   camera->setExposureMode(QCamera::ExposureAction);
-  // camera->setExposureMode(QCamera::ExposureManual);
-  // camera->setManualExposureTime(0.0167);
-  camera->setFocusMode(QCamera::FocusModeAutoFar);
+  camera->setFocusMode(QCamera::FocusModeAuto);
   camera->setWhiteBalanceMode(QCamera::WhiteBalanceAuto);
-
-  connect(this, &Backend::videoSinkChanged, [this]() { draw_offline_image(); });
-
-  connect(camera_video_sink.get(), &QVideoSink::videoFrameChanged,
-          [this](const QVideoFrame& frame) { process_frame(frame); });
-
-  connect(media_player_video_sink.get(), &QVideoSink::videoFrameChanged,
-          [this](const QVideoFrame& frame) { process_frame(frame); });
 }
 
 Backend::~Backend() {
   camera->stop();
   media_player->stop();
-
-  _videoSink = nullptr;
 }
 
 void Backend::start() {
   switch (current_source_type) {
     case Camera: {
+      pause_camera = false;
       camera->start();
     } break;
     case VideoFile: {
       media_player->play();
+      break;
+    }
+  }
+}
+
+void Backend::pause() {
+  switch (current_source_type) {
+    case Camera: {
+      pause_camera = true;
+    } break;
+    case VideoFile: {
+      media_player->pause();
       break;
     }
   }
@@ -250,8 +265,6 @@ void Backend::stop() {
 
 void Backend::append(const QUrl& videoUrl) {
   if (videoUrl.isLocalFile()) {
-    util::warning(videoUrl.toString().toStdString());
-
     sourceModel.append(std::make_shared<VideoFileSource>(videoUrl));
   }
 }
@@ -360,22 +373,40 @@ void Backend::draw_offline_image() {
   _videoSink->setVideoFrame(video_frame);
 }
 
-void Backend::onNewRoi(double x, double y, double width, double height) {
+void Backend::drawRoiSelection(const bool& state) {
+  draw_roi_selection = state;
+}
+
+void Backend::createNewRoi(double x, double y, double width, double height) {
   cv::Rect2d roi = {x, y, width, height};  // region of interest that is being created
 
   auto tracker = cv::legacy::TrackerMOSSE::create();
-  // cv::TrackerVit::Params params;
-  // params.net = "vitTracker.onnx";
-  // auto tracker = cv::TrackerVit::create(params);
+  // auto tracker = cv::legacy::TrackerMedianFlow::create();
 
   trackers.emplace_back(tracker, roi, false);
 }
 
-void Backend::onNewRoiSelection(double x, double y, double width, double height) {
+void Backend::newRoiSelection(double x, double y, double width, double height) {
   rect_selection.setRect(x, y, width, height);
 }
 
+void Backend::removeRoi(double x, double y) {
+  for (size_t n = 0; n < trackers.size(); n++) {
+    const auto& [tracker, roi, initialized] = trackers[n];
+
+    if (x >= roi.x && x < roi.x + roi.width) {
+      if (y >= roi.y && y < roi.y + roi.height) {
+        std::erase(trackers, trackers[n]);
+      }
+    }
+  }
+}
+
 void Backend::process_frame(const QVideoFrame& input_frame) {
+  if (_videoSink == nullptr) {
+    util::warning("Invalid videoSink pointer!");
+  }
+
   if (!input_frame.isValid()) {
     util::warning("QVideoFrame is not valid or not writable");
 
@@ -450,14 +481,21 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
     // ui::chart::update(self->chart_y);
   }
 
-  painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignBottom,
-                   QString::fromStdString(
-                       fmt::format("{0:.0f} fps", 1000000.0 / (input_frame.endTime() - input_frame.startTime()))));
+  if (db::Main::showFps()) {
+    painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignBottom,
+                     QString::fromStdString(
+                         fmt::format("{0:.0f} fps", 1000000.0 / (input_frame.endTime() - input_frame.startTime()))));
+  }
 
-  // drawing the detected rois
+  if (db::Main::showDateTime()) {
+    painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignTop, QDateTime::currentDateTime().toString());
+  }
 
-  painter.drawRect(rect_selection);
-  painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignTop, QDateTime::currentDateTime().toString());
+  if (draw_roi_selection) {
+    painter.setPen(QColorConstants::Red);
+    painter.drawRect(rect_selection);
+  }
+
   painter.end();
 
   // sending the output qvideoframe to the video sink

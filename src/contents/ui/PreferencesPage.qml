@@ -1,4 +1,4 @@
-import CfgWindow
+import EoSdb
 import org.kde.kirigamiaddons.formcard as FormCard
 
 FormCard.FormCardPage {
@@ -11,10 +11,10 @@ FormCard.FormCardPage {
             id: showTrayIcon
 
             label: i18n("Show the Tray Icon")
-            isChecked: CfgWindow.showTrayIcon
+            isChecked: EoSdb.showTrayIcon
             onCheckedChanged: {
-                if (isChecked !== CfgWindow.showTrayIcon)
-                    CfgWindow.showTrayIcon = isChecked;
+                if (isChecked !== EoSdb.showTrayIcon)
+                    EoSdb.showTrayIcon = isChecked;
 
             }
         }
@@ -22,10 +22,34 @@ FormCard.FormCardPage {
     }
 
     FormCard.FormHeader {
-        title: i18n("Camera")
+        title: i18n("Tracker")
     }
 
     FormCard.FormCard {
+        EoSSwitch {
+            id: showDateTime
+
+            label: i18n("Show Date and Time")
+            isChecked: EoSdb.showDateTime
+            onCheckedChanged: {
+                if (isChecked !== EoSdb.showDateTime)
+                    EoSdb.showDateTime = isChecked;
+
+            }
+        }
+
+        EoSSwitch {
+            id: showFps
+
+            label: i18n("Show FPS")
+            isChecked: EoSdb.showFps
+            onCheckedChanged: {
+                if (isChecked !== EoSdb.showFps)
+                    EoSdb.showFps = isChecked;
+
+            }
+        }
+
     }
 
 }

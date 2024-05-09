@@ -1,5 +1,5 @@
 import AboutEoS
-import CfgWindow
+import EoSdb
 import Qt.labs.platform
 import QtQuick
 import QtQuick.Controls as Controls
@@ -10,20 +10,20 @@ import org.kde.kirigamiaddons.formcard as FormCard
 Kirigami.ApplicationWindow {
     id: root
 
-    width: CfgWindow.width
-    height: CfgWindow.height
+    width: EoSdb.width
+    height: EoSdb.height
     pageStack.initialPage: tracker
     pageStack.globalToolBar.style: Kirigami.Settings.isMobile ? Kirigami.ApplicationHeaderStyle.Titles : Kirigami.ApplicationHeaderStyle.Auto
     title: i18nc("@title:window", "Eye Of Sauron")
     onWidthChanged: {
-        CfgWindow.width = applicationWindow().width;
+        EoSdb.width = applicationWindow().width;
     }
     onHeightChanged: {
-        CfgWindow.height = applicationWindow().height;
+        EoSdb.height = applicationWindow().height;
     }
     onVisibleChanged: {
         if (!root.visible)
-            CfgWindow.save();
+            EoSdb.save();
 
     }
 
@@ -73,7 +73,7 @@ Kirigami.ApplicationWindow {
     SystemTrayIcon {
         id: tray
 
-        visible: CfgWindow.showTrayIcon
+        visible: EoSdb.showTrayIcon
         icon.name: "eyeofsauron"
         onActivated: {
             if (!root.visible) {
