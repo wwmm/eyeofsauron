@@ -1,4 +1,5 @@
 import EoSTrackerBackend
+import EoSdb
 import EosTrackerSourceModel
 import QtCharts
 import QtMultimedia
@@ -36,6 +37,18 @@ Kirigami.ScrollablePage {
         }
     ]
 
+    Connections {
+        function onUpdateChart() {
+            for (let n = 0; n < chart.count; n += 2) {
+                if (n + 1 < chart.count)
+                    EoSTrackerBackend.updateSeries(chart.series(n), chart.series(n + 1), n);
+
+            }
+        }
+
+        target: EoSTrackerBackend
+    }
+
     SourceMenu {
         id: sourceMenu
 
@@ -66,9 +79,13 @@ Kirigami.ScrollablePage {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 preventStealing: true
                 onClicked: (event) => {
-                    if (event.button == Qt.RightButton)
-                        EoSTrackerBackend.removeRoi(event.x, event.y);
-
+                    if (event.button == Qt.RightButton) {
+                        let seriesIndex = EoSTrackerBackend.removeRoi(event.x, event.y);
+                        if (seriesIndex !== -1) {
+                            chart.removeSeries(chart.series(seriesIndex)); // x
+                            chart.removeSeries(chart.series(seriesIndex)); // y
+                        }
+                    }
                 }
                 onReleased: (event) => {
                     if (event.button == Qt.LeftButton) {
@@ -87,6 +104,8 @@ Kirigami.ScrollablePage {
                         }
                         EoSTrackerBackend.createNewRoi(x0, y0, width, height);
                         EoSTrackerBackend.drawRoiSelection(false);
+                        chart.addSeries("x");
+                        chart.addSeries("y");
                         event.accepted = true;
                     }
                 }
@@ -123,51 +142,36 @@ Kirigami.ScrollablePage {
         }
 
         ChartView {
-            title: "Line Chart"
+            id: chart
+
+            function addSeries(axisName) {
+                let label = i18n("Object-" + Math.floor(chart.count / 2) + "-" + axisName);
+                let series = createSeries(ChartView.SeriesTypeLine, label, axisTime, axisPosition);
+                series.useOpenGL = true;
+            }
+
+            title: i18n("Position")
             antialiasing: true
             Layout.fillWidth: true
             Layout.fillHeight: true
             implicitHeight: 480
             implicitWidth: 640
+            theme: EoSdb.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
 
-            LineSeries {
-                name: "Line"
+            ValueAxis {
+                id: axisPosition
 
-                XYPoint {
-                    x: 0
-                    y: 0
-                }
+                labelFormat: "%.1f"
+                min: 0
+                max: 1024
+            }
 
-                XYPoint {
-                    x: 1.1
-                    y: 2.1
-                }
+            ValueAxis {
+                id: axisTime
 
-                XYPoint {
-                    x: 1.9
-                    y: 3.3
-                }
-
-                XYPoint {
-                    x: 2.1
-                    y: 2.1
-                }
-
-                XYPoint {
-                    x: 2.9
-                    y: 4.9
-                }
-
-                XYPoint {
-                    x: 3.4
-                    y: 3
-                }
-
-                XYPoint {
-                    x: 4.1
-                    y: 3.3
-                }
-
+                labelFormat: "%.1f"
+                min: 0
+                max: 10
             }
 
         }
@@ -187,7 +191,7 @@ Kirigami.ScrollablePage {
                     stepSize: 1
                     from: 2
                     to: 1000
-                    value: 100
+                    value: EoSdb.chartDataPoints
                 }
 
             },

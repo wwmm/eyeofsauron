@@ -2,6 +2,7 @@
 
 #include <memory.h>
 #include <qabstractitemmodel.h>
+#include <qabstractseries.h>
 #include <qhash.h>
 #include <qlist.h>
 #include <qnamespace.h>
@@ -70,16 +71,18 @@ class Backend : public QObject {
   Q_INVOKABLE void drawRoiSelection(const bool& state);
   Q_INVOKABLE void createNewRoi(double x, double y, double width, double height);
   Q_INVOKABLE void newRoiSelection(double x, double y, double width, double height);
-  Q_INVOKABLE void removeRoi(double x, double y);
+  Q_INVOKABLE int removeRoi(double x, double y);
+  Q_INVOKABLE void updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y, const int& index);
 
  signals:
   void videoSinkChanged();
   void frameWidthChanged();
   void frameHeightChanged();
+  void updateChart();
 
  private:
   bool draw_roi_selection = false;
-  bool pause_camera = false;
+  bool pause_preview = false;
 
   int _frameWidth = 640;
   int _frameHeight = 480;
@@ -89,6 +92,8 @@ class Backend : public QObject {
   SourceType current_source_type = SourceType::Camera;
 
   QVideoSink* _videoSink = nullptr;
+
+  QVideoFrame input_video_frame;
 
   QRectF rect_selection = {0.0, 0.0, 0.0, 0.0};
 
@@ -100,12 +105,12 @@ class Backend : public QObject {
   std::unique_ptr<QMediaPlayer> media_player;
   std::unique_ptr<QVideoSink> media_player_video_sink;
 
-  std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMOSSE>, cv::Rect2d, bool>> trackers;
+  std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMOSSE>, cv::Rect2d, bool, QList<QPointF>, QList<QPointF>>> trackers;
   // std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMedianFlow>, cv::Rect2d, bool>> trackers;
 
   void find_best_camera_resolution();
   void draw_offline_image();
-  void process_frame(const QVideoFrame& input_frame);
+  void process_frame();
 };
 
 }  // namespace tracker

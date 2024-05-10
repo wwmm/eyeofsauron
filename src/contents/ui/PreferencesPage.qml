@@ -50,6 +50,18 @@ FormCard.FormCardPage {
             }
         }
 
+        EoSSwitch {
+            id: darkChartTheme
+
+            label: i18n("Dark Chart Theme")
+            isChecked: EoSdb.darkChartTheme
+            onCheckedChanged: {
+                if (isChecked !== EoSdb.darkChartTheme)
+                    EoSdb.darkChartTheme = isChecked;
+
+            }
+        }
+
     }
 
 }

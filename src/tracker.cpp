@@ -1,5 +1,6 @@
 #include <opencv2/core/hal/interface.h>
 #include <qabstractitemmodel.h>
+#include <qabstractseries.h>
 #include <qbytearray.h>
 #include <qcolor.h>
 #include <qdatetime.h>
@@ -13,8 +14,10 @@
 #include <qstring.h>
 #include <qtmetamacros.h>
 #include <qurl.h>
+#include <qvalueaxis.h>
 #include <qvariant.h>
 #include <qvideoframeformat.h>
+#include <qxyseries.h>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -27,6 +30,7 @@
 #include <fmt/format.h>
 #include <qqml.h>
 #include <qsize.h>
+#include <KLocalizedString>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QMediaDevices>
@@ -200,15 +204,18 @@ Backend::Backend(QObject* parent)
   connect(this, &Backend::videoSinkChanged, [this]() { draw_offline_image(); });
 
   connect(camera_video_sink.get(), &QVideoSink::videoFrameChanged, [this](const QVideoFrame& frame) {
-    if (!pause_camera) {
-      process_frame(frame);
+    if (!pause_preview) {
+      input_video_frame = frame;
+      process_frame();
     }
   });
 
-  connect(media_player_video_sink.get(), &QVideoSink::videoFrameChanged,
-          [this](const QVideoFrame& frame) { process_frame(frame); });
-
-  find_best_camera_resolution();
+  connect(media_player_video_sink.get(), &QVideoSink::videoFrameChanged, [this](const QVideoFrame& frame) {
+    if (!pause_preview) {
+      input_video_frame = frame;
+      process_frame();
+    }
+  });
 
   capture_session->setCamera(camera.get());
   capture_session->setVideoSink(camera_video_sink.get());
@@ -218,6 +225,8 @@ Backend::Backend(QObject* parent)
   camera->setExposureMode(QCamera::ExposureAction);
   camera->setFocusMode(QCamera::FocusModeAuto);
   camera->setWhiteBalanceMode(QCamera::WhiteBalanceAuto);
+
+  find_best_camera_resolution();
 }
 
 Backend::~Backend() {
@@ -226,9 +235,10 @@ Backend::~Backend() {
 }
 
 void Backend::start() {
+  pause_preview = false;
+
   switch (current_source_type) {
     case Camera: {
-      pause_camera = false;
       camera->start();
     } break;
     case VideoFile: {
@@ -239,9 +249,10 @@ void Backend::start() {
 }
 
 void Backend::pause() {
+  pause_preview = true;
+
   switch (current_source_type) {
     case Camera: {
-      pause_camera = true;
     } break;
     case VideoFile: {
       media_player->pause();
@@ -383,37 +394,45 @@ void Backend::createNewRoi(double x, double y, double width, double height) {
   auto tracker = cv::legacy::TrackerMOSSE::create();
   // auto tracker = cv::legacy::TrackerMedianFlow::create();
 
-  trackers.emplace_back(tracker, roi, false);
+  trackers.emplace_back(tracker, roi, false, QList<QPointF>(), QList<QPointF>());
 }
 
 void Backend::newRoiSelection(double x, double y, double width, double height) {
   rect_selection.setRect(x, y, width, height);
+
+  if (pause_preview) {
+    process_frame();
+  }
 }
 
-void Backend::removeRoi(double x, double y) {
+int Backend::removeRoi(double x, double y) {
   for (size_t n = 0; n < trackers.size(); n++) {
-    const auto& [tracker, roi, initialized] = trackers[n];
+    const auto& [tracker, roi, initialized, data_tx, data_ty] = trackers[n];
 
     if (x >= roi.x && x < roi.x + roi.width) {
       if (y >= roi.y && y < roi.y + roi.height) {
         std::erase(trackers, trackers[n]);
+
+        return n;
       }
     }
   }
+
+  return -1;
 }
 
-void Backend::process_frame(const QVideoFrame& input_frame) {
+void Backend::process_frame() {
   if (_videoSink == nullptr) {
     util::warning("Invalid videoSink pointer!");
   }
 
-  if (!input_frame.isValid()) {
+  if (!input_video_frame.isValid()) {
     util::warning("QVideoFrame is not valid or not writable");
 
     return;
   }
 
-  auto input_image = input_frame.toImage()
+  auto input_image = input_video_frame.toImage()
                          .scaled(_frameWidth, _frameHeight, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
                          .convertedTo(QImage::Format_BGR888);
 
@@ -451,10 +470,10 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
 
   cv::Mat cv_frame(_frameHeight, _frameWidth, CV_8UC3, input_image.bits(), input_image.bytesPerLine());
 
-  initial_time = (initial_time == 0) ? input_frame.startTime() : initial_time;
+  initial_time = (initial_time == 0) ? input_video_frame.startTime() : initial_time;
 
   for (size_t n = 0; n < trackers.size(); n++) {
-    auto& [tracker, roi_n, initialized] = trackers[n];
+    auto& [tracker, roi_n, initialized, data_tx, data_ty] = trackers[n];
 
     if (!initialized) {
       tracker->init(cv_frame, roi_n);
@@ -468,11 +487,23 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
 
     double xc = roi_n.x + roi_n.width * 0.5;
     double yc = roi_n.y + roi_n.height * 0.5;
-    double t = static_cast<double>(input_frame.startTime() - initial_time) / 1000000.0;
+    double t = static_cast<double>(input_video_frame.startTime() - initial_time) / 1000000.0;
 
     // changing the coordinate system origin to the bottom left corner
 
-    yc = output_image.height() - yc;
+    yc = _frameHeight - yc;
+
+    data_tx.append(QPointF(t, xc));
+    data_ty.append(QPointF(t, yc));
+
+    if (data_tx.size() > db::Main::chartDataPoints()) {
+      data_tx.removeFirst();
+      data_ty.removeFirst();
+    }
+
+    if (!pause_preview) {
+      Q_EMIT updateChart();
+    }
 
     // ui::chart::add_point(self->chart_x, static_cast<int>(n), t, xc);
     // ui::chart::update(self->chart_x);
@@ -483,8 +514,8 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
 
   if (db::Main::showFps()) {
     painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignBottom,
-                     QString::fromStdString(
-                         fmt::format("{0:.0f} fps", 1000000.0 / (input_frame.endTime() - input_frame.startTime()))));
+                     QString::fromStdString(fmt::format(
+                         "{0:.0f} fps", 1000000.0 / (input_video_frame.endTime() - input_video_frame.startTime()))));
   }
 
   if (db::Main::showDateTime()) {
@@ -503,6 +534,19 @@ void Backend::process_frame(const QVideoFrame& input_frame) {
   video_frame.unmap();
 
   _videoSink->setVideoFrame(video_frame);
+}
+
+void Backend::updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y, const int& index) {
+  if (series_x != nullptr && series_y != nullptr) {
+    auto xySeries_x = dynamic_cast<QXYSeries*>(series_x);
+    auto xySeries_y = dynamic_cast<QXYSeries*>(series_y);
+
+    auto& [tracker, roi_n, initialized, data_tx, data_ty] = trackers[index];
+
+    // Use replace instead of clear + append, it's optimized for performance
+    xySeries_x->replace(data_tx);
+    xySeries_y->replace(data_ty);
+  }
 }
 
 }  // namespace tracker

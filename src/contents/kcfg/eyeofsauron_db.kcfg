@@ -26,5 +26,15 @@
             <label>Show FPS</label>
             <default>true</default>
         </entry>
+        <entry name="darkChartTheme" type="Bool">
+            <label>Dark Chart Theme</label>
+            <default>true</default>
+        </entry>
+        <entry name="chartDataPoints" type="Int">
+            <label>Number of Data Points in the Chart</label>
+            <default>200</default>
+            <min>2</min>
+            <max>1000</max>
+        </entry>
     </group>
 </kcfg>
