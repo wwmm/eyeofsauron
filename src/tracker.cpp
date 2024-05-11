@@ -235,6 +235,7 @@ Backend::~Backend() {
 }
 
 void Backend::start() {
+  initial_time = 0;
   pause_preview = false;
 
   switch (current_source_type) {
@@ -262,7 +263,8 @@ void Backend::pause() {
 }
 
 void Backend::stop() {
-  camera->stop();
+  initial_time = 0;
+
   switch (current_source_type) {
     case Camera: {
       camera->stop();
@@ -394,7 +396,14 @@ void Backend::createNewRoi(double x, double y, double width, double height) {
   auto tracker = cv::legacy::TrackerMOSSE::create();
   // auto tracker = cv::legacy::TrackerMedianFlow::create();
 
+  for (auto& [tracker, roi, initialized, data_tx, data_ty] : trackers) {
+    data_tx.clear();
+    data_ty.clear();
+  }
+
   trackers.emplace_back(tracker, roi, false, QList<QPointF>(), QList<QPointF>());
+
+  initial_time = 0;
 }
 
 void Backend::newRoiSelection(double x, double y, double width, double height) {
@@ -406,6 +415,8 @@ void Backend::newRoiSelection(double x, double y, double width, double height) {
 }
 
 int Backend::removeRoi(double x, double y) {
+  initial_time = 0;
+
   for (size_t n = 0; n < trackers.size(); n++) {
     const auto& [tracker, roi, initialized, data_tx, data_ty] = trackers[n];
 
@@ -472,9 +483,7 @@ void Backend::process_frame() {
 
   initial_time = (initial_time == 0) ? input_video_frame.startTime() : initial_time;
 
-  for (size_t n = 0; n < trackers.size(); n++) {
-    auto& [tracker, roi_n, initialized, data_tx, data_ty] = trackers[n];
-
+  for (auto& [tracker, roi_n, initialized, data_tx, data_ty] : trackers) {
     if (!initialized) {
       tracker->init(cv_frame, roi_n);
 
@@ -496,7 +505,7 @@ void Backend::process_frame() {
     data_tx.append(QPointF(t, xc));
     data_ty.append(QPointF(t, yc));
 
-    if (data_tx.size() > db::Main::chartDataPoints()) {
+    while (data_tx.size() > db::Main::chartDataPoints()) {
       data_tx.removeFirst();
       data_ty.removeFirst();
     }
@@ -504,12 +513,6 @@ void Backend::process_frame() {
     if (!pause_preview) {
       Q_EMIT updateChart();
     }
-
-    // ui::chart::add_point(self->chart_x, static_cast<int>(n), t, xc);
-    // ui::chart::update(self->chart_x);
-
-    // ui::chart::add_point(self->chart_y, static_cast<int>(n), t, yc);
-    // ui::chart::update(self->chart_y);
   }
 
   if (db::Main::showFps()) {
@@ -543,9 +546,36 @@ void Backend::updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y,
 
     auto& [tracker, roi_n, initialized, data_tx, data_ty] = trackers[index];
 
+    if (data_tx.empty() || data_ty.empty()) {
+      return;
+    }
+
+    {
+      auto [min_x, max_x] = std::ranges::minmax_element(data_tx, [](QPointF a, QPointF b) { return a.y() < b.y(); });
+      auto [min_y, max_y] = std::ranges::minmax_element(data_ty, [](QPointF a, QPointF b) { return a.y() < b.y(); });
+
+      _yAxisMin = std::min(min_x->y(), min_y->y());
+      _yAxisMax = std::max(max_x->y(), max_y->y());
+
+      Q_EMIT yAxisMinChanged();
+      Q_EMIT yAxisMaxChanged();
+    }
+
+    {
+      auto [min_t, max_t] = std::ranges::minmax_element(data_tx, [](QPointF a, QPointF b) { return a.x() < b.x(); });
+
+      _xAxisMin = min_t->x();
+      _xAxisMax = max_t->x();
+
+      Q_EMIT xAxisMinChanged();
+      Q_EMIT xAxisMaxChanged();
+    }
+
     // Use replace instead of clear + append, it's optimized for performance
     xySeries_x->replace(data_tx);
     xySeries_y->replace(data_ty);
+  } else {
+    util::warning("series_x or series_y is null!");
   }
 }
 

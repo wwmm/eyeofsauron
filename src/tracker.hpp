@@ -58,6 +58,14 @@ class Backend : public QObject {
 
   Q_PROPERTY(int frameHeight MEMBER _frameHeight NOTIFY frameHeightChanged)
 
+  Q_PROPERTY(double xAxisMin MEMBER _xAxisMin NOTIFY xAxisMinChanged)
+
+  Q_PROPERTY(double xAxisMax MEMBER _xAxisMax NOTIFY xAxisMaxChanged)
+
+  Q_PROPERTY(double yAxisMin MEMBER _yAxisMin NOTIFY yAxisMinChanged)
+
+  Q_PROPERTY(double yAxisMax MEMBER _yAxisMax NOTIFY yAxisMaxChanged)
+
  public:
   Backend(QObject* parent = nullptr);
 
@@ -78,6 +86,10 @@ class Backend : public QObject {
   void videoSinkChanged();
   void frameWidthChanged();
   void frameHeightChanged();
+  void xAxisMinChanged();
+  void xAxisMaxChanged();
+  void yAxisMinChanged();
+  void yAxisMaxChanged();
   void updateChart();
 
  private:
@@ -86,6 +98,11 @@ class Backend : public QObject {
 
   int _frameWidth = 640;
   int _frameHeight = 480;
+
+  double _xAxisMin = 10000;
+  double _xAxisMax = 0;
+  double _yAxisMin = 10000;
+  double _yAxisMax = 0;
 
   qint64 initial_time = 0;
 

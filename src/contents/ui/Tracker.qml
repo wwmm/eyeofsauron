@@ -40,9 +40,7 @@ Kirigami.ScrollablePage {
     Connections {
         function onUpdateChart() {
             for (let n = 0; n < chart.count; n += 2) {
-                if (n + 1 < chart.count)
-                    EoSTrackerBackend.updateSeries(chart.series(n), chart.series(n + 1), n);
-
+                EoSTrackerBackend.updateSeries(chart.series(n), chart.series(n + 1), Math.floor(n / 2));
             }
         }
 
@@ -102,10 +100,10 @@ Kirigami.ScrollablePage {
                             y0 = height + y0;
                             height *= -1;
                         }
-                        EoSTrackerBackend.createNewRoi(x0, y0, width, height);
-                        EoSTrackerBackend.drawRoiSelection(false);
                         chart.addSeries("x");
                         chart.addSeries("y");
+                        EoSTrackerBackend.createNewRoi(x0, y0, width, height);
+                        EoSTrackerBackend.drawRoiSelection(false);
                         event.accepted = true;
                     }
                 }
@@ -145,9 +143,17 @@ Kirigami.ScrollablePage {
             id: chart
 
             function addSeries(axisName) {
-                let label = i18n("Object-" + Math.floor(chart.count / 2) + "-" + axisName);
+                let label = i18n(axisName + Math.floor(chart.count / 2));
                 let series = createSeries(ChartView.SeriesTypeLine, label, axisTime, axisPosition);
                 series.useOpenGL = true;
+                if (axisName === "x")
+                    series.visible = Qt.binding(function() {
+                    return actionViewXdata.showChart;
+                });
+                else if (axisName === "y")
+                    series.visible = Qt.binding(function() {
+                    return actionViewYdata.showChart;
+                });
             }
 
             title: i18n("Position")
@@ -162,16 +168,16 @@ Kirigami.ScrollablePage {
                 id: axisPosition
 
                 labelFormat: "%.1f"
-                min: 0
-                max: 1024
+                min: EoSTrackerBackend.yAxisMin
+                max: EoSTrackerBackend.yAxisMax
             }
 
             ValueAxis {
                 id: axisTime
 
                 labelFormat: "%.1f"
-                min: 0
-                max: 10
+                min: EoSTrackerBackend.xAxisMin
+                max: EoSTrackerBackend.xAxisMax
             }
 
         }
@@ -192,6 +198,9 @@ Kirigami.ScrollablePage {
                     from: 2
                     to: 1000
                     value: EoSdb.chartDataPoints
+                    onValueModified: (v) => {
+                        EoSdb.chartDataPoints = v;
+                    }
                 }
 
             },
@@ -202,6 +211,34 @@ Kirigami.ScrollablePage {
             Kirigami.Action {
                 text: i18n("Save Table")
                 icon.name: "folder-table-symbolic"
+            },
+            Kirigami.Action {
+                id: actionViewXdata
+
+                property bool showChart: true
+
+                displayComponent: Controls.CheckBox {
+                    text: i18n("x")
+                    checked: true
+                    onCheckedChanged: {
+                        actionViewXdata.showChart = checked;
+                    }
+                }
+
+            },
+            Kirigami.Action {
+                id: actionViewYdata
+
+                property bool showChart: true
+
+                displayComponent: Controls.CheckBox {
+                    text: i18n("y")
+                    checked: true
+                    onCheckedChanged: {
+                        actionViewYdata.showChart = checked;
+                    }
+                }
+
             }
         ]
     }
