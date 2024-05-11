@@ -66,6 +66,10 @@ class Backend : public QObject {
 
   Q_PROPERTY(double yAxisMax MEMBER _yAxisMax NOTIFY yAxisMaxChanged)
 
+  Q_PROPERTY(bool xDataVisible MEMBER _xDataVisible NOTIFY xDataVisibleChanged)
+
+  Q_PROPERTY(bool yDataVisible MEMBER _yDataVisible NOTIFY yDataVisibleChanged)
+
  public:
   Backend(QObject* parent = nullptr);
 
@@ -90,11 +94,15 @@ class Backend : public QObject {
   void xAxisMaxChanged();
   void yAxisMinChanged();
   void yAxisMaxChanged();
+  void xDataVisibleChanged();
+  void yDataVisibleChanged();
   void updateChart();
 
  private:
   bool draw_roi_selection = false;
   bool pause_preview = false;
+  bool _xDataVisible = true;
+  bool _yDataVisible = true;
 
   int _frameWidth = 640;
   int _frameHeight = 480;
@@ -128,6 +136,7 @@ class Backend : public QObject {
   void find_best_camera_resolution();
   void draw_offline_image();
   void process_frame();
+  void update_chart_range();
 };
 
 }  // namespace tracker

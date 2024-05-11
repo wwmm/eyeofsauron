@@ -40,6 +40,7 @@ Kirigami.ScrollablePage {
     Connections {
         function onUpdateChart() {
             for (let n = 0; n < chart.count; n += 2) {
+                // console.log(chart.series(n).name + " -> " + chart.series(n + 1).name);
                 EoSTrackerBackend.updateSeries(chart.series(n), chart.series(n + 1), Math.floor(n / 2));
             }
         }
@@ -142,9 +143,11 @@ Kirigami.ScrollablePage {
         ChartView {
             id: chart
 
+            property real rangeMargin: 0.01
+
             function addSeries(axisName) {
-                let label = i18n(axisName + Math.floor(chart.count / 2));
-                let series = createSeries(ChartView.SeriesTypeLine, label, axisTime, axisPosition);
+                let name = i18n(axisName + Math.floor(chart.count / 2));
+                let series = createSeries(ChartView.SeriesTypeLine, name, axisTime, axisPosition);
                 series.useOpenGL = true;
                 if (axisName === "x")
                     series.visible = Qt.binding(function() {
@@ -168,8 +171,8 @@ Kirigami.ScrollablePage {
                 id: axisPosition
 
                 labelFormat: "%.1f"
-                min: EoSTrackerBackend.yAxisMin
-                max: EoSTrackerBackend.yAxisMax
+                min: EoSTrackerBackend.yAxisMin * (1 - chart.rangeMargin)
+                max: EoSTrackerBackend.yAxisMax * (1 + chart.rangeMargin)
             }
 
             ValueAxis {
@@ -219,9 +222,12 @@ Kirigami.ScrollablePage {
 
                 displayComponent: Controls.CheckBox {
                     text: i18n("x")
-                    checked: true
+                    checked: EoSTrackerBackend.xDataVisible
                     onCheckedChanged: {
                         actionViewXdata.showChart = checked;
+                        if (EoSTrackerBackend.xDataVisible !== checked)
+                            EoSTrackerBackend.xDataVisible = checked;
+
                     }
                 }
 
@@ -233,9 +239,12 @@ Kirigami.ScrollablePage {
 
                 displayComponent: Controls.CheckBox {
                     text: i18n("y")
-                    checked: true
+                    checked: EoSTrackerBackend.yDataVisible
                     onCheckedChanged: {
                         actionViewYdata.showChart = checked;
+                        if (EoSTrackerBackend.yDataVisible !== checked)
+                            EoSTrackerBackend.yDataVisible = checked;
+
                     }
                 }
 

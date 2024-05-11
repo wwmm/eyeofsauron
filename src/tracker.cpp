@@ -22,6 +22,7 @@
 #include <iterator>
 #include <memory>
 #include <opencv2/core/mat.hpp>
+#include <utility>
 #include <vector>
 #include "eyeofsauron_db.h"
 #include "frame_source.hpp"
@@ -509,10 +510,6 @@ void Backend::process_frame() {
       data_tx.removeFirst();
       data_ty.removeFirst();
     }
-
-    if (!pause_preview) {
-      Q_EMIT updateChart();
-    }
   }
 
   if (db::Main::showFps()) {
@@ -537,6 +534,11 @@ void Backend::process_frame() {
   video_frame.unmap();
 
   _videoSink->setVideoFrame(video_frame);
+
+  if (!pause_preview) {
+    update_chart_range();
+    Q_EMIT updateChart();
+  }
 }
 
 void Backend::updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y, const int& index) {
@@ -550,33 +552,76 @@ void Backend::updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y,
       return;
     }
 
-    {
-      auto [min_x, max_x] = std::ranges::minmax_element(data_tx, [](QPointF a, QPointF b) { return a.y() < b.y(); });
-      auto [min_y, max_y] = std::ranges::minmax_element(data_ty, [](QPointF a, QPointF b) { return a.y() < b.y(); });
-
-      _yAxisMin = std::min(min_x->y(), min_y->y());
-      _yAxisMax = std::max(max_x->y(), max_y->y());
-
-      Q_EMIT yAxisMinChanged();
-      Q_EMIT yAxisMaxChanged();
-    }
-
-    {
-      auto [min_t, max_t] = std::ranges::minmax_element(data_tx, [](QPointF a, QPointF b) { return a.x() < b.x(); });
-
-      _xAxisMin = min_t->x();
-      _xAxisMax = max_t->x();
-
-      Q_EMIT xAxisMinChanged();
-      Q_EMIT xAxisMaxChanged();
-    }
-
     // Use replace instead of clear + append, it's optimized for performance
     xySeries_x->replace(data_tx);
     xySeries_y->replace(data_ty);
   } else {
     util::warning("series_x or series_y is null!");
   }
+}
+
+void Backend::update_chart_range() {
+  double x_axis_min = 0;
+  double x_axis_max = 0;
+  double y_axis_min = 0;
+  double y_axis_max = 0;
+
+  for (size_t n = 0; n < trackers.size(); n++) {
+    const auto& [tracker, roi, initialized, data_tx, data_ty] = trackers[n];
+
+    auto [min_x, max_x] = std::ranges::minmax_element(data_tx, [](QPointF a, QPointF b) { return a.y() < b.y(); });
+    auto [min_y, max_y] = std::ranges::minmax_element(data_ty, [](QPointF a, QPointF b) { return a.y() < b.y(); });
+
+    auto get_y_range = [this, min_x, min_y, max_x, max_y]() {
+      double r_min = 0;
+      double r_max = 0;
+
+      if (_xDataVisible && _yDataVisible) {
+        r_min = std::min(min_x->y(), min_y->y());
+        r_max = std::max(max_x->y(), max_y->y());
+      } else if (!_xDataVisible && _yDataVisible) {
+        r_min = min_y->y();
+        r_max = max_y->y();
+      } else {
+        r_min = min_x->y();
+        r_max = max_x->y();
+      }
+
+      return std::make_pair(r_min, r_max);
+    };
+
+    auto r = get_y_range();
+
+    if (n == 0) {
+      y_axis_min = r.first;
+      y_axis_max = r.second;
+    } else {
+      y_axis_min = std::min(r.first, y_axis_min);
+      y_axis_max = std::max(r.second, y_axis_max);
+    }
+
+    // calculating the time axis range
+
+    auto [min_t, max_t] = std::ranges::minmax_element(data_tx, [](QPointF a, QPointF b) { return a.x() < b.x(); });
+
+    if (n == 0) {
+      x_axis_min = min_t->x();
+      x_axis_max = max_t->x();
+    } else {
+      x_axis_min = std::min(min_t->x(), x_axis_min);
+      x_axis_max = std::max(max_t->x(), x_axis_max);
+    }
+  }
+
+  _xAxisMin = x_axis_min;
+  _xAxisMax = x_axis_max;
+  _yAxisMin = y_axis_min;
+  _yAxisMax = y_axis_max;
+
+  Q_EMIT xAxisMinChanged();
+  Q_EMIT xAxisMaxChanged();
+  Q_EMIT yAxisMinChanged();
+  Q_EMIT yAxisMaxChanged();
 }
 
 }  // namespace tracker

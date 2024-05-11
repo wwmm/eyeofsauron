@@ -52,11 +52,11 @@ auto get_lock_file() -> std::unique_ptr<QLockFile> {
 }
 
 void construct_about_window() {
-  KAboutData aboutData(
-      QStringLiteral(COMPONENT_NAME), i18nc("@title", APPLICATION_NAME), QStringLiteral(PROJECT_VERSION),
-      i18n("Using webcams and the power of the Middle-earth in your Physics classes"), KAboutLicense::GPL_V3,
-      i18n("(c) 2024"), QStringLiteral(""), QStringLiteral("https://github.com/wwmm/eyeofsauron"),
-      QStringLiteral("https://github.com/wwmm/eyeofsauron/issues"));
+  KAboutData aboutData(QStringLiteral(COMPONENT_NAME), i18nc("@title", APPLICATION_NAME),
+                       QStringLiteral(PROJECT_VERSION),
+                       i18n("Using webcams and Middle-earth's power in your Physics classes"), KAboutLicense::GPL_V3,
+                       i18n("(c) 2024"), QStringLiteral(""), QStringLiteral("https://github.com/wwmm/eyeofsauron"),
+                       QStringLiteral("https://github.com/wwmm/eyeofsauron/issues"));
 
   aboutData.addAuthor(i18nc("@info:credit", "Wellington Wallace"), i18nc("@info:credit", "Developer"),
                       QStringLiteral("wellingtonwallace@gmail.com"));
