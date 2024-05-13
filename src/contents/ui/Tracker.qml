@@ -2,9 +2,11 @@ import EoSTrackerBackend
 import EoSdb
 import EosTrackerSourceModel
 import QtCharts
+import QtCore
 import QtMultimedia
 import QtQuick
 import QtQuick.Controls as Controls
+import QtQuick.Dialogs
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.delegates as Delegates
@@ -40,7 +42,6 @@ Kirigami.ScrollablePage {
     Connections {
         function onUpdateChart() {
             for (let n = 0; n < chart.count; n += 2) {
-                // console.log(chart.series(n).name + " -> " + chart.series(n + 1).name);
                 EoSTrackerBackend.updateSeries(chart.series(n), chart.series(n + 1), Math.floor(n / 2));
             }
         }
@@ -55,6 +56,19 @@ Kirigami.ScrollablePage {
         model: EosTrackerSourceModel
     }
 
+    FileDialog {
+        id: fileDialogSaveChart
+
+        fileMode: FileDialog.SaveFile
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        nameFilters: ["PNG files (*.png)"]
+        onAccepted: {
+            chart.grabToImage(function(result) {
+                result.saveToFile(fileDialogSaveChart.selectedFile);
+            });
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
 
@@ -63,7 +77,6 @@ Kirigami.ScrollablePage {
 
             implicitWidth: EoSTrackerBackend.frameWidth
             implicitHeight: EoSTrackerBackend.frameHeight
-            // fillMode: VideoOutput.Stretch
             Component.onCompleted: {
                 EoSTrackerBackend.videoSink = videoOutput.videoSink;
             }
@@ -210,6 +223,9 @@ Kirigami.ScrollablePage {
             Kirigami.Action {
                 text: i18n("Save Chart")
                 icon.name: "folder-chart-symbolic"
+                onTriggered: {
+                    fileDialogSaveChart.open();
+                }
             },
             Kirigami.Action {
                 text: i18n("Save Table")
