@@ -1,3 +1,4 @@
+#include "tracker.hpp"
 #include <opencv2/core/hal/interface.h>
 #include <qabstractitemmodel.h>
 #include <qabstractseries.h>
@@ -10,7 +11,9 @@
 #include <qmediaplayer.h>
 #include <qnamespace.h>
 #include <qobject.h>
+#include <qqml.h>
 #include <qrect.h>
+#include <qsize.h>
 #include <qstring.h>
 #include <qtmetamacros.h>
 #include <qurl.h>
@@ -18,19 +21,6 @@
 #include <qvariant.h>
 #include <qvideoframeformat.h>
 #include <qxyseries.h>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <opencv2/core/mat.hpp>
-#include <utility>
-#include <vector>
-#include "eyeofsauron_db.h"
-#include "frame_source.hpp"
-#define FMT_HEADER_ONLY
-#include <fmt/core.h>
-#include <fmt/format.h>
-#include <qqml.h>
-#include <qsize.h>
 #include <KLocalizedString>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
@@ -38,9 +28,20 @@
 #include <QPainter>
 #include <QVideoFrame>
 #include <algorithm>
+#include <cstddef>
+#include <format>
+#include <fstream>
+#include <iomanip>
+#include <ios>
+#include <iterator>
+#include <memory>
+#include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
+#include <utility>
+#include <vector>
 #include "config.h"
-#include "tracker.hpp"
+#include "eyeofsauron_db.h"
+#include "frame_source.hpp"
 #include "util.hpp"
 
 namespace tracker {
@@ -335,7 +336,7 @@ void Backend::find_best_camera_resolution() {
         return false;
       });
 
-      auto resolution = fmt::format("{0}x{1}:{2}", formats.front().resolution().width(),
+      auto resolution = std::format("{0}x{1}:{2}", formats.front().resolution().width(),
                                     formats.front().resolution().height(), formats.begin()->maxFrameRate());
 
       sourceModel.append(std::make_shared<CameraSource>(cameraDevice, formats.front()));
@@ -445,7 +446,7 @@ void Backend::process_frame() {
   }
 
   auto input_image = input_video_frame.toImage()
-                         .scaled(_frameWidth, _frameHeight, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
+                         .scaled(_frameWidth, _frameHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
                          .convertedTo(QImage::Format_BGR888);
 
   // creating the output qvideoframe
@@ -514,7 +515,7 @@ void Backend::process_frame() {
 
   if (db::Main::showFps()) {
     painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignBottom,
-                     QString::fromStdString(fmt::format(
+                     QString::fromStdString(std::format(
                          "{0:.0f} fps", 1000000.0 / (input_video_frame.endTime() - input_video_frame.startTime()))));
   }
 
@@ -622,6 +623,59 @@ void Backend::update_chart_range() {
   Q_EMIT xAxisMaxChanged();
   Q_EMIT yAxisMinChanged();
   Q_EMIT yAxisMaxChanged();
+}
+
+void Backend::saveTable(const QUrl& fileUrl) {
+  if (trackers.empty()) {
+    return;
+  }
+
+  if (fileUrl.isLocalFile()) {
+    QList<QList<QPointF>> list_tx;
+    QList<QList<QPointF>> list_ty;
+
+    for (const auto& [tracker, roi, initialized, data_tx, data_ty] : trackers) {
+      list_tx.emplace_back(data_tx);
+      list_ty.emplace_back(data_ty);
+    }
+
+    if (list_tx[0].empty() || list_ty[0].empty()) {
+      return;
+    }
+
+    const auto N_ROWS = list_tx[0].size();
+
+    std::vector<std::vector<double>> table;
+
+    for (int n = 0; n < N_ROWS; n++) {
+      std::vector<double> row;
+
+      row.emplace_back(list_tx[0][n].x());  // time
+
+      for (int m = 0; m < list_tx.size(); m++) {
+        row.emplace_back(list_tx[m][n].y());  // x coord
+        row.emplace_back(list_ty[m][n].y());  // y coord
+      }
+
+      table.emplace_back(row);
+    }
+
+    std::ofstream output_file(fileUrl.toLocalFile().toStdString());
+
+    output_file << std::fixed << std::setprecision(_tableFilePrecision);
+
+    for (const auto& row : table) {
+      // std::ranges::copy(row, std::ostream_iterator<double>(output_file, "\t"));
+
+      for (const auto& v : row) {
+        output_file << std::format("{0:.{1}f}", v, _tableFilePrecision) << "\t";
+      }
+
+      output_file << "\n";
+    }
+
+    output_file.close();
+  }
 }
 
 }  // namespace tracker

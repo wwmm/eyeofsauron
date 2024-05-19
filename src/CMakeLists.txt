@@ -30,7 +30,6 @@ target_link_libraries(eyeofsauron PRIVATE
     KF${QT_MAJOR_VERSION}::ConfigCore
     KF${QT_MAJOR_VERSION}::ConfigGui
     ${OpenCV_LIBS}
-    fmt::fmt
     ${LIBV4L2_LIBRARIES}
 )
 

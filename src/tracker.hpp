@@ -70,6 +70,8 @@ class Backend : public QObject {
 
   Q_PROPERTY(bool yDataVisible MEMBER _yDataVisible NOTIFY yDataVisibleChanged)
 
+  Q_PROPERTY(int tableFilePrecision MEMBER _tableFilePrecision NOTIFY tableFilePrecisionChanged)
+
  public:
   Backend(QObject* parent = nullptr);
 
@@ -85,11 +87,13 @@ class Backend : public QObject {
   Q_INVOKABLE void newRoiSelection(double x, double y, double width, double height);
   Q_INVOKABLE int removeRoi(double x, double y);
   Q_INVOKABLE void updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y, const int& index);
+  Q_INVOKABLE void saveTable(const QUrl& fileUrl);
 
  signals:
   void videoSinkChanged();
   void frameWidthChanged();
   void frameHeightChanged();
+  void tableFilePrecisionChanged();
   void xAxisMinChanged();
   void xAxisMaxChanged();
   void yAxisMinChanged();
@@ -104,8 +108,9 @@ class Backend : public QObject {
   bool _xDataVisible = true;
   bool _yDataVisible = true;
 
-  int _frameWidth = 640;
-  int _frameHeight = 480;
+  int _frameWidth = 800;
+  int _frameHeight = 600;
+  int _tableFilePrecision = 3;
 
   double _xAxisMin = 10000;
   double _xAxisMax = 0;

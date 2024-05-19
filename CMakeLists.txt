@@ -46,7 +46,6 @@ find_package(KF${QT_MAJOR_VERSION} REQUIRED COMPONENTS
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(fmt REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(LIBV4L2 libv4l2)
