@@ -662,11 +662,15 @@ void Backend::saveTable(const QUrl& fileUrl) {
 
     std::ofstream output_file(fileUrl.toLocalFile().toStdString());
 
-    output_file << std::fixed << std::setprecision(_tableFilePrecision);
+    output_file << std::fixed << std::setprecision(_tableFilePrecision) << "#time";
+
+    for (size_t k = 0; k < trackers.size(); k++) {
+      output_file << std::format("\tx{0}\ty{0}", k);
+    }
+
+    output_file << "\n";
 
     for (const auto& row : table) {
-      // std::ranges::copy(row, std::ostream_iterator<double>(output_file, "\t"));
-
       for (const auto& v : row) {
         output_file << std::format("{0:.{1}f}", v, _tableFilePrecision) << "\t";
       }
