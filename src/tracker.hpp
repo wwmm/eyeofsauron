@@ -107,6 +107,7 @@ class Backend : public QObject {
   bool pause_preview = false;
   bool _xDataVisible = true;
   bool _yDataVisible = true;
+  bool exiting = false;
 
   int _frameWidth = 800;
   int _frameHeight = 600;

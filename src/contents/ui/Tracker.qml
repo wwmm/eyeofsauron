@@ -183,13 +183,13 @@ Kirigami.ScrollablePage {
                 });
             }
 
-            title: i18n("Position")
             antialiasing: true
             Layout.fillWidth: true
             Layout.fillHeight: true
             implicitHeight: 480
             implicitWidth: 640
             theme: EoSdb.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
+            localizeNumbers: true
 
             ValueAxis {
                 id: axisPosition
@@ -197,6 +197,7 @@ Kirigami.ScrollablePage {
                 labelFormat: "%.1f"
                 min: EoSTrackerBackend.yAxisMin * (1 - chart.rangeMargin)
                 max: EoSTrackerBackend.yAxisMax * (1 + chart.rangeMargin)
+                titleText: i18n("Position [px]")
             }
 
             ValueAxis {
@@ -205,6 +206,79 @@ Kirigami.ScrollablePage {
                 labelFormat: "%.1f"
                 min: EoSTrackerBackend.xAxisMin
                 max: EoSTrackerBackend.xAxisMax
+                titleText: i18n("Time [s]")
+            }
+
+            Rectangle {
+                id: zoomRect
+
+                color: EoSdb.darkChartTheme === true ? "aquamarine" : "crimson"
+                opacity: 0.25
+                visible: false
+                width: 0
+                height: 0
+            }
+
+            MouseArea {
+                property real x0: 0
+                property real y0: 0
+
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                preventStealing: true
+                onPressed: (event) => {
+                    if (event.button == Qt.LeftButton) {
+                        x0 = event.x;
+                        y0 = event.y;
+                        zoomRect.width = 0;
+                        zoomRect.height = 0;
+                        zoomRect.visible = true;
+                        event.accepted = true;
+                    }
+                }
+                onReleased: (event) => {
+                    if (event.button == Qt.LeftButton) {
+                        let width = event.x - x0;
+                        let height = event.y - y0;
+                        if (Math.abs(width) === 0 || Math.abs(height) === 0)
+                            return ;
+
+                        if (width < 0) {
+                            x0 = width + x0;
+                            width *= -1;
+                        }
+                        if (height < 0) {
+                            y0 = height + y0;
+                            height *= -1;
+                        }
+                        chart.zoomIn(zoomRect);
+                        zoomRect.visible = false;
+                        event.accepted = true;
+                    }
+                }
+                onPositionChanged: (event) => {
+                    if (event.buttons & Qt.LeftButton) {
+                        let x = x0;
+                        let y = y0;
+                        let width = event.x - x;
+                        let height = event.y - y;
+                        if (Math.abs(width) === 0 || Math.abs(height) === 0)
+                            return ;
+
+                        if (width < 0) {
+                            x = width + x;
+                            width *= -1;
+                        }
+                        if (height < 0) {
+                            y = height + y;
+                            height *= -1;
+                        }
+                        zoomRect.x = x;
+                        zoomRect.y = y;
+                        zoomRect.width = width;
+                        zoomRect.height = height;
+                    }
+                }
             }
 
         }
@@ -230,20 +304,6 @@ Kirigami.ScrollablePage {
                     }
                 }
 
-            },
-            Kirigami.Action {
-                text: i18n("Save Chart")
-                icon.name: "folder-chart-symbolic"
-                onTriggered: {
-                    fileDialogSaveChart.open();
-                }
-            },
-            Kirigami.Action {
-                text: i18n("Save Table")
-                icon.name: "folder-table-symbolic"
-                onTriggered: {
-                    fileDialogSaveTable.open();
-                }
             },
             Kirigami.Action {
                 id: actionViewXdata
@@ -278,6 +338,27 @@ Kirigami.ScrollablePage {
                     }
                 }
 
+            },
+            Kirigami.Action {
+                text: i18n("Save Chart")
+                icon.name: "folder-chart-symbolic"
+                onTriggered: {
+                    fileDialogSaveChart.open();
+                }
+            },
+            Kirigami.Action {
+                text: i18n("Save Table")
+                icon.name: "folder-table-symbolic"
+                onTriggered: {
+                    fileDialogSaveTable.open();
+                }
+            },
+            Kirigami.Action {
+                text: i18n("Reset Zoom")
+                icon.name: "edit-reset-symbolic"
+                onTriggered: {
+                    chart.zoomReset();
+                }
             }
         ]
     }

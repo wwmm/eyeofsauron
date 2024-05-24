@@ -206,14 +206,14 @@ Backend::Backend(QObject* parent)
   connect(this, &Backend::videoSinkChanged, [this]() { draw_offline_image(); });
 
   connect(camera_video_sink.get(), &QVideoSink::videoFrameChanged, [this](const QVideoFrame& frame) {
-    if (!pause_preview) {
+    if (!pause_preview && !exiting) {
       input_video_frame = frame;
       process_frame();
     }
   });
 
   connect(media_player_video_sink.get(), &QVideoSink::videoFrameChanged, [this](const QVideoFrame& frame) {
-    if (!pause_preview) {
+    if (!pause_preview && !exiting) {
       input_video_frame = frame;
       process_frame();
     }
@@ -232,6 +232,7 @@ Backend::Backend(QObject* parent)
 }
 
 Backend::~Backend() {
+  exiting = true;
   camera->stop();
   media_player->stop();
 }
