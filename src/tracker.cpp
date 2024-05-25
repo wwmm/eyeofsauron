@@ -527,6 +527,10 @@ void Backend::process_frame() {
   if (draw_roi_selection) {
     painter.setPen(QColorConstants::Red);
     painter.drawRect(rect_selection);
+
+    painter.drawText(
+        rect_selection.x(), rect_selection.y(),
+        QString::fromStdString(std::format("{0:.0f} x {1:.0f}", rect_selection.width(), rect_selection.height())));
   }
 
   painter.end();
