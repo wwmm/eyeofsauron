@@ -86,6 +86,7 @@ class Backend : public QObject {
   Q_INVOKABLE void createNewRoi(double x, double y, double width, double height);
   Q_INVOKABLE void newRoiSelection(double x, double y, double width, double height);
   Q_INVOKABLE int removeRoi(double x, double y);
+  Q_INVOKABLE void removeAllTrackers();
   Q_INVOKABLE void updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y, const int& index);
   Q_INVOKABLE void saveTable(const QUrl& fileUrl);
 

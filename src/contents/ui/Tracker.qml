@@ -359,6 +359,14 @@ Kirigami.ScrollablePage {
                 onTriggered: {
                     chart.zoomReset();
                 }
+            },
+            Kirigami.Action {
+                text: i18n("Remove Trackers")
+                icon.name: "delete-symbolic"
+                onTriggered: {
+                    EoSTrackerBackend.removeAllTrackers();
+                    chart.removeAllSeries();
+                }
             }
         ]
     }

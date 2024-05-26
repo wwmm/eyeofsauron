@@ -458,6 +458,10 @@ int Backend::removeRoi(double x, double y) {
   return -1;
 }
 
+void Backend::removeAllTrackers() {
+  trackers.clear();
+}
+
 void Backend::process_frame() {
   if (_videoSink == nullptr) {
     util::warning("Invalid videoSink pointer!");
