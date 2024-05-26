@@ -26,6 +26,21 @@ FormCard.FormCardPage {
     }
 
     FormCard.FormCard {
+        FormCard.FormComboBoxDelegate {
+            id: trackingAlgorithm
+
+            text: i18n("Tracking Algorithm")
+            displayMode: FormCard.FormComboBoxDelegate.ComboBox
+            currentIndex: EoSdb.trackingAlgorithm
+            editable: false
+            model: ["MOSSE", "KCF", "TLD", "MIL"]
+            onActivated: (idx) => {
+                if (idx !== EoSdb.trackingAlgorithm)
+                    EoSdb.trackingAlgorithm = idx;
+
+            }
+        }
+
         EoSSwitch {
             id: showDateTime
 

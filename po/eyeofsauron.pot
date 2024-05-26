@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/wwmm/eyeofsauron/issues\n"
-"POT-Creation-Date: 2024-05-10 23:06-0300\n"
+"POT-Creation-Date: 2024-05-26 12:31-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,25 +42,29 @@ msgstr ""
 msgid "Show the Tray Icon"
 msgstr ""
 
-#: src/contents/ui/PreferencesPage.qml:25 src/contents/ui/Tracker.qml:16
+#: src/contents/ui/PreferencesPage.qml:25 src/contents/ui/Tracker.qml:18
 msgid "Tracker"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:22
+#: src/contents/ui/PreferencesPage.qml:32
+msgid "Tracking Algorithm"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:40
 #. i18n: ectx: label, entry (showDateTime), group (Tracker)
-#: src/contents/ui/PreferencesPage.qml:32 rc.cpp:12
+#: src/contents/ui/PreferencesPage.qml:47 rc.cpp:27
 msgid "Show Date and Time"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:26
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:44
 #. i18n: ectx: label, entry (showFps), group (Tracker)
-#: src/contents/ui/PreferencesPage.qml:44 rc.cpp:15
+#: src/contents/ui/PreferencesPage.qml:59 rc.cpp:30
 msgid "Show FPS"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:30
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:48
 #. i18n: ectx: label, entry (darkChartTheme), group (Tracker)
-#: src/contents/ui/PreferencesPage.qml:56 rc.cpp:18
+#: src/contents/ui/PreferencesPage.qml:71 rc.cpp:33
 msgid "Dark Chart Theme"
 msgstr ""
 
@@ -68,17 +72,17 @@ msgstr ""
 msgid "Sound Wave"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:15 src/contents/ui/Tracker.qml:25
+#: src/contents/ui/SoundWave.qml:15 src/contents/ui/Tracker.qml:27
 msgctxt "@action:button"
 msgid "Play"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:19 src/contents/ui/Tracker.qml:30
+#: src/contents/ui/SoundWave.qml:19 src/contents/ui/Tracker.qml:32
 msgctxt "@action:button"
 msgid "Pause"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:23 src/contents/ui/Tracker.qml:35
+#: src/contents/ui/SoundWave.qml:23 src/contents/ui/Tracker.qml:37
 msgctxt "@action:button"
 msgid "Stop"
 msgstr ""
@@ -87,15 +91,15 @@ msgstr ""
 msgid "Points"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:35 src/contents/ui/Tracker.qml:195
+#: src/contents/ui/SoundWave.qml:35 src/contents/ui/Tracker.qml:296
 msgid "points"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:45 src/contents/ui/Tracker.qml:208
+#: src/contents/ui/SoundWave.qml:45 src/contents/ui/Tracker.qml:343
 msgid "Save Chart"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:49 src/contents/ui/Tracker.qml:212
+#: src/contents/ui/SoundWave.qml:49 src/contents/ui/Tracker.qml:350
 msgid "Save Table"
 msgstr ""
 
@@ -111,24 +115,32 @@ msgstr ""
 msgid "Add Video File"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:19
+#: src/contents/ui/Tracker.qml:21
 msgid "Video Source"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:159
-msgid "Position"
+#: src/contents/ui/Tracker.qml:200
+msgid "Position [px]"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:194
+#: src/contents/ui/Tracker.qml:209
+msgid "Time [s]"
+msgstr ""
+
+#: src/contents/ui/Tracker.qml:295
 msgid "History"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:221
+#: src/contents/ui/Tracker.qml:314
 msgid "x"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:235
+#: src/contents/ui/Tracker.qml:331
 msgid "y"
+msgstr ""
+
+#: src/contents/ui/Tracker.qml:357
+msgid "Reset Zoom"
 msgstr ""
 
 #: src/main.cpp:57
@@ -167,9 +179,39 @@ msgstr ""
 msgid "Show the tray icon"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:34
-#. i18n: ectx: label, entry (chartDataPoints), group (Tracker)
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:22
+#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
+#: rc.cpp:12
+msgid "Traking Algorithm"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:25
+#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
+#: rc.cpp:15
+msgid "MOSSE"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:28
+#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
+#: rc.cpp:18
+msgid "KCF"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:31
+#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
 #: rc.cpp:21
+msgid "TLD"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:34
+#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
+#: rc.cpp:24
+msgid "MIL"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:52
+#. i18n: ectx: label, entry (chartDataPoints), group (Tracker)
+#: rc.cpp:36
 msgid "Number of Data Points in the Chart"
 msgstr ""
 

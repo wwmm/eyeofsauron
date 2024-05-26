@@ -35,6 +35,7 @@
 #include <ios>
 #include <iterator>
 #include <memory>
+#include <opencv2/core/cvstd_wrapper.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 #include <utility>
@@ -396,8 +397,30 @@ void Backend::drawRoiSelection(const bool& state) {
 void Backend::createNewRoi(double x, double y, double width, double height) {
   cv::Rect2d roi = {x, y, width, height};  // region of interest that is being created
 
-  auto tracker = cv::legacy::TrackerMOSSE::create();
-  // auto tracker = cv::legacy::TrackerMedianFlow::create();
+  cv::Ptr<cv::legacy::Tracker> tracker;
+
+  switch (db::Main::trackingAlgorithm()) {
+    case db::Main::EnumTrackingAlgorithm::mosse: {
+      tracker = cv::legacy::TrackerMOSSE::create();
+      break;
+    }
+    case db::Main::EnumTrackingAlgorithm::kcf: {
+      tracker = cv::legacy::TrackerKCF::create();
+      break;
+    }
+    case db::Main::EnumTrackingAlgorithm::tld: {
+      tracker = cv::legacy::TrackerTLD::create();
+      break;
+    }
+    case db::Main::EnumTrackingAlgorithm::mil: {
+      tracker = cv::legacy::TrackerMIL::create();
+      break;
+    }
+    default: {
+      util::warning("Unknown tracking algorithm choice!");
+      return;
+    }
+  }
 
   for (auto& [tracker, roi, initialized, data_tx, data_ty] : trackers) {
     data_tx.clear();

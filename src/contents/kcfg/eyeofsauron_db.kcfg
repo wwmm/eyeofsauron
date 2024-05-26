@@ -18,6 +18,24 @@
         </entry>
     </group>
     <group name="Tracker">
+        <entry name="trackingAlgorithm" type="Enum">
+            <label>Traking Algorithm</label>
+            <choices>
+                <choice name="mosse">
+                    <label>MOSSE</label>
+                </choice>
+                <choice name="kcf">
+                    <label>KCF</label>
+                </choice>
+                <choice name="tld">
+                    <label>TLD</label>
+                </choice>
+                <choice name="mil">
+                    <label>MIL</label>
+                </choice>
+            </choices>
+            <default>0</default> <!-- MOSSE -->
+        </entry>
         <entry name="showDateTime" type="Bool">
             <label>Show Date and Time</label>
             <default>true</default>

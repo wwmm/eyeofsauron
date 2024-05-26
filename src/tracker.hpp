@@ -136,8 +136,7 @@ class Backend : public QObject {
   std::unique_ptr<QMediaPlayer> media_player;
   std::unique_ptr<QVideoSink> media_player_video_sink;
 
-  std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMOSSE>, cv::Rect2d, bool, QList<QPointF>, QList<QPointF>>> trackers;
-  // std::vector<std::tuple<cv::Ptr<cv::legacy::TrackerMedianFlow>, cv::Rect2d, bool>> trackers;
+  std::vector<std::tuple<cv::Ptr<cv::legacy::Tracker>, cv::Rect2d, bool, QList<QPointF>, QList<QPointF>>> trackers;
 
   void find_best_camera_resolution();
   void draw_offline_image();
