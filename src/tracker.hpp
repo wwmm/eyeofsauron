@@ -52,11 +52,19 @@ class SourceModel : public QAbstractListModel {
 class Backend : public QObject {
   Q_OBJECT
 
-  Q_PROPERTY(QVideoSink* videoSink MEMBER _videoSink NOTIFY videoSinkChanged)
+  Q_PROPERTY(bool xDataVisible MEMBER _xDataVisible NOTIFY xDataVisibleChanged)
+
+  Q_PROPERTY(bool yDataVisible MEMBER _yDataVisible NOTIFY yDataVisibleChanged)
+
+  Q_PROPERTY(int showPlayerSlider MEMBER _showPlayerSlider NOTIFY showPlayerSliderChanged)
 
   Q_PROPERTY(int frameWidth MEMBER _frameWidth NOTIFY frameWidthChanged)
 
   Q_PROPERTY(int frameHeight MEMBER _frameHeight NOTIFY frameHeightChanged)
+
+  Q_PROPERTY(int playerPosition MEMBER _playerPosition NOTIFY playerPositionChanged)
+
+  Q_PROPERTY(int playerDuration MEMBER _playerDuration NOTIFY playerDurationChanged)
 
   Q_PROPERTY(double xAxisMin MEMBER _xAxisMin NOTIFY xAxisMinChanged)
 
@@ -66,11 +74,9 @@ class Backend : public QObject {
 
   Q_PROPERTY(double yAxisMax MEMBER _yAxisMax NOTIFY yAxisMaxChanged)
 
-  Q_PROPERTY(bool xDataVisible MEMBER _xDataVisible NOTIFY xDataVisibleChanged)
-
-  Q_PROPERTY(bool yDataVisible MEMBER _yDataVisible NOTIFY yDataVisibleChanged)
-
   Q_PROPERTY(int tableFilePrecision MEMBER _tableFilePrecision NOTIFY tableFilePrecisionChanged)
+
+  Q_PROPERTY(QVideoSink* videoSink MEMBER _videoSink NOTIFY videoSinkChanged)
 
  public:
   Backend(QObject* parent = nullptr);
@@ -89,6 +95,7 @@ class Backend : public QObject {
   Q_INVOKABLE void removeAllTrackers();
   Q_INVOKABLE void updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y, const int& index);
   Q_INVOKABLE void saveTable(const QUrl& fileUrl);
+  Q_INVOKABLE void setPlayerPosition(qint64 value);
 
  signals:
   void videoSinkChanged();
@@ -101,13 +108,17 @@ class Backend : public QObject {
   void yAxisMaxChanged();
   void xDataVisibleChanged();
   void yDataVisibleChanged();
+  void playerPositionChanged();
+  void playerDurationChanged();
+  void showPlayerSliderChanged();
   void updateChart();
 
  private:
-  bool draw_roi_selection = false;
-  bool pause_preview = false;
   bool _xDataVisible = true;
   bool _yDataVisible = true;
+  bool _showPlayerSlider = false;
+  bool draw_roi_selection = false;
+  bool pause_preview = false;
   bool exiting = false;
 
   int _frameWidth = 800;
@@ -120,6 +131,8 @@ class Backend : public QObject {
   double _yAxisMax = 0;
 
   qint64 initial_time = 0;
+  qint64 _playerPosition = 0;
+  qint64 _playerDuration = 0;
 
   SourceType current_source_type = SourceType::Camera;
 

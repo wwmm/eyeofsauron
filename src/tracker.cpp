@@ -16,6 +16,7 @@
 #include <qsize.h>
 #include <qstring.h>
 #include <qtmetamacros.h>
+#include <qtypes.h>
 #include <qurl.h>
 #include <qvalueaxis.h>
 #include <qvariant.h>
@@ -220,6 +221,18 @@ Backend::Backend(QObject* parent)
     }
   });
 
+  connect(media_player.get(), &QMediaPlayer::positionChanged, [this](const qint64& value) {
+    _playerPosition = value;
+
+    Q_EMIT playerPositionChanged();
+  });
+
+  connect(media_player.get(), &QMediaPlayer::durationChanged, [this](const qint64& value) {
+    _playerDuration = value;
+
+    Q_EMIT playerDurationChanged();
+  });
+
   capture_session->setCamera(camera.get());
   capture_session->setVideoSink(camera_video_sink.get());
 
@@ -239,12 +252,12 @@ Backend::~Backend() {
 }
 
 void Backend::start() {
-  initial_time = 0;
   pause_preview = false;
 
   switch (current_source_type) {
     case Camera: {
       camera->start();
+
     } break;
     case VideoFile: {
       media_player->play();
@@ -293,9 +306,13 @@ void Backend::selectSource(const int& index) {
   camera->stop();
   trackers.clear();
 
+  pause_preview = false;
+
   switch (source->source_type) {
     case Camera: {
       current_source_type = SourceType::Camera;
+
+      _showPlayerSlider = false;
 
       auto device = dynamic_cast<const CameraSource*>(source.get())->device;
 
@@ -308,6 +325,8 @@ void Backend::selectSource(const int& index) {
     case VideoFile: {
       current_source_type = SourceType::VideoFile;
 
+      _showPlayerSlider = true;
+
       auto url = dynamic_cast<const VideoFileSource*>(source.get())->url;
 
       media_player->setSource(url);
@@ -316,6 +335,8 @@ void Backend::selectSource(const int& index) {
       break;
     }
   }
+
+  Q_EMIT showPlayerSliderChanged();
 }
 
 void Backend::find_best_camera_resolution() {
@@ -541,6 +562,8 @@ void Backend::process_frame() {
     }
   }
 
+  painter.setPen(QColorConstants::Red);
+
   if (db::Main::showFps()) {
     painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignBottom,
                      QString::fromStdString(std::format(
@@ -552,7 +575,6 @@ void Backend::process_frame() {
   }
 
   if (draw_roi_selection) {
-    painter.setPen(QColorConstants::Red);
     painter.drawRect(rect_selection);
 
     painter.drawText(
@@ -712,6 +734,12 @@ void Backend::saveTable(const QUrl& fileUrl) {
 
     output_file.close();
   }
+}
+
+void Backend::setPlayerPosition(qint64 value) {
+  initial_time = 0;
+
+  media_player->setPosition(value);
 }
 
 }  // namespace tracker
