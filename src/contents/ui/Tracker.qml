@@ -92,6 +92,7 @@ Kirigami.ScrollablePage {
                 Component.onCompleted: {
                     EoSTrackerBackend.videoSink = videoOutput.videoSink;
                 }
+                Component.onDestruction: EoSTrackerBackend.stop() // So we do not write to an invalid videoSink
 
                 MouseArea {
                     id: mouseArea

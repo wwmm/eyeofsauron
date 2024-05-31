@@ -14,7 +14,10 @@
 #include <cstring>
 #include <ext/string_conversions.h>
 #include <filesystem>
+#include <format>
+#include <sstream>
 #include <string>
+#include <thread>
 
 namespace util {
 
@@ -44,6 +47,14 @@ void warning(const std::string& s, source_location location) {
 
 void info(const std::string& s, source_location location) {
   qInfo().noquote() << prepare_debug_message(s, location);
+}
+
+void print_thread_id() {
+  std::ostringstream oss;
+
+  oss << std::this_thread::get_id() << '\n';
+
+  warning(std::format("thread id: {0}", oss.str()));
 }
 
 auto v4l2_find_device(const std::string& description) -> std::string {

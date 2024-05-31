@@ -22,6 +22,8 @@ void warning(const std::string& s, source_location location = source_location::c
 
 void info(const std::string& s, source_location location = source_location::current());
 
+void print_thread_id();
+
 auto v4l2_find_device(const std::string& description) -> std::string;
 
 void v4l2_disable_dynamic_fps(const std::string& device_path);

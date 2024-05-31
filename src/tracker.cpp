@@ -36,6 +36,7 @@
 #include <ios>
 #include <iterator>
 #include <memory>
+#include <mutex>
 #include <opencv2/core/cvstd_wrapper.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
@@ -208,16 +209,30 @@ Backend::Backend(QObject* parent)
   connect(this, &Backend::videoSinkChanged, [this]() { draw_offline_image(); });
 
   connect(camera_video_sink.get(), &QVideoSink::videoFrameChanged, [this](const QVideoFrame& frame) {
+    std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
+
     if (!pause_preview && !exiting) {
-      input_video_frame = frame;
-      process_frame();
+      QMetaObject::invokeMethod(
+          this,
+          [this, frame] {
+            input_video_frame = frame;
+            process_frame();
+          },
+          Qt::QueuedConnection);
     }
   });
 
   connect(media_player_video_sink.get(), &QVideoSink::videoFrameChanged, [this](const QVideoFrame& frame) {
+    std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
+
     if (!pause_preview && !exiting) {
-      input_video_frame = frame;
-      process_frame();
+      QMetaObject::invokeMethod(
+          this,
+          [this, frame] {
+            input_video_frame = frame;
+            process_frame();
+          },
+          Qt::QueuedConnection);
     }
   });
 
@@ -246,9 +261,14 @@ Backend::Backend(QObject* parent)
 }
 
 Backend::~Backend() {
-  exiting = true;
   camera->stop();
   media_player->stop();
+
+  std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
+
+  util::debug("Tracker backend exiting...");
+
+  exiting = true;
 }
 
 void Backend::start() {
@@ -416,6 +436,8 @@ void Backend::drawRoiSelection(const bool& state) {
 }
 
 void Backend::createNewRoi(double x, double y, double width, double height) {
+  std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
+
   cv::Rect2d roi = {x, y, width, height};  // region of interest that is being created
 
   cv::Ptr<cv::legacy::Tracker> tracker;
@@ -462,6 +484,8 @@ void Backend::newRoiSelection(double x, double y, double width, double height) {
 }
 
 int Backend::removeRoi(double x, double y) {
+  std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
+
   initial_time = 0;
 
   for (size_t n = 0; n < trackers.size(); n++) {
@@ -480,6 +504,8 @@ int Backend::removeRoi(double x, double y) {
 }
 
 void Backend::removeAllTrackers() {
+  std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
+
   trackers.clear();
 }
 

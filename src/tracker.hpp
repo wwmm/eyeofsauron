@@ -13,6 +13,7 @@
 #include <QMediaPlayer>
 #include <QVideoSink>
 #include <memory>
+#include <mutex>
 #include <opencv2/core/cvstd_wrapper.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/tracking.hpp>
@@ -151,6 +152,8 @@ class Backend : public QObject {
   std::unique_ptr<QVideoSink> media_player_video_sink;
 
   std::vector<std::tuple<cv::Ptr<cv::legacy::Tracker>, cv::Rect2d, bool, QList<QPointF>, QList<QPointF>>> trackers;
+
+  std::mutex trackers_mutex;
 
   void find_best_camera_resolution();
   void draw_offline_image();
