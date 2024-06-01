@@ -77,6 +77,32 @@ FormCard.FormCardPage {
             }
         }
 
+        EoSSpinBox {
+            label: i18n("Video Width")
+            unit: i18n("px")
+            decimals: 0
+            stepSize: 1
+            from: 640
+            to: 1920
+            value: EoSdb.videoWidth
+            onValueModified: (v) => {
+                EoSdb.videoWidth = v;
+            }
+        }
+
+        EoSSpinBox {
+            label: i18n("Video Height")
+            unit: i18n("px")
+            decimals: 0
+            stepSize: 1
+            from: 480
+            to: 1080
+            value: EoSdb.videoHeight
+            onValueModified: (v) => {
+                EoSdb.videoHeight = v;
+            }
+        }
+
     }
 
 }

@@ -54,5 +54,17 @@
             <min>2</min>
             <max>1000</max>
         </entry>
+        <entry name="videoWidth" type="Int">
+            <label>Video Preview Width</label>
+            <default>800</default>
+            <min>640</min>
+            <max>1920</max>
+        </entry>
+        <entry name="videoHeight" type="Int">
+            <label>Video Preview Height</label>
+            <default>600</default>
+            <min>480</min>
+            <max>1080</max>
+        </entry>
     </group>
 </kcfg>

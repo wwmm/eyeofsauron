@@ -248,6 +248,22 @@ Backend::Backend(QObject* parent)
     Q_EMIT playerDurationChanged();
   });
 
+  connect(db::Main::self(), &db::Main::videoWidthChanged, [this]() {
+    std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
+
+    _frameWidth = db::Main::videoWidth();
+
+    Q_EMIT frameWidthChanged();
+  });
+
+  connect(db::Main::self(), &db::Main::videoHeightChanged, [this]() {
+    std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
+
+    _frameHeight = db::Main::videoHeight();
+
+    Q_EMIT frameHeightChanged();
+  });
+
   capture_session->setCamera(camera.get());
   capture_session->setVideoSink(camera_video_sink.get());
 
