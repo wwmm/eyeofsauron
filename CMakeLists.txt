@@ -49,6 +49,7 @@ find_package(OpenCV REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(LIBV4L2 libv4l2)
+pkg_check_modules(LIBMEDIAINFO libmediainfo)
 
 ki18n_install(po)
 

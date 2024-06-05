@@ -1,9 +1,10 @@
 #pragma once
 
 #include <qcameradevice.h>
+#include <qstring.h>
 #include <qurl.h>
 
-enum SourceType { Camera, VideoFile };
+enum SourceType { Camera, MediaFile };
 
 class Source {
  public:
@@ -24,9 +25,15 @@ class CameraSource : public Source {
   QCameraFormat format;
 };
 
-class VideoFileSource : public Source {
+class MediaFileSource : public Source {
  public:
-  VideoFileSource(QUrl file_url);
+  MediaFileSource(QUrl file_url);
 
   QUrl url;
+
+  QString file_size_mb;
+
+  QString duration;
+
+  QString frame_rate;
 };

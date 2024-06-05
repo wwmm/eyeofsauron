@@ -1,3 +1,4 @@
+import "Common.js" as Common
 import QtCore
 import QtQuick
 import QtQuick.Controls as Controls
@@ -85,6 +86,7 @@ Kirigami.OverlaySheet {
                                 Controls.Label {
                                     wrapMode: Text.WordWrap
                                     text: sourceSubtitle
+                                    visible: !Common.isEmpty(sourceSubtitle)
                                 }
 
                             }
@@ -95,7 +97,7 @@ Kirigami.OverlaySheet {
                     Kirigami.Action {
                         text: i18n("Remove this Source")
                         icon.name: "delete"
-                        visible: sourceType === "video_file"
+                        visible: sourceType === "media_file"
                         displayHint: Kirigami.DisplayHint.AlwaysHide
                         onTriggered: {
                             control.model.removeSource(index);

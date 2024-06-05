@@ -75,8 +75,8 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
 
           break;
         }
-        case VideoFile: {
-          value = "video_file";
+        case MediaFile: {
+          value = "media_file";
 
           break;
         }
@@ -93,8 +93,8 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
 
           break;
         }
-        case VideoFile: {
-          value = dynamic_cast<const VideoFileSource*>(it->get())->url.fileName();
+        case MediaFile: {
+          value = dynamic_cast<const MediaFileSource*>(it->get())->url.fileName();
 
           break;
         }
@@ -117,8 +117,12 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
 
           break;
         }
-        case VideoFile: {
-          value = "";
+        case MediaFile: {
+          auto file_size_mb = dynamic_cast<const MediaFileSource*>(it->get())->file_size_mb;
+          auto duration = dynamic_cast<const MediaFileSource*>(it->get())->duration;
+          auto frame_rate = dynamic_cast<const MediaFileSource*>(it->get())->frame_rate;
+
+          value = frame_rate + " fps" + ", " + file_size_mb + " MiB" + ", " + duration;
 
           break;
         }
@@ -135,7 +139,7 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
 
           break;
         }
-        case VideoFile: {
+        case MediaFile: {
           name = "video-symbolic";
 
           break;
@@ -166,7 +170,7 @@ void SourceModel::append(std::shared_ptr<Source> source) {
     case Camera:
       list.insert(0, source);
       break;
-    case VideoFile:
+    case MediaFile:
       list.append(source);
       break;
   }
@@ -295,7 +299,7 @@ void Backend::start() {
       camera->start();
 
     } break;
-    case VideoFile: {
+    case MediaFile: {
       media_player->play();
       break;
     }
@@ -308,7 +312,7 @@ void Backend::pause() {
   switch (current_source_type) {
     case Camera: {
     } break;
-    case VideoFile: {
+    case MediaFile: {
       media_player->pause();
       break;
     }
@@ -322,7 +326,7 @@ void Backend::stop() {
     case Camera: {
       camera->stop();
     } break;
-    case VideoFile: {
+    case MediaFile: {
       media_player->stop();
       break;
     }
@@ -331,7 +335,7 @@ void Backend::stop() {
 
 void Backend::append(const QUrl& videoUrl) {
   if (videoUrl.isLocalFile()) {
-    sourceModel.append(std::make_shared<VideoFileSource>(videoUrl));
+    sourceModel.append(std::make_shared<MediaFileSource>(videoUrl));
   }
 }
 
@@ -358,12 +362,12 @@ void Backend::selectSource(const int& index) {
 
       break;
     }
-    case VideoFile: {
-      current_source_type = SourceType::VideoFile;
+    case MediaFile: {
+      current_source_type = SourceType::MediaFile;
 
       _showPlayerSlider = true;
 
-      auto url = dynamic_cast<const VideoFileSource*>(source.get())->url;
+      auto url = dynamic_cast<const MediaFileSource*>(source.get())->url;
 
       media_player->setSource(url);
       media_player->play();
