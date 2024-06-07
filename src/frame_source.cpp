@@ -4,6 +4,7 @@
 #include <cmath>
 #include <format>
 #include <string>
+#include <utility>
 #define _UNICODE
 #include <MediaInfo/MediaInfo.h>
 #include <MediaInfo/MediaInfo_Const.h>

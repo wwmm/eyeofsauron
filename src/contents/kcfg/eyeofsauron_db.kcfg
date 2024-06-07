@@ -16,16 +16,20 @@
             <label>Show the tray icon</label>
             <default>true</default>
         </entry>
+        <entry name="darkChartTheme" type="Bool">
+            <label>Dark Chart Theme</label>
+            <default>true</default>
+        </entry>
     </group>
     <group name="Tracker">
         <entry name="trackingAlgorithm" type="Enum">
             <label>Traking Algorithm</label>
             <choices>
-                <choice name="mosse">
-                    <label>MOSSE</label>
-                </choice>
                 <choice name="kcf">
                     <label>KCF</label>
+                </choice>
+                <choice name="mosse">
+                    <label>MOSSE</label>
                 </choice>
                 <choice name="tld">
                     <label>TLD</label>
@@ -42,10 +46,6 @@
         </entry>
         <entry name="showFps" type="Bool">
             <label>Show FPS</label>
-            <default>true</default>
-        </entry>
-        <entry name="darkChartTheme" type="Bool">
-            <label>Dark Chart Theme</label>
             <default>true</default>
         </entry>
         <entry name="chartDataPoints" type="Int">

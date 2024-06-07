@@ -19,6 +19,18 @@ FormCard.FormCardPage {
             }
         }
 
+        EoSSwitch {
+            id: darkChartTheme
+
+            label: i18n("Dark Chart Theme")
+            isChecked: EoSdb.darkChartTheme
+            onCheckedChanged: {
+                if (isChecked !== EoSdb.darkChartTheme)
+                    EoSdb.darkChartTheme = isChecked;
+
+            }
+        }
+
     }
 
     FormCard.FormHeader {
@@ -33,7 +45,7 @@ FormCard.FormCardPage {
             displayMode: FormCard.FormComboBoxDelegate.ComboBox
             currentIndex: EoSdb.trackingAlgorithm
             editable: false
-            model: ["MOSSE", "KCF", "TLD", "MIL"]
+            model: ["KCF", "MOSSE", "TLD", "MIL"]
             onActivated: (idx) => {
                 if (idx !== EoSdb.trackingAlgorithm)
                     EoSdb.trackingAlgorithm = idx;
@@ -61,18 +73,6 @@ FormCard.FormCardPage {
             onCheckedChanged: {
                 if (isChecked !== EoSdb.showFps)
                     EoSdb.showFps = isChecked;
-
-            }
-        }
-
-        EoSSwitch {
-            id: darkChartTheme
-
-            label: i18n("Dark Chart Theme")
-            isChecked: EoSdb.darkChartTheme
-            onCheckedChanged: {
-                if (isChecked !== EoSdb.darkChartTheme)
-                    EoSdb.darkChartTheme = isChecked;
 
             }
         }
