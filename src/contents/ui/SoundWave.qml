@@ -1,4 +1,6 @@
+import EoSSoundBackend
 import EoSdb
+import EosSoundSourceModel
 import QtCharts
 import QtQuick
 import QtQuick.Controls as Controls
@@ -10,6 +12,11 @@ Kirigami.ScrollablePage {
 
     title: i18n("Sound Wave")
     actions: [
+        Kirigami.Action {
+            text: i18n("Audio Source")
+            icon.name: "emblem-music-symbolic"
+            onTriggered: sourceMenu.open()
+        },
         Kirigami.Action {
             icon.name: "media-playback-start-symbolic"
             text: i18nc("@action:button", "Play")
@@ -23,6 +30,14 @@ Kirigami.ScrollablePage {
             text: i18nc("@action:button", "Stop")
         }
     ]
+
+    SourceMenu {
+        id: sourceMenu
+
+        backend: EoSSoundBackend
+        model: EosSoundSourceModel
+        backendName: "sound_wave"
+    }
 
     ColumnLayout {
         anchors.fill: parent

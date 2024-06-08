@@ -9,6 +9,7 @@ kde_target_enable_exceptions(eyeofsauron PRIVATE)
 target_sources(eyeofsauron PRIVATE
     frame_source.cpp
     main.cpp
+    sound_wave.cpp
     tracker.cpp
     util.cpp
     resources.qrc

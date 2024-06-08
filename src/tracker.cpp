@@ -34,7 +34,6 @@
 #include <fstream>
 #include <iomanip>
 #include <ios>
-#include <iterator>
 #include <memory>
 #include <mutex>
 #include <opencv2/core/cvstd_wrapper.hpp>
@@ -48,155 +47,6 @@
 #include "util.hpp"
 
 namespace tracker {
-
-int SourceModel::rowCount(const QModelIndex& /*parent*/) const {
-  return list.size();
-}
-
-QHash<int, QByteArray> SourceModel::roleNames() const {
-  return {
-      {Roles::SourceType, "sourceType"}, {Roles::Name, "name"}, {Roles::Subtitle, "subtitle"}, {Roles::Icon, "icon"}};
-}
-
-QVariant SourceModel::data(const QModelIndex& index, int role) const {
-  if (list.empty()) {
-    return "";
-  }
-
-  const auto it = std::next(list.begin(), index.row());
-
-  switch (role) {
-    case Roles::SourceType: {
-      QString value;
-
-      switch (it->get()->source_type) {
-        case Camera: {
-          value = "camera";
-
-          break;
-        }
-        case MediaFile: {
-          value = "media_file";
-
-          break;
-        }
-      }
-
-      return value;
-    }
-    case Roles::Name: {
-      QString value;
-
-      switch (it->get()->source_type) {
-        case Camera: {
-          value = dynamic_cast<const CameraSource*>(it->get())->device.description();
-
-          break;
-        }
-        case MediaFile: {
-          value = dynamic_cast<const MediaFileSource*>(it->get())->url.fileName();
-
-          break;
-        }
-      }
-
-      return value;
-    }
-    case Roles::Subtitle: {
-      QString value;
-
-      switch (it->get()->source_type) {
-        case Camera: {
-          auto format = dynamic_cast<const CameraSource*>(it->get())->format;
-
-          auto resolution = util::to_string(format.resolution().width()) + "x" +
-                            util::to_string(format.resolution().height()) + "  " +
-                            util::to_string(format.maxFrameRate()) + " fps";
-
-          value = QString::fromStdString(resolution);
-
-          break;
-        }
-        case MediaFile: {
-          auto file_size_mb = dynamic_cast<const MediaFileSource*>(it->get())->file_size_mb;
-          auto duration = dynamic_cast<const MediaFileSource*>(it->get())->duration;
-          auto frame_rate = dynamic_cast<const MediaFileSource*>(it->get())->frame_rate;
-
-          value = frame_rate + " fps" + ", " + file_size_mb + " MiB" + ", " + duration;
-
-          break;
-        }
-      }
-
-      return value;
-    }
-    case Roles::Icon: {
-      QString name;
-
-      switch (it->get()->source_type) {
-        case Camera: {
-          name = "camera-web-symbolic";
-
-          break;
-        }
-        case MediaFile: {
-          name = "video-symbolic";
-
-          break;
-        }
-      }
-
-      return name;
-    }
-    default:
-      return {};
-  }
-}
-
-auto SourceModel::getList() -> QList<std::shared_ptr<Source>> {
-  return list;
-}
-
-auto SourceModel::get_source(const int& rowIndex) -> std::shared_ptr<Source> {
-  return list[rowIndex];
-}
-
-void SourceModel::append(std::shared_ptr<Source> source) {
-  int pos = list.empty() ? 0 : list.size() - 1;
-
-  beginInsertRows(QModelIndex(), pos, pos);
-
-  switch (source->source_type) {
-    case Camera:
-      list.insert(0, source);
-      break;
-    case MediaFile:
-      list.append(source);
-      break;
-  }
-
-  endInsertRows();
-
-  emit dataChanged(index(0), index(list.size() - 1));
-}
-
-void SourceModel::reset() {
-  beginResetModel();
-
-  list.clear();
-
-  endResetModel();
-}
-
-void SourceModel::removeSource(const int& rowIndex) {
-  beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
-
-  list.remove(rowIndex);
-
-  endRemoveRows();
-
-  emit dataChanged(index(0), index(list.size() - 1));
-}
 
 Backend::Backend(QObject* parent)
     : QObject(parent),
@@ -298,9 +148,13 @@ void Backend::start() {
     case Camera: {
       camera->start();
 
-    } break;
+      break;
+    }
     case MediaFile: {
       media_player->play();
+      break;
+    }
+    case Microphone: {
       break;
     }
   }
@@ -311,9 +165,13 @@ void Backend::pause() {
 
   switch (current_source_type) {
     case Camera: {
-    } break;
+      break;
+    }
     case MediaFile: {
       media_player->pause();
+      break;
+    }
+    case Microphone: {
       break;
     }
   }
@@ -325,9 +183,13 @@ void Backend::stop() {
   switch (current_source_type) {
     case Camera: {
       camera->stop();
-    } break;
+      break;
+    }
     case MediaFile: {
       media_player->stop();
+      break;
+    }
+    case Microphone: {
       break;
     }
   }
@@ -372,6 +234,9 @@ void Backend::selectSource(const int& index) {
       media_player->setSource(url);
       media_player->play();
 
+      break;
+    }
+    case Microphone: {
       break;
     }
   }

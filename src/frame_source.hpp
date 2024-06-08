@@ -1,10 +1,20 @@
 #pragma once
 
+#include <qabstractitemmodel.h>
+#include <qaudioformat.h>
+#include <qbytearray.h>
 #include <qcameradevice.h>
+#include <qhash.h>
+#include <qlist.h>
+#include <qnamespace.h>
 #include <qstring.h>
+#include <qtmetamacros.h>
 #include <qurl.h>
+#include <qvariant.h>
+#include <QAudioDevice>
+#include <memory>
 
-enum SourceType { Camera, MediaFile };
+enum SourceType { Camera, MediaFile, Microphone };
 
 class Source {
  public:
@@ -36,4 +46,39 @@ class MediaFileSource : public Source {
   QString duration;
 
   QString frame_rate;
+};
+
+class MicSource : public Source {
+ public:
+  MicSource(QAudioDevice dev, QAudioFormat fmt);
+
+  QAudioDevice device;
+
+  QAudioFormat format;
+};
+
+class SourceModel : public QAbstractListModel {
+  Q_OBJECT;
+
+ public:
+  enum Roles { SourceType = Qt::UserRole, Name, Subtitle, Icon = Qt::DecorationRole };
+
+  [[nodiscard]] int rowCount(const QModelIndex& /*parent*/) const override;
+
+  [[nodiscard]] QHash<int, QByteArray> roleNames() const override;
+
+  [[nodiscard]] QVariant data(const QModelIndex& index, int role) const override;
+
+  auto getList() -> QList<std::shared_ptr<Source>>;
+
+  auto get_source(const int& rowIndex) -> std::shared_ptr<Source>;
+
+  void reset();
+
+  void append(std::shared_ptr<Source> source);
+
+  Q_INVOKABLE void removeSource(const int& rowIndex);
+
+ private:
+  QList<std::shared_ptr<Source>> list;
 };

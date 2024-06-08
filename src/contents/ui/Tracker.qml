@@ -19,7 +19,7 @@ Kirigami.ScrollablePage {
     actions: [
         Kirigami.Action {
             text: i18n("Video Source")
-            icon.name: "camera-web-symbolic"
+            icon.name: "video-symbolic"
             onTriggered: sourceMenu.open()
         },
         Kirigami.Action {
@@ -54,6 +54,7 @@ Kirigami.ScrollablePage {
 
         backend: EoSTrackerBackend
         model: EosTrackerSourceModel
+        backendName: "tracker"
     }
 
     FileDialog {

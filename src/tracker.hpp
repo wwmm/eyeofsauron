@@ -1,14 +1,12 @@
 #pragma once
 
-#include <memory.h>
-#include <qabstractitemmodel.h>
 #include <qabstractseries.h>
-#include <qhash.h>
 #include <qlist.h>
-#include <qnamespace.h>
 #include <qobject.h>
+#include <qpoint.h>
 #include <qtmetamacros.h>
 #include <qtypes.h>
+#include <qurl.h>
 #include <QCamera>
 #include <QMediaPlayer>
 #include <QVideoSink>
@@ -23,32 +21,6 @@
 #include "frame_source.hpp"
 
 namespace tracker {
-
-class SourceModel : public QAbstractListModel {
-  Q_OBJECT;
-
- public:
-  enum Roles { SourceType = Qt::UserRole, Name, Subtitle, Icon = Qt::DecorationRole };
-
-  [[nodiscard]] int rowCount(const QModelIndex& /*parent*/) const override;
-
-  [[nodiscard]] QHash<int, QByteArray> roleNames() const override;
-
-  [[nodiscard]] QVariant data(const QModelIndex& index, int role) const override;
-
-  auto getList() -> QList<std::shared_ptr<Source>>;
-
-  auto get_source(const int& rowIndex) -> std::shared_ptr<Source>;
-
-  void reset();
-
-  void append(std::shared_ptr<Source> source);
-
-  Q_INVOKABLE void removeSource(const int& rowIndex);
-
- private:
-  QList<std::shared_ptr<Source>> list;
-};
 
 class Backend : public QObject {
   Q_OBJECT

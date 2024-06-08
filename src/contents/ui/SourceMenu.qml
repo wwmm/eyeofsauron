@@ -11,6 +11,7 @@ Kirigami.OverlaySheet {
 
     property var backend: null
     property var model: null
+    property string backendName
 
     showCloseButton: false
     implicitWidth: Kirigami.Units.gridUnit * 30
@@ -123,7 +124,7 @@ Kirigami.OverlaySheet {
 
         fileMode: FileDialog.OpenFile
         currentFolder: StandardPaths.standardLocations(StandardPaths.MoviesLocation)[0]
-        nameFilters: ["Video files (*.*)"]
+        nameFilters: backendName === "tracker" ? ["Video files (*.*)"] : ["Audio files (*.*)"]
         onAccepted: {
             backend.append(fileDialog.selectedFile);
         }
@@ -133,8 +134,8 @@ Kirigami.OverlaySheet {
         alignment: Qt.AlignCenter
         actions: [
             Kirigami.Action {
-                text: i18n("Add Video File")
-                icon.name: "video-symbolic"
+                text: backendName === "tracker" ? i18n("Add Video File") : i18n("Add Audio File")
+                icon.name: backendName === "tracker" ? "video-symbolic" : "emblem-music-symbolic"
                 onTriggered: {
                     fileDialog.open();
                 }

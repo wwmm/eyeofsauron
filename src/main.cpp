@@ -16,6 +16,7 @@
 #include <memory>
 #include "config.h"
 #include "eyeofsauron_db.h"
+#include "sound_wave.hpp"
 #include "tracker.hpp"
 #include "util.hpp"
 
@@ -99,6 +100,7 @@ int main(int argc, char* argv[]) {
   // loading classes
 
   tracker::Backend tracker;
+  sound::Backend sound;
 
   QQmlApplicationEngine engine;
 

@@ -1,8 +1,16 @@
 #include "frame_source.hpp"
+#include <qabstractitemmodel.h>
+#include <qbytearray.h>
 #include <qdebug.h>
+#include <qhash.h>
+#include <qlist.h>
 #include <qlogging.h>
+#include <qtmetamacros.h>
+#include <qvariant.h>
 #include <cmath>
 #include <format>
+#include <iterator>
+#include <memory>
 #include <string>
 #include <utility>
 #define _UNICODE
@@ -58,4 +66,184 @@ MediaFileSource::MediaFileSource(QUrl file_url) : Source(SourceType::MediaFile),
       util::warning("failed to get media information");
     }
   }
+}
+
+int SourceModel::rowCount(const QModelIndex& /*parent*/) const {
+  return list.size();
+}
+
+QHash<int, QByteArray> SourceModel::roleNames() const {
+  return {
+      {Roles::SourceType, "sourceType"}, {Roles::Name, "name"}, {Roles::Subtitle, "subtitle"}, {Roles::Icon, "icon"}};
+}
+
+QVariant SourceModel::data(const QModelIndex& index, int role) const {
+  if (list.empty()) {
+    return "";
+  }
+
+  const auto it = std::next(list.begin(), index.row());
+
+  switch (role) {
+    case Roles::SourceType: {
+      QString value;
+
+      switch (it->get()->source_type) {
+        case Camera: {
+          value = "camera";
+
+          break;
+        }
+        case MediaFile: {
+          value = "media_file";
+
+          break;
+        }
+        case Microphone: {
+          value = "microphone";
+
+          break;
+        }
+      }
+
+      return value;
+    }
+    case Roles::Name: {
+      QString value;
+
+      switch (it->get()->source_type) {
+        case Camera: {
+          value = dynamic_cast<const CameraSource*>(it->get())->device.description();
+
+          break;
+        }
+        case MediaFile: {
+          value = dynamic_cast<const MediaFileSource*>(it->get())->url.fileName();
+
+          break;
+        }
+        case Microphone: {
+          value = dynamic_cast<const MicSource*>(it->get())->device.description();
+
+          break;
+        }
+      }
+
+      return value;
+    }
+    case Roles::Subtitle: {
+      QString value;
+
+      switch (it->get()->source_type) {
+        case Camera: {
+          auto format = dynamic_cast<const CameraSource*>(it->get())->format;
+
+          if (!format.isNull()) {
+            auto resolution = util::to_string(format.resolution().width()) + "x" +
+                              util::to_string(format.resolution().height()) + "  " +
+                              util::to_string(format.maxFrameRate()) + " fps";
+
+            value = QString::fromStdString(resolution);
+          }
+
+          break;
+        }
+        case MediaFile: {
+          auto file_size_mb = dynamic_cast<const MediaFileSource*>(it->get())->file_size_mb;
+          auto duration = dynamic_cast<const MediaFileSource*>(it->get())->duration;
+          auto frame_rate = dynamic_cast<const MediaFileSource*>(it->get())->frame_rate;
+
+          value = frame_rate + " fps" + ", " + file_size_mb + " MiB" + ", " + duration;
+
+          break;
+        }
+        case Microphone: {
+          auto format = dynamic_cast<const MicSource*>(it->get())->format;
+
+          if (format.isValid()) {
+            auto resolution = util::to_string(format.sampleRate()) + " Hz, " + util::to_string(format.sampleFormat());
+
+            value = QString::fromStdString(resolution);
+          }
+
+          break;
+        }
+      }
+
+      return value;
+    }
+    case Roles::Icon: {
+      QString name;
+
+      switch (it->get()->source_type) {
+        case Camera: {
+          name = "camera-web-symbolic";
+
+          break;
+        }
+        case MediaFile: {
+          name = "video-symbolic";
+
+          break;
+        }
+        case Microphone: {
+          name = "audio-input-microphone-symbolic";
+
+          break;
+        }
+      }
+
+      return name;
+    }
+    default:
+      return {};
+  }
+}
+
+auto SourceModel::getList() -> QList<std::shared_ptr<Source>> {
+  return list;
+}
+
+auto SourceModel::get_source(const int& rowIndex) -> std::shared_ptr<Source> {
+  return list[rowIndex];
+}
+
+void SourceModel::append(std::shared_ptr<Source> source) {
+  int pos = list.empty() ? 0 : list.size() - 1;
+
+  beginInsertRows(QModelIndex(), pos, pos);
+
+  switch (source->source_type) {
+    case Camera:
+      list.insert(0, source);
+      break;
+    case MediaFile:
+      list.append(source);
+      break;
+    case Microphone:
+      list.append(source);
+      break;
+  }
+
+  endInsertRows();
+
+  emit dataChanged(index(0), index(list.size() - 1));
+}
+
+void SourceModel::reset() {
+  beginResetModel();
+
+  list.clear();
+
+  endResetModel();
+}
+
+void SourceModel::removeSource(const int& rowIndex) {
+  beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
+
+  list.remove(rowIndex);
+
+  endRemoveRows();
+
+  emit dataChanged(index(0), index(list.size() - 1));
 }
