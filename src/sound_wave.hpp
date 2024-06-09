@@ -99,6 +99,8 @@ class Backend : public QObject {
   std::unique_ptr<QMediaCaptureSession> capture_session;
   std::unique_ptr<QMediaPlayer> media_player;
   std::unique_ptr<QAudioSink> media_player_audio_sink;
+
+  void find_microphones();
 };
 
 }  // namespace sound

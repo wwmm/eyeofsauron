@@ -50,11 +50,9 @@ class MediaFileSource : public Source {
 
 class MicSource : public Source {
  public:
-  MicSource(QAudioDevice dev, QAudioFormat fmt);
+  MicSource(QAudioDevice dev);
 
   QAudioDevice device;
-
-  QAudioFormat format;
 };
 
 class SourceModel : public QAbstractListModel {

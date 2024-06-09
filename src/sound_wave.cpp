@@ -7,6 +7,7 @@
 #include <qqml.h>
 #include <qtmetamacros.h>
 #include <qtypes.h>
+#include <QMediaDevices>
 #include <memory>
 #include "config.h"
 #include "frame_source.hpp"
@@ -24,6 +25,8 @@ Backend::Backend(QObject* parent)
 
   qmlRegisterSingletonInstance<SourceModel>("EosSoundSourceModel", VERSION_MAJOR, VERSION_MINOR, "EosSoundSourceModel",
                                             &sourceModel);
+
+  find_microphones();
 }
 
 Backend::~Backend() {
@@ -112,6 +115,16 @@ void Backend::selectSource(const int& index) {
   }
 
   Q_EMIT showPlayerSliderChanged();
+}
+
+void Backend::find_microphones() {
+  for (const auto& device : QMediaDevices::audioInputs()) {
+    if (!device.isNull()) {
+      qDebug() << device.description() << device.preferredFormat() << device.supportedSampleFormats();
+
+      sourceModel.append(std::make_shared<MicSource>(device));
+    }
+  }
 }
 
 void Backend::saveTable(const QUrl& fileUrl) {}

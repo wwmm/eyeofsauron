@@ -1,5 +1,7 @@
 #include "frame_source.hpp"
 #include <qabstractitemmodel.h>
+#include <qaudiodevice.h>
+#include <qaudioformat.h>
 #include <qbytearray.h>
 #include <qdebug.h>
 #include <qhash.h>
@@ -18,6 +20,7 @@
 #include <MediaInfo/MediaInfo_Const.h>
 #include <qcameradevice.h>
 #include <qurl.h>
+#include <KLocalizedString>
 #include "util.hpp"
 
 Source::Source(SourceType source_type) : source_type(source_type) {}
@@ -67,6 +70,8 @@ MediaFileSource::MediaFileSource(QUrl file_url) : Source(SourceType::MediaFile),
     }
   }
 }
+
+MicSource::MicSource(QAudioDevice dev) : Source(SourceType::Microphone), device(std::move(dev)) {}
 
 int SourceModel::rowCount(const QModelIndex& /*parent*/) const {
   return list.size();
@@ -158,13 +163,34 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
           break;
         }
         case Microphone: {
-          auto format = dynamic_cast<const MicSource*>(it->get())->format;
+          auto device = dynamic_cast<const MicSource*>(it->get())->device;
 
-          if (format.isValid()) {
-            auto resolution = util::to_string(format.sampleRate()) + " Hz, " + util::to_string(format.sampleFormat());
+          std::string format;
 
-            value = QString::fromStdString(resolution);
+          switch (device.preferredFormat().sampleFormat()) {
+            case QAudioFormat::Unknown:
+              format = "";
+              break;
+            case QAudioFormat::UInt8:
+              format = "UInt8";
+              break;
+            case QAudioFormat::Int16:
+              format = "Int16";
+              break;
+            case QAudioFormat::Int32:
+              format = "Int32";
+              break;
+            case QAudioFormat::Float:
+              format = "Float";
+              break;
+            case QAudioFormat::NSampleFormats:
+              format = "NSampleFormats";
+              break;
           }
+
+          value = QString::fromStdString(std::format("{0:d} Hz, {1:d} {2}, {3}", device.preferredFormat().sampleRate(),
+                                                     device.preferredFormat().channelCount(),
+                                                     i18n("channels").toStdString(), format));
 
           break;
         }
@@ -221,7 +247,14 @@ void SourceModel::append(std::shared_ptr<Source> source) {
       list.append(source);
       break;
     case Microphone:
-      list.append(source);
+      auto mic = dynamic_cast<const MicSource*>(source.get())->device;
+
+      if (mic.isDefault()) {
+        list.insert(0, source);
+
+      } else {
+        list.append(source);
+      }
       break;
   }
 
