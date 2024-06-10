@@ -1,6 +1,6 @@
 #include "sound_wave.hpp"
 #include <qaudiodevice.h>
-#include <qaudiosink.h>
+#include <qaudiosource.h>
 #include <qmediacapturesession.h>
 #include <qmediaplayer.h>
 #include <qobject.h>
@@ -11,20 +11,21 @@
 #include <memory>
 #include "config.h"
 #include "frame_source.hpp"
+#include "io_device.hpp"
 
 namespace sound {
 
 Backend::Backend(QObject* parent)
     : QObject(parent),
-      microphone(std::make_unique<QAudioDevice>()),
-      microphone_audio_sink(std::make_unique<QAudioSink>()),
+      io_device(std::make_unique<IODevice>()),
       capture_session(std::make_unique<QMediaCaptureSession>()),
-      media_player(std::make_unique<QMediaPlayer>()),
-      media_player_audio_sink(std::make_unique<QAudioSink>()) {
+      media_player(std::make_unique<QMediaPlayer>()) {
   qmlRegisterSingletonInstance<Backend>("EoSSoundBackend", VERSION_MAJOR, VERSION_MINOR, "EoSSoundBackend", this);
 
   qmlRegisterSingletonInstance<SourceModel>("EosSoundSourceModel", VERSION_MAJOR, VERSION_MINOR, "EosSoundSourceModel",
                                             &sourceModel);
+
+  io_device->open(QIODevice::WriteOnly);
 
   find_microphones();
 }
@@ -110,6 +111,14 @@ void Backend::selectSource(const int& index) {
       break;
     }
     case Microphone: {
+      auto device = dynamic_cast<const MicSource*>(source.get())->device;
+
+      // https:  // code.qt.io/cgit/qt/qtcharts.git/tree/examples/charts/audio/widget.cpp?h=6.7
+
+      microphone = std::make_unique<QAudioSource>(device, device.preferredFormat());
+
+      microphone->start(io_device.get());
+
       break;
     }
   }
@@ -120,8 +129,6 @@ void Backend::selectSource(const int& index) {
 void Backend::find_microphones() {
   for (const auto& device : QMediaDevices::audioInputs()) {
     if (!device.isNull()) {
-      qDebug() << device.description() << device.preferredFormat() << device.supportedSampleFormats();
-
       sourceModel.append(std::make_shared<MicSource>(device));
     }
   }

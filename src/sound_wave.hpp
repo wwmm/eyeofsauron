@@ -10,10 +10,11 @@
 #include <qtmetamacros.h>
 #include <qtypes.h>
 #include <qvariant.h>
-#include <QAudioSink>
+#include <QAudioSource>
 #include <QMediaPlayer>
 #include <memory>
 #include "frame_source.hpp"
+#include "io_device.hpp"
 
 namespace sound {
 
@@ -94,11 +95,10 @@ class Backend : public QObject {
 
   SourceType current_source_type = SourceType::Microphone;
 
-  std::unique_ptr<QAudioDevice> microphone;
-  std::unique_ptr<QAudioSink> microphone_audio_sink;
+  std::unique_ptr<IODevice> io_device;
+  std::unique_ptr<QAudioSource> microphone;
   std::unique_ptr<QMediaCaptureSession> capture_session;
   std::unique_ptr<QMediaPlayer> media_player;
-  std::unique_ptr<QAudioSink> media_player_audio_sink;
 
   void find_microphones();
 };
