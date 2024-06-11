@@ -20,14 +20,17 @@ Kirigami.ScrollablePage {
         Kirigami.Action {
             icon.name: "media-playback-start-symbolic"
             text: i18nc("@action:button", "Play")
+            onTriggered: EoSSoundBackend.start()
         },
         Kirigami.Action {
             icon.name: "media-playback-pause-symbolic"
             text: i18nc("@action:button", "Pause")
+            onTriggered: EoSSoundBackend.pause()
         },
         Kirigami.Action {
             icon.name: "media-playback-stop-symbolic"
             text: i18nc("@action:button", "Stop")
+            onTriggered: EoSSoundBackend.stop()
         }
     ]
 

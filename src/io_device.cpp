@@ -1,11 +1,21 @@
 #include "io_device.hpp"
+#include <qaudioformat.h>
 #include <qobject.h>
+#include <qtmetamacros.h>
 #include <qtpreprocessorsupport.h>
 #include <qtypes.h>
+#include <algorithm>
+#include <bit>
+#include <cstddef>
+#include <span>
 
 namespace sound {
 
 IODevice::IODevice(QObject* parent) : QIODevice(parent) {}
+
+void IODevice::set_format(QAudioFormat device_format) {
+  format = device_format;
+}
 
 qint64 IODevice::readData(char* data, qint64 maxSize) {
   Q_UNUSED(data);
@@ -14,35 +24,19 @@ qint64 IODevice::readData(char* data, qint64 maxSize) {
 }
 
 qint64 IODevice::writeData(const char* data, qint64 maxSize) {
-  static const int resolution = 4;
+  const int n_samples = maxSize / format.bytesPerSample();
 
-  if (m_buffer.isEmpty()) {
-    m_buffer.reserve(sampleCount);
-
-    for (int i = 0; i < sampleCount; ++i) {
-      m_buffer.append(QPointF(i, 0));
-    }
+  if (buffer.size() != static_cast<size_t>(n_samples)) {
+    buffer.resize(n_samples);
   }
 
-  int start = 0;
+  auto input_data = std::span<const float>(std::bit_cast<const float*>(data), n_samples);
 
-  const int availableSamples = int(maxSize) / resolution;
+  std::copy(input_data.begin(), input_data.end(), buffer.begin());
 
-  if (availableSamples < sampleCount) {
-    start = sampleCount - availableSamples;
+  Q_EMIT bufferChanged(buffer);
 
-    for (int s = 0; s < start; ++s) {
-      m_buffer[s].setY(m_buffer.at(s + availableSamples).y());
-    }
-  }
-
-  for (int s = start; s < sampleCount; ++s, data += resolution) {
-    m_buffer[s].setY(qreal(uchar(*data) - 128) / qreal(128));
-  }
-
-  //   m_series->replace(m_buffer);
-
-  return (sampleCount - start) * resolution;
+  return maxSize;
 }
 
 }  // namespace sound

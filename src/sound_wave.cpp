@@ -1,5 +1,6 @@
 #include "sound_wave.hpp"
 #include <qaudiodevice.h>
+#include <qaudioformat.h>
 #include <qaudiosource.h>
 #include <qmediacapturesession.h>
 #include <qmediaplayer.h>
@@ -9,9 +10,11 @@
 #include <qtypes.h>
 #include <QMediaDevices>
 #include <memory>
+#include <vector>
 #include "config.h"
 #include "frame_source.hpp"
 #include "io_device.hpp"
+#include "util.hpp"
 
 namespace sound {
 
@@ -25,12 +28,19 @@ Backend::Backend(QObject* parent)
   qmlRegisterSingletonInstance<SourceModel>("EosSoundSourceModel", VERSION_MAJOR, VERSION_MINOR, "EosSoundSourceModel",
                                             &sourceModel);
 
+  connect(io_device.get(), &IODevice::bufferChanged, [this](const std::vector<double>& buffer) {
+    for (double v : buffer) {
+      qDebug() << v;
+    }
+  });
+
   io_device->open(QIODevice::WriteOnly);
 
   find_microphones();
 }
 
 Backend::~Backend() {
+  microphone->stop();
   media_player->stop();
 
   exiting = true;
@@ -46,6 +56,7 @@ void Backend::start() {
       break;
     }
     case Microphone: {
+      microphone->start(io_device.get());
       break;
     }
   }
@@ -61,6 +72,7 @@ void Backend::pause() {
       break;
     }
     case Microphone: {
+      microphone->stop();
       break;
     }
   }
@@ -78,6 +90,7 @@ void Backend::stop() {
       break;
     }
     case Microphone: {
+      microphone->stop();
       break;
     }
   }
@@ -91,6 +104,10 @@ void Backend::append(const QUrl& mediaUrl) {
 
 void Backend::selectSource(const int& index) {
   auto source = sourceModel.get_source(index);
+
+  if (microphone != nullptr) {
+    microphone->stop();
+  }
 
   media_player->stop();
 
@@ -115,7 +132,13 @@ void Backend::selectSource(const int& index) {
 
       // https:  // code.qt.io/cgit/qt/qtcharts.git/tree/examples/charts/audio/widget.cpp?h=6.7
 
-      microphone = std::make_unique<QAudioSource>(device, device.preferredFormat());
+      auto format = device.preferredFormat();
+      format.setSampleFormat(QAudioFormat::Float);
+      format.setChannelCount(1);
+
+      io_device->set_format(format);
+
+      microphone = std::make_unique<QAudioSource>(device, format);
 
       microphone->start(io_device.get());
 
