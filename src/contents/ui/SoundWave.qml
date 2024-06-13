@@ -42,6 +42,14 @@ Kirigami.ScrollablePage {
         backendName: "sound_wave"
     }
 
+    Connections {
+        function onUpdateChart() {
+            EoSSoundBackend.updateSeriesWaveform(chartWaveForm.series(0));
+        }
+
+        target: EoSSoundBackend
+    }
+
     ColumnLayout {
         anchors.fill: parent
 
@@ -57,15 +65,23 @@ Kirigami.ScrollablePage {
                     antialiasing: true
                     theme: EoSdb.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
                     localizeNumbers: true
-                    title: i18n("WaveForm")
 
                     ValueAxis {
                         id: axisTime
 
-                        labelFormat: "%.1f"
-                        // min: EoSTrackerBackend.xAxisMin
-                        // max: EoSTrackerBackend.xAxisMax
+                        labelFormat: "%.2e"
+                        min: EoSSoundBackend.xAxisMinWave
+                        max: EoSSoundBackend.xAxisMaxWave
                         titleText: i18n("Time [s]")
+                    }
+
+                    ValueAxis {
+                        id: axisWaveform
+
+                        labelFormat: "%.1e"
+                        min: EoSSoundBackend.yAxisMinWave
+                        max: EoSSoundBackend.yAxisMaxWave
+                        titleText: i18n("Amplitude")
                     }
 
                     Rectangle {
@@ -85,6 +101,15 @@ Kirigami.ScrollablePage {
                         zoomRect: zoomRectWaveForm
                     }
 
+                    LineSeries {
+                        id: chartWaveFormLineSeries
+
+                        name: i18n("Waveform")
+                        axisX: axisTime
+                        axisY: axisWaveform
+                        useOpenGL: true
+                    }
+
                 }
 
                 Text {
@@ -92,7 +117,7 @@ Kirigami.ScrollablePage {
                     horizontalAlignment: Text.AlignHCenter
                     color: Kirigami.Theme.textColor
                     text: {
-                        return `x = ${mouseAreaWaveForm.mouseX.toFixed(1)} \t y = ${mouseAreaWaveForm.mouseY.toFixed(1)}`;
+                        return `x = ${mouseAreaWaveForm.mouseX.toExponential(5)} \t y = ${mouseAreaWaveForm.mouseY.toExponential(5)}`;
                     }
                 }
 
@@ -115,8 +140,8 @@ Kirigami.ScrollablePage {
                         id: axisFrequency
 
                         labelFormat: "%.1f"
-                        // min: EoSTrackerBackend.xAxisMin
-                        // max: EoSTrackerBackend.xAxisMax
+                        // min: EoSSoundBackend.xAxisMin
+                        // max: EoSSoundBackend.xAxisMax
                         titleText: i18n("Frequency [Hz]")
                     }
 
@@ -157,17 +182,18 @@ Kirigami.ScrollablePage {
     footer: Kirigami.ActionToolBar {
         actions: [
             Kirigami.Action {
-                text: i18n("Points")
+                text: i18n("Time Window")
 
                 displayComponent: EoSSpinBox {
-                    id: nPoints
-
-                    unit: i18n("points")
-                    decimals: 0
-                    stepSize: 1
-                    from: 2
-                    to: 1000
-                    value: 100
+                    unit: i18n("s")
+                    decimals: 2
+                    stepSize: 0.01
+                    from: 0.01
+                    to: 60
+                    value: EoSdb.chartTimeWindow
+                    onValueModified: (v) => {
+                        EoSdb.chartTimeWindow = v;
+                    }
                 }
 
             },

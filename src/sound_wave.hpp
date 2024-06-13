@@ -1,6 +1,7 @@
 #pragma once
 
 #include <qabstractitemmodel.h>
+#include <qabstractseries.h>
 #include <qbytearray.h>
 #include <qhash.h>
 #include <qlist.h>
@@ -13,6 +14,8 @@
 #include <QAudioSource>
 #include <QMediaPlayer>
 #include <memory>
+#include <mutex>
+#include <vector>
 #include "frame_source.hpp"
 #include "io_device.hpp"
 
@@ -55,6 +58,7 @@ class Backend : public QObject {
   Q_INVOKABLE void stop();
   Q_INVOKABLE void append(const QUrl& mediaUrl);
   Q_INVOKABLE void selectSource(const int& index);
+  Q_INVOKABLE void updateSeriesWaveform(QAbstractSeries* series);
   Q_INVOKABLE void saveTable(const QUrl& fileUrl);
   Q_INVOKABLE void setPlayerPosition(qint64 value);
 
@@ -71,6 +75,7 @@ class Backend : public QObject {
   void playerPositionChanged();
   void playerDurationChanged();
   void showPlayerSliderChanged();
+  void updateChart();
 
  private:
   bool _showPlayerSlider = false;
@@ -86,8 +91,8 @@ class Backend : public QObject {
   double _xAxisMaxFFT = 0;
   double _yAxisMinFFT = 10000;
   double _yAxisMaxFFT = 0;
+  double time_axis = 0;
 
-  qint64 initial_time = 0;
   qint64 _playerPosition = 0;
   qint64 _playerDuration = 0;
 
@@ -100,7 +105,13 @@ class Backend : public QObject {
   std::unique_ptr<QMediaCaptureSession> capture_session;
   std::unique_ptr<QMediaPlayer> media_player;
 
+  std::mutex microphone_mutex;
+
+  QList<QPointF> waveform;
+
   void find_microphones();
+  void process_buffer(const std::vector<double>& buffer);
+  void update_waveformt_chart_range();
 };
 
 }  // namespace sound

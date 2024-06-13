@@ -1,17 +1,23 @@
 #include "sound_wave.hpp"
+#include <qabstractseries.h>
 #include <qaudiodevice.h>
 #include <qaudioformat.h>
 #include <qaudiosource.h>
+#include <qlogging.h>
 #include <qmediacapturesession.h>
 #include <qmediaplayer.h>
 #include <qobject.h>
 #include <qqml.h>
 #include <qtmetamacros.h>
 #include <qtypes.h>
+#include <qxyseries.h>
 #include <QMediaDevices>
+#include <algorithm>
 #include <memory>
+#include <mutex>
 #include <vector>
 #include "config.h"
+#include "eyeofsauron_db.h"
 #include "frame_source.hpp"
 #include "io_device.hpp"
 #include "util.hpp"
@@ -29,9 +35,9 @@ Backend::Backend(QObject* parent)
                                             &sourceModel);
 
   connect(io_device.get(), &IODevice::bufferChanged, [this](const std::vector<double>& buffer) {
-    for (double v : buffer) {
-      qDebug() << v;
-    }
+    std::lock_guard<std::mutex> microphone_lock_guard(microphone_mutex);
+
+    process_buffer(buffer);
   });
 
   io_device->open(QIODevice::WriteOnly);
@@ -79,7 +85,7 @@ void Backend::pause() {
 }
 
 void Backend::stop() {
-  initial_time = 0;
+  time_axis = 0;
 
   switch (current_source_type) {
     case Camera: {
@@ -138,6 +144,8 @@ void Backend::selectSource(const int& index) {
 
       io_device->set_format(format);
 
+      std::lock_guard<std::mutex> microphone_lock_guard(microphone_mutex);
+
       microphone = std::make_unique<QAudioSource>(device, format);
 
       microphone->start(io_device.get());
@@ -157,10 +165,61 @@ void Backend::find_microphones() {
   }
 }
 
+void Backend::process_buffer(const std::vector<double>& buffer) {
+  double dt = 1.0 / microphone->format().sampleRate();
+
+  for (double v : buffer) {
+    waveform.append(QPointF(time_axis, v));
+
+    time_axis += dt;
+
+    // qDebug() << v;
+  }
+
+  while ((waveform.size() - 1) * dt > db::Main::chartTimeWindow()) {
+    waveform.removeFirst();
+    waveform.removeFirst();
+  }
+
+  update_waveformt_chart_range();
+
+  Q_EMIT updateChart();
+}
+
+void Backend::update_waveformt_chart_range() {
+  auto [min_x, max_x] = std::ranges::minmax_element(waveform, [](QPointF a, QPointF b) { return a.x() < b.x(); });
+  auto [min_y, max_y] = std::ranges::minmax_element(waveform, [](QPointF a, QPointF b) { return a.y() < b.y(); });
+
+  _xAxisMinWave = min_x->x();
+  _xAxisMaxWave = max_x->x();
+  _yAxisMinWave = min_y->y();
+  _yAxisMaxWave = max_y->y();
+
+  Q_EMIT xAxisMinWaveChanged();
+  Q_EMIT xAxisMaxWaveChanged();
+  Q_EMIT yAxisMinWaveChanged();
+  Q_EMIT yAxisMaxWaveChanged();
+}
+
+void Backend::updateSeriesWaveform(QAbstractSeries* series) {
+  if (series != nullptr) {
+    auto xySeries = dynamic_cast<QXYSeries*>(series);
+
+    if (waveform.empty()) {
+      return;
+    }
+
+    // Use replace instead of clear + append, it's optimized for performance
+    xySeries->replace(waveform);
+  } else {
+    util::warning("series waveform is null!");
+  }
+}
+
 void Backend::saveTable(const QUrl& fileUrl) {}
 
 void Backend::setPlayerPosition(qint64 value) {
-  initial_time = 0;
+  time_axis = 0;
 
   media_player->setPosition(value);
 }

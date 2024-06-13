@@ -67,4 +67,12 @@
             <max>1080</max>
         </entry>
     </group>
+    <group name="SoundWave">
+        <entry name="chartTimeWindow" type="Double">
+            <label>Time Window in Seconds</label>
+            <default>1.0</default>
+            <min>0.01</min>
+            <max>60</max>
+        </entry>
+    </group>
 </kcfg>
