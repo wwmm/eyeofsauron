@@ -45,6 +45,7 @@ Kirigami.ScrollablePage {
     Connections {
         function onUpdateChart() {
             EoSSoundBackend.updateSeriesWaveform(chartWaveForm.series(0));
+            EoSSoundBackend.updateSeriesFFT(chartFFT.series(0));
         }
 
         target: EoSSoundBackend
@@ -134,15 +135,24 @@ Kirigami.ScrollablePage {
                     antialiasing: true
                     theme: EoSdb.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
                     localizeNumbers: true
-                    title: i18n("Fourier Transform")
+
+                    LogValueAxis {
+                        id: axisFreq
+
+                        labelFormat: "%.1e"
+                        min: EoSSoundBackend.xAxisMinFFT
+                        max: EoSSoundBackend.xAxisMaxFFT
+                        titleText: i18n("Frequency [Hz]")
+                        base: 10
+                    }
 
                     ValueAxis {
-                        id: axisFrequency
+                        id: axisFFT
 
-                        labelFormat: "%.1f"
-                        // min: EoSSoundBackend.xAxisMin
-                        // max: EoSSoundBackend.xAxisMax
-                        titleText: i18n("Frequency [Hz]")
+                        labelFormat: "%.1e"
+                        min: EoSSoundBackend.yAxisMinFFT
+                        max: EoSSoundBackend.yAxisMaxFFT
+                        titleText: i18n("Amplitude²")
                     }
 
                     Rectangle {
@@ -162,6 +172,15 @@ Kirigami.ScrollablePage {
                         zoomRect: zoomRectFFT
                     }
 
+                    LineSeries {
+                        id: chartFFTLineSeries
+
+                        name: i18n("Fourier Transform")
+                        axisX: axisFreq
+                        axisY: axisFFT
+                        useOpenGL: true
+                    }
+
                 }
 
                 Text {
@@ -169,7 +188,7 @@ Kirigami.ScrollablePage {
                     horizontalAlignment: Text.AlignHCenter
                     color: Kirigami.Theme.textColor
                     text: {
-                        return `x = ${mouseAreaFFT.mouseX.toFixed(1)} \t y = ${mouseAreaFFT.mouseY.toFixed(1)}`;
+                        return `x = ${mouseAreaFFT.mouseX.toExponential(5)} \t y = ${mouseAreaFFT.mouseY.toExponential(5)}`;
                     }
                 }
 
@@ -182,9 +201,9 @@ Kirigami.ScrollablePage {
     footer: Kirigami.ActionToolBar {
         actions: [
             Kirigami.Action {
-                text: i18n("Time Window")
 
                 displayComponent: EoSSpinBox {
+                    label: i18n("Time Window")
                     unit: i18n("s")
                     decimals: 2
                     stepSize: 0.01

@@ -59,6 +59,7 @@ class Backend : public QObject {
   Q_INVOKABLE void append(const QUrl& mediaUrl);
   Q_INVOKABLE void selectSource(const int& index);
   Q_INVOKABLE void updateSeriesWaveform(QAbstractSeries* series);
+  Q_INVOKABLE void updateSeriesFFT(QAbstractSeries* series);
   Q_INVOKABLE void saveTable(const QUrl& fileUrl);
   Q_INVOKABLE void setPlayerPosition(qint64 value);
 
@@ -108,10 +109,15 @@ class Backend : public QObject {
   std::mutex microphone_mutex;
 
   QList<QPointF> waveform;
+  QList<QPointF> fft_list;
+
+  std::vector<double> real_input;
 
   void find_microphones();
   void process_buffer(const std::vector<double>& buffer);
-  void update_waveformt_chart_range();
+  void calc_fft();
+  void update_waveform_chart_range();
+  void update_fft_chart_range();
 };
 
 }  // namespace sound

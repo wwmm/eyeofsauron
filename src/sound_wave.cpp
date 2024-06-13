@@ -1,4 +1,5 @@
 #include "sound_wave.hpp"
+#include <fftw3.h>
 #include <qabstractseries.h>
 #include <qaudiodevice.h>
 #include <qaudioformat.h>
@@ -13,8 +14,10 @@
 #include <qxyseries.h>
 #include <QMediaDevices>
 #include <algorithm>
+#include <cmath>
 #include <memory>
 #include <mutex>
+#include <numbers>
 #include <vector>
 #include "config.h"
 #include "eyeofsauron_db.h"
@@ -165,6 +168,57 @@ void Backend::find_microphones() {
   }
 }
 
+void Backend::calc_fft() {
+  if (waveform.empty()) {
+    return;
+  }
+
+  fft_list.resize(waveform.size() / 2U + 1U);
+
+  real_input.resize(0);
+
+  for (const auto& p : waveform) {
+    real_input.emplace_back(p.y());
+  }
+
+  for (uint n = 0U; n < real_input.size(); n++) {
+    // https://en.wikipedia.org/wiki/Hann_function
+
+    const float w = 0.5F * (1.0F - std::cos(2.0F * std::numbers::pi_v<float> * static_cast<float>(n) /
+                                            static_cast<float>(real_input.size() - 1U)));
+
+    real_input[n] *= w;
+  }
+
+  auto* complex_output = fftw_alloc_complex(real_input.size());
+
+  auto* plan =
+      fftw_plan_dft_r2c_1d(static_cast<int>(real_input.size()), real_input.data(), complex_output, FFTW_ESTIMATE);
+
+  fftw_execute(plan);
+
+  for (uint i = 0U; i < fft_list.size(); i++) {
+    double sqr = complex_output[i][0] * complex_output[i][0] + complex_output[i][1] * complex_output[i][1];
+
+    sqr /= static_cast<double>(fft_list.size() * fft_list.size());
+
+    double f = 0.5F * static_cast<float>(microphone->format().sampleRate()) * static_cast<float>(i) /
+               static_cast<float>(fft_list.size());
+
+    fft_list[i] = QPointF(f, sqr);
+  }
+
+  // removing the DC component at f = 0 Hz
+
+  fft_list.erase(fft_list.begin());
+
+  if (complex_output != nullptr) {
+    fftw_free(complex_output);
+  }
+
+  fftw_destroy_plan(plan);
+}
+
 void Backend::process_buffer(const std::vector<double>& buffer) {
   double dt = 1.0 / microphone->format().sampleRate();
 
@@ -181,12 +235,19 @@ void Backend::process_buffer(const std::vector<double>& buffer) {
     waveform.removeFirst();
   }
 
-  update_waveformt_chart_range();
+  calc_fft();
+
+  update_waveform_chart_range();
+  update_fft_chart_range();
 
   Q_EMIT updateChart();
 }
 
-void Backend::update_waveformt_chart_range() {
+void Backend::update_waveform_chart_range() {
+  if (waveform.empty()) {
+    return;
+  }
+
   auto [min_x, max_x] = std::ranges::minmax_element(waveform, [](QPointF a, QPointF b) { return a.x() < b.x(); });
   auto [min_y, max_y] = std::ranges::minmax_element(waveform, [](QPointF a, QPointF b) { return a.y() < b.y(); });
 
@@ -201,6 +262,25 @@ void Backend::update_waveformt_chart_range() {
   Q_EMIT yAxisMaxWaveChanged();
 }
 
+void Backend::update_fft_chart_range() {
+  if (fft_list.empty()) {
+    return;
+  }
+
+  auto [min_x, max_x] = std::ranges::minmax_element(fft_list, [](QPointF a, QPointF b) { return a.x() < b.x(); });
+  auto [min_y, max_y] = std::ranges::minmax_element(fft_list, [](QPointF a, QPointF b) { return a.y() < b.y(); });
+
+  _xAxisMinFFT = min_x->x();
+  _xAxisMaxFFT = max_x->x();
+  _yAxisMinFFT = min_y->y();
+  _yAxisMaxFFT = max_y->y();
+
+  Q_EMIT xAxisMinFFTChanged();
+  Q_EMIT xAxisMaxFFTChanged();
+  Q_EMIT yAxisMinFFTChanged();
+  Q_EMIT yAxisMaxFFTChanged();
+}
+
 void Backend::updateSeriesWaveform(QAbstractSeries* series) {
   if (series != nullptr) {
     auto xySeries = dynamic_cast<QXYSeries*>(series);
@@ -213,6 +293,21 @@ void Backend::updateSeriesWaveform(QAbstractSeries* series) {
     xySeries->replace(waveform);
   } else {
     util::warning("series waveform is null!");
+  }
+}
+
+void Backend::updateSeriesFFT(QAbstractSeries* series) {
+  if (series != nullptr) {
+    auto xySeries = dynamic_cast<QXYSeries*>(series);
+
+    if (fft_list.empty()) {
+      return;
+    }
+
+    // Use replace instead of clear + append, it's optimized for performance
+    xySeries->replace(fft_list);
+  } else {
+    util::warning("series fft is null!");
   }
 }
 
