@@ -2,8 +2,10 @@ import EoSSoundBackend
 import EoSdb
 import EosSoundSourceModel
 import QtCharts
+import QtCore
 import QtQuick
 import QtQuick.Controls as Controls
+import QtQuick.Dialogs
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
@@ -49,6 +51,22 @@ Kirigami.ScrollablePage {
         }
 
         target: EoSSoundBackend
+    }
+
+    FileDialog {
+        id: fileDialogSaveChart
+
+        fileMode: FileDialog.SaveFile
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        nameFilters: ["PNG files (*.png)"]
+        onAccepted: {
+            chartWaveForm.grabToImage(function(result) {
+                result.saveToFile(fileDialogSaveChart.selectedFile.toString().replace(".png", "_waveform.png"));
+            });
+            chartFFT.grabToImage(function(result) {
+                result.saveToFile(fileDialogSaveChart.selectedFile.toString().replace(".png", "_fft.png"));
+            });
+        }
     }
 
     ColumnLayout {
@@ -217,8 +235,11 @@ Kirigami.ScrollablePage {
 
             },
             Kirigami.Action {
-                text: i18n("Save Chart")
+                text: i18n("Save Charts")
                 icon.name: "folder-chart-symbolic"
+                onTriggered: {
+                    fileDialogSaveChart.open();
+                }
             },
             Kirigami.Action {
                 text: i18n("Save Table")
