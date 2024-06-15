@@ -71,8 +71,8 @@
         <entry name="chartTimeWindow" type="Double">
             <label>Time Window in Seconds</label>
             <default>1.0</default>
-            <min>0.01</min>
-            <max>60</max>
+            <min>0.001</min>
+            <max>3600</max>
         </entry>
     </group>
 </kcfg>

@@ -1,7 +1,7 @@
 #include "sound_wave.hpp"
 #include <fftw3.h>
 #include <qabstractseries.h>
-#include <qaudiodevice.h>
+#include <qaudiodecoder.h>
 #include <qaudioformat.h>
 #include <qaudiosource.h>
 #include <qlogging.h>
@@ -15,9 +15,11 @@
 #include <QMediaDevices>
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <memory>
 #include <mutex>
 #include <numbers>
+#include <span>
 #include <vector>
 #include "config.h"
 #include "eyeofsauron_db.h"
@@ -28,10 +30,7 @@
 namespace sound {
 
 Backend::Backend(QObject* parent)
-    : QObject(parent),
-      io_device(std::make_unique<IODevice>()),
-      capture_session(std::make_unique<QMediaCaptureSession>()),
-      media_player(std::make_unique<QMediaPlayer>()) {
+    : QObject(parent), io_device(std::make_unique<IODevice>()), decoder(std::make_unique<QAudioDecoder>()) {
   qmlRegisterSingletonInstance<Backend>("EoSSoundBackend", VERSION_MAJOR, VERSION_MINOR, "EoSSoundBackend", this);
 
   qmlRegisterSingletonInstance<SourceModel>("EosSoundSourceModel", VERSION_MAJOR, VERSION_MINOR, "EosSoundSourceModel",
@@ -40,17 +39,55 @@ Backend::Backend(QObject* parent)
   connect(io_device.get(), &IODevice::bufferChanged, [this](const std::vector<double>& buffer) {
     std::lock_guard<std::mutex> microphone_lock_guard(microphone_mutex);
 
-    process_buffer(buffer);
+    process_buffer(buffer, microphone->format().sampleRate());
+  });
+
+  connect(decoder.get(), &QAudioDecoder::positionChanged, [this](const qint64& value) {
+    _playerPosition = value;
+
+    // util::warning(util::to_string(value));
+
+    Q_EMIT playerPositionChanged();
+  });
+
+  connect(decoder.get(), &QAudioDecoder::durationChanged, [this](const qint64& value) {
+    _playerDuration = value;
+
+    Q_EMIT playerDurationChanged();
+  });
+
+  connect(decoder.get(), &QAudioDecoder::bufferReady, [this]() {
+    auto qaudio_buffer = decoder->read();
+
+    if (decoder_buffer.size() != static_cast<size_t>(qaudio_buffer.sampleCount())) {
+      decoder_buffer.resize(qaudio_buffer.sampleCount());
+    }
+
+    auto input_data = std::span<const float>(qaudio_buffer.constData<float>(), qaudio_buffer.sampleCount());
+
+    std::copy(input_data.begin(), input_data.end(), decoder_buffer.begin());
+
+    process_buffer(decoder_buffer, qaudio_buffer.format().sampleRate());
   });
 
   io_device->open(QIODevice::WriteOnly);
+
+  QAudioFormat format;
+
+  format.setSampleFormat(QAudioFormat::Float);
+  format.setChannelCount(1);
+
+  decoder->setAudioFormat(format);
 
   find_microphones();
 }
 
 Backend::~Backend() {
-  microphone->stop();
-  media_player->stop();
+  if (microphone != nullptr) {
+    microphone->stop();
+  }
+
+  decoder->stop();
 
   exiting = true;
 }
@@ -61,11 +98,13 @@ void Backend::start() {
       break;
     }
     case MediaFile: {
-      media_player->play();
+      decoder->start();
       break;
     }
     case Microphone: {
-      microphone->start(io_device.get());
+      if (microphone != nullptr) {
+        microphone->start(io_device.get());
+      }
       break;
     }
   }
@@ -77,11 +116,13 @@ void Backend::pause() {
       break;
     }
     case MediaFile: {
-      media_player->pause();
+      decoder->stop();
       break;
     }
     case Microphone: {
-      microphone->stop();
+      if (microphone != nullptr) {
+        microphone->stop();
+      }
       break;
     }
   }
@@ -95,11 +136,13 @@ void Backend::stop() {
       break;
     }
     case MediaFile: {
-      media_player->stop();
+      decoder->stop();
       break;
     }
     case Microphone: {
-      microphone->stop();
+      if (microphone != nullptr) {
+        microphone->stop();
+      }
       break;
     }
   }
@@ -118,7 +161,7 @@ void Backend::selectSource(const int& index) {
     microphone->stop();
   }
 
-  media_player->stop();
+  decoder->stop();
 
   switch (source->source_type) {
     case Camera: {
@@ -131,8 +174,9 @@ void Backend::selectSource(const int& index) {
 
       auto url = dynamic_cast<const MediaFileSource*>(source.get())->url;
 
-      media_player->setSource(url);
-      media_player->play();
+      decoder->setSource(url);
+
+      decoder->start();
 
       break;
     }
@@ -168,7 +212,7 @@ void Backend::find_microphones() {
   }
 }
 
-void Backend::calc_fft() {
+void Backend::calc_fft(const int& sampling_rate) {
   if (waveform.empty()) {
     return;
   }
@@ -202,8 +246,7 @@ void Backend::calc_fft() {
 
     sqr /= static_cast<double>(fft_list.size() * fft_list.size());
 
-    double f = 0.5F * static_cast<float>(microphone->format().sampleRate()) * static_cast<float>(i) /
-               static_cast<float>(fft_list.size());
+    double f = 0.5F * static_cast<float>(sampling_rate) * static_cast<float>(i) / static_cast<float>(fft_list.size());
 
     fft_list[i] = QPointF(f, sqr);
   }
@@ -219,15 +262,13 @@ void Backend::calc_fft() {
   fftw_destroy_plan(plan);
 }
 
-void Backend::process_buffer(const std::vector<double>& buffer) {
-  double dt = 1.0 / microphone->format().sampleRate();
+void Backend::process_buffer(const std::vector<double>& buffer, const int& sampling_rate) {
+  double dt = 1.0 / sampling_rate;
 
   for (double v : buffer) {
     waveform.append(QPointF(time_axis, v));
 
     time_axis += dt;
-
-    // qDebug() << v;
   }
 
   while ((waveform.size() - 1) * dt > db::Main::chartTimeWindow()) {
@@ -235,7 +276,7 @@ void Backend::process_buffer(const std::vector<double>& buffer) {
     waveform.removeFirst();
   }
 
-  calc_fft();
+  calc_fft(sampling_rate);
 
   update_waveform_chart_range();
   update_fft_chart_range();
@@ -316,7 +357,7 @@ void Backend::saveTable(const QUrl& fileUrl) {}
 void Backend::setPlayerPosition(qint64 value) {
   time_axis = 0;
 
-  media_player->setPosition(value);
+  // decoder->setPosition(value);
 }
 
 }  // namespace sound

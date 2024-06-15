@@ -5,14 +5,15 @@
 #include <qbytearray.h>
 #include <qhash.h>
 #include <qlist.h>
-#include <qmediacapturesession.h>
+#include <qmediaplayer.h>
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qtmetamacros.h>
 #include <qtypes.h>
 #include <qvariant.h>
+#include <QAudioDecoder>
+#include <QAudioOutput>
 #include <QAudioSource>
-#include <QMediaPlayer>
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -103,8 +104,7 @@ class Backend : public QObject {
 
   std::unique_ptr<IODevice> io_device;
   std::unique_ptr<QAudioSource> microphone;
-  std::unique_ptr<QMediaCaptureSession> capture_session;
-  std::unique_ptr<QMediaPlayer> media_player;
+  std::unique_ptr<QAudioDecoder> decoder;
 
   std::mutex microphone_mutex;
 
@@ -112,10 +112,11 @@ class Backend : public QObject {
   QList<QPointF> fft_list;
 
   std::vector<double> real_input;
+  std::vector<double> decoder_buffer;
 
   void find_microphones();
-  void process_buffer(const std::vector<double>& buffer);
-  void calc_fft();
+  void process_buffer(const std::vector<double>& buffer, const int& sampling_rate);
+  void calc_fft(const int& sampling_rate);
   void update_waveform_chart_range();
   void update_fft_chart_range();
 };

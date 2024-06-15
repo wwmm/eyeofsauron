@@ -8,13 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/wwmm/eyeofsauron/issues\n"
-"POT-Creation-Date: 2024-05-26 12:31-0300\n"
+"POT-Creation-Date: 2024-06-15 13:04-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/contents/ui/main.qml:17
@@ -42,121 +42,178 @@ msgstr ""
 msgid "Show the Tray Icon"
 msgstr ""
 
-#: src/contents/ui/PreferencesPage.qml:25 src/contents/ui/Tracker.qml:18
-msgid "Tracker"
-msgstr ""
-
-#: src/contents/ui/PreferencesPage.qml:32
-msgid "Tracking Algorithm"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:40
-#. i18n: ectx: label, entry (showDateTime), group (Tracker)
-#: src/contents/ui/PreferencesPage.qml:47 rc.cpp:27
-msgid "Show Date and Time"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:44
-#. i18n: ectx: label, entry (showFps), group (Tracker)
-#: src/contents/ui/PreferencesPage.qml:59 rc.cpp:30
-msgid "Show FPS"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:48
-#. i18n: ectx: label, entry (darkChartTheme), group (Tracker)
-#: src/contents/ui/PreferencesPage.qml:71 rc.cpp:33
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:20
+#. i18n: ectx: label, entry (darkChartTheme), group (Window)
+#: src/contents/ui/PreferencesPage.qml:25 rc.cpp:12
 msgid "Dark Chart Theme"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:9
+#: src/contents/ui/PreferencesPage.qml:37 src/contents/ui/Tracker.qml:18
+msgid "Tracker"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:44
+msgid "Tracking Algorithm"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:44
+#. i18n: ectx: label, entry (showDateTime), group (Tracker)
+#: src/contents/ui/PreferencesPage.qml:59 rc.cpp:30
+msgid "Show Date and Time"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:48
+#. i18n: ectx: label, entry (showFps), group (Tracker)
+#: src/contents/ui/PreferencesPage.qml:71 rc.cpp:33
+msgid "Show FPS"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:81
+msgid "Video Width"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:82
+#: src/contents/ui/PreferencesPage.qml:95
+msgid "px"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:94
+msgid "Video Height"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:15
 msgid "Sound Wave"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:15 src/contents/ui/Tracker.qml:27
+#: src/contents/ui/SoundWave.qml:18
+msgid "Audio Source"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:24 src/contents/ui/Tracker.qml:27
 msgctxt "@action:button"
 msgid "Play"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:19 src/contents/ui/Tracker.qml:32
+#: src/contents/ui/SoundWave.qml:29 src/contents/ui/Tracker.qml:32
 msgctxt "@action:button"
 msgid "Pause"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:23 src/contents/ui/Tracker.qml:37
+#: src/contents/ui/SoundWave.qml:34 src/contents/ui/Tracker.qml:37
 msgctxt "@action:button"
 msgid "Stop"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:30
-msgid "Points"
+#: src/contents/ui/SoundWave.qml:94 src/contents/ui/Tracker.qml:213
+msgid "Time [s]"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:35 src/contents/ui/Tracker.qml:296
-msgid "points"
+#: src/contents/ui/SoundWave.qml:103
+msgid "Amplitude"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:45 src/contents/ui/Tracker.qml:343
-msgid "Save Chart"
+#: src/contents/ui/SoundWave.qml:126
+msgid "Waveform"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:49 src/contents/ui/Tracker.qml:350
+#: src/contents/ui/SoundWave.qml:163
+msgid "Frequency [Hz]"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:173
+msgid "Amplitude²"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:196
+msgid "Fourier Transform"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:258
+msgid "Time Window"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:259
+msgid "s"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:272
+msgid "Save Charts"
+msgstr ""
+
+#: src/contents/ui/SoundWave.qml:279 src/contents/ui/Tracker.qml:344
 msgid "Save Table"
 msgstr ""
 
-#: src/contents/ui/SourceMenu.qml:31
+#: src/contents/ui/SoundWave.qml:283 src/contents/ui/Tracker.qml:351
+msgid "Reset Zoom"
+msgstr ""
+
+#: src/contents/ui/SourceMenu.qml:33
 msgid "No Source Available"
 msgstr ""
 
-#: src/contents/ui/SourceMenu.qml:96
+#: src/contents/ui/SourceMenu.qml:99
 msgid "Remove this Source"
 msgstr ""
 
-#: src/contents/ui/SourceMenu.qml:134
+#: src/contents/ui/SourceMenu.qml:137
 msgid "Add Video File"
+msgstr ""
+
+#: src/contents/ui/SourceMenu.qml:137
+msgid "Add Audio File"
 msgstr ""
 
 #: src/contents/ui/Tracker.qml:21
 msgid "Video Source"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:200
+#: src/contents/ui/Tracker.qml:204
 msgid "Position [px]"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:209
-msgid "Time [s]"
-msgstr ""
-
-#: src/contents/ui/Tracker.qml:295
+#: src/contents/ui/Tracker.qml:289
 msgid "History"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:314
+#: src/contents/ui/Tracker.qml:290
+msgid "points"
+msgstr ""
+
+#: src/contents/ui/Tracker.qml:308
 msgid "x"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:331
+#: src/contents/ui/Tracker.qml:325
 msgid "y"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:357
-msgid "Reset Zoom"
+#: src/contents/ui/Tracker.qml:337
+msgid "Save Chart"
 msgstr ""
 
-#: src/main.cpp:57
-msgid "Using webcams and Middle-earth's power in your Physics classes"
+#: src/contents/ui/Tracker.qml:358
+msgid "Remove Trackers"
+msgstr ""
+
+#: src/frame_source.cpp:193
+msgid "channels"
 msgstr ""
 
 #: src/main.cpp:58
+msgid "Using webcams and Middle-earth's power in your Physics classes"
+msgstr ""
+
+#: src/main.cpp:59
 msgid "(c) 2024"
 msgstr ""
 
-#: src/main.cpp:61
+#: src/main.cpp:62
 msgctxt "@info:credit"
 msgid "Wellington Wallace"
 msgstr ""
 
-#: src/main.cpp:61
+#: src/main.cpp:62
 msgctxt "@info:credit"
 msgid "Developer"
 msgstr ""
@@ -179,33 +236,33 @@ msgstr ""
 msgid "Show the tray icon"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:22
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:26
 #. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
-#: rc.cpp:12
+#: rc.cpp:15
 msgid "Traking Algorithm"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:25
-#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
-#: rc.cpp:15
-msgid "MOSSE"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:28
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:29
 #. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
 #: rc.cpp:18
 msgid "KCF"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:31
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:32
 #. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
 #: rc.cpp:21
+msgid "MOSSE"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:35
+#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
+#: rc.cpp:24
 msgid "TLD"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:34
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:38
 #. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
-#: rc.cpp:24
+#: rc.cpp:27
 msgid "MIL"
 msgstr ""
 
@@ -213,6 +270,24 @@ msgstr ""
 #. i18n: ectx: label, entry (chartDataPoints), group (Tracker)
 #: rc.cpp:36
 msgid "Number of Data Points in the Chart"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:58
+#. i18n: ectx: label, entry (videoWidth), group (Tracker)
+#: rc.cpp:39
+msgid "Video Preview Width"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:64
+#. i18n: ectx: label, entry (videoHeight), group (Tracker)
+#: rc.cpp:42
+msgid "Video Preview Height"
+msgstr ""
+
+#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:72
+#. i18n: ectx: label, entry (chartTimeWindow), group (SoundWave)
+#: rc.cpp:45
+msgid "Time Window in Seconds"
 msgstr ""
 
 #: com.github.wwmm.eyeofsauron.desktop.template.h:1

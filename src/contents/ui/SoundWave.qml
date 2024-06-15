@@ -214,6 +214,40 @@ Kirigami.ScrollablePage {
 
         }
 
+        RowLayout {
+            visible: EoSSoundBackend.showPlayerSlider
+
+            Text {
+                horizontalAlignment: Text.AlignRight
+                color: Kirigami.Theme.textColor
+                text: {
+                    var m = Math.floor(EoSSoundBackend.playerPosition / 60000);
+                    var ms = (EoSSoundBackend.playerPosition / 1000 - m * 60).toFixed(1);
+                    return `${m}:${ms.padStart(4, 0)}`;
+                }
+            }
+
+            Controls.ProgressBar {
+                id: playerSlider
+
+                value: EoSSoundBackend.playerPosition / EoSSoundBackend.playerDuration
+                to: 1
+                indeterminate: false
+                Layout.fillWidth: true
+            }
+
+            Text {
+                horizontalAlignment: Text.AlignRight
+                color: Kirigami.Theme.textColor
+                text: {
+                    var m = Math.floor(EoSSoundBackend.playerDuration / 60000);
+                    var ms = (EoSSoundBackend.playerDuration / 1000 - m * 60).toFixed(1);
+                    return `${m}:${ms.padStart(4, 0)}`;
+                }
+            }
+
+        }
+
     }
 
     footer: Kirigami.ActionToolBar {
@@ -224,9 +258,9 @@ Kirigami.ScrollablePage {
                     label: i18n("Time Window")
                     unit: i18n("s")
                     decimals: 2
-                    stepSize: 0.01
-                    from: 0.01
-                    to: 60
+                    stepSize: 0.001
+                    from: 0.001
+                    to: 3600
                     value: EoSdb.chartTimeWindow
                     onValueModified: (v) => {
                         EoSdb.chartTimeWindow = v;

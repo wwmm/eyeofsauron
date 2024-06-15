@@ -18,7 +18,7 @@ depends=(
   'qt6-charts' 
   'opencv'
   'linux-api-headers')
-makedepends=('boost' 'cmake' 'extra-cmake-modules' 'git' 'ninja' 'intltool' 'appstream-glib' 'libmediainfo')
+makedepends=('boost' 'cmake' 'extra-cmake-modules' 'git' 'ninja' 'intltool' 'appstream-glib' 'libmediainfo' 'fftw')
 source=("git+https://github.com/wwmm/eyeofsauron.git#branch=eosqt")
 conflicts=(eyeofsauron)
 provides=(eyeofsauron)
