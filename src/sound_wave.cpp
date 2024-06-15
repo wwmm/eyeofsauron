@@ -14,12 +14,14 @@
 #include <qxyseries.h>
 #include <QMediaDevices>
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <memory>
 #include <mutex>
 #include <numbers>
 #include <span>
+#include <thread>
 #include <vector>
 #include "config.h"
 #include "eyeofsauron_db.h"
@@ -66,6 +68,8 @@ Backend::Backend(QObject* parent)
     auto input_data = std::span<const float>(qaudio_buffer.constData<float>(), qaudio_buffer.sampleCount());
 
     std::copy(input_data.begin(), input_data.end(), decoder_buffer.begin());
+
+    std::this_thread::sleep_for(std::chrono::microseconds(qaudio_buffer.duration()));
 
     process_buffer(decoder_buffer, qaudio_buffer.format().sampleRate());
   });
