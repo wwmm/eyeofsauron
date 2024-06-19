@@ -1,7 +1,7 @@
 # Maintainer: Wellington <wellingtonwallace@gmail.com>
 
 pkgname=eyeofsauron-git
-pkgver=eosqt.r0.g137e67c
+pkgver=0.0.1.r0.gdb4fc90
 pkgrel=1
 pkgdesc='Optimize system performance for games'
 arch=(x86_64 i686)
