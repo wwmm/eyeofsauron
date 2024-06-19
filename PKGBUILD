@@ -19,15 +19,16 @@ depends=(
   'opencv'
   'linux-api-headers')
 makedepends=('boost' 'cmake' 'extra-cmake-modules' 'git' 'ninja' 'intltool' 'appstream-glib' 'libmediainfo' 'fftw')
-source=("git+https://github.com/wwmm/eyeofsauron.git#branch=eosqt")
+#source=("git+https://github.com/wwmm/eyeofsauron.git#branch=eosqt")
+source=("git+https://github.com/wwmm/eyeofsauron.git")
 conflicts=(eyeofsauron)
 provides=(eyeofsauron)
 sha512sums=('SKIP')
 
 pkgver() {
   cd eyeofsauron
-  # git describe --long | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
-  git describe --long --all | sed 's/^v//;s/^heads\///;s/\([^-]*-g\)/r\1/;s/-/./g'
+  git describe --long | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+  #git describe --long --all | sed 's/^v//;s/^heads\///;s/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 build() {

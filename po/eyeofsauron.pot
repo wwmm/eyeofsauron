@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/wwmm/eyeofsauron/issues\n"
-"POT-Creation-Date: 2024-06-15 13:04-0300\n"
+"POT-Creation-Date: 2024-06-19 11:26-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -104,47 +104,47 @@ msgctxt "@action:button"
 msgid "Stop"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:94 src/contents/ui/Tracker.qml:213
+#: src/contents/ui/SoundWave.qml:105 src/contents/ui/Tracker.qml:213
 msgid "Time [s]"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:103
+#: src/contents/ui/SoundWave.qml:114
 msgid "Amplitude"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:126
+#: src/contents/ui/SoundWave.qml:137
 msgid "Waveform"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:163
+#: src/contents/ui/SoundWave.qml:174
 msgid "Frequency [Hz]"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:173
+#: src/contents/ui/SoundWave.qml:184
 msgid "Amplitude²"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:196
+#: src/contents/ui/SoundWave.qml:207
 msgid "Fourier Transform"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:258
+#: src/contents/ui/SoundWave.qml:269
 msgid "Time Window"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:259
+#: src/contents/ui/SoundWave.qml:270
 msgid "s"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:272
+#: src/contents/ui/SoundWave.qml:283
 msgid "Save Charts"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:279 src/contents/ui/Tracker.qml:344
+#: src/contents/ui/SoundWave.qml:290 src/contents/ui/Tracker.qml:344
 msgid "Save Table"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:283 src/contents/ui/Tracker.qml:351
+#: src/contents/ui/SoundWave.qml:297 src/contents/ui/Tracker.qml:351
 msgid "Reset Zoom"
 msgstr ""
 
@@ -196,7 +196,7 @@ msgstr ""
 msgid "Remove Trackers"
 msgstr ""
 
-#: src/frame_source.cpp:193
+#: src/frame_source.cpp:210
 msgid "channels"
 msgstr ""
 
