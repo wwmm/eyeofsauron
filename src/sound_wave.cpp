@@ -17,9 +17,15 @@
 #include <chrono>
 #include <cmath>
 #include <cstddef>
+#include <format>
+#include <fstream>
+#include <iomanip>
+#include <ios>
 #include <memory>
 #include <mutex>
 #include <numbers>
+#include <ratio>
+#include <regex>
 #include <span>
 #include <thread>
 #include <vector>
@@ -69,7 +75,23 @@ Backend::Backend(QObject* parent)
 
     std::copy(input_data.begin(), input_data.end(), decoder_buffer.begin());
 
-    std::this_thread::sleep_for(std::chrono::microseconds(qaudio_buffer.duration()));
+    if (qaudio_buffer.startTime() == 0) {
+      first_buffer_clock = std::chrono::steady_clock::now();
+    }
+
+    std::chrono::duration<double, std::micro> diff = std::chrono::steady_clock::now() - first_buffer_clock;
+
+    auto elapsed_time = diff.count();
+
+    while (static_cast<qint64>(elapsed_time) < qaudio_buffer.startTime()) {
+      std::this_thread::sleep_for(std::chrono::microseconds(1));
+
+      std::chrono::duration<double, std::micro> diff = std::chrono::steady_clock::now() - first_buffer_clock;
+
+      elapsed_time = diff.count();
+    }
+
+    // qDebug() << static_cast<qint64>(elapsed_time) << qaudio_buffer.startTime();
 
     process_buffer(decoder_buffer, qaudio_buffer.format().sampleRate());
   });
@@ -134,6 +156,9 @@ void Backend::pause() {
 
 void Backend::stop() {
   time_axis = 0;
+
+  waveform.clear();
+  fft_list.clear();
 
   switch (current_source_type) {
     case Camera: {
@@ -356,7 +381,39 @@ void Backend::updateSeriesFFT(QAbstractSeries* series) {
   }
 }
 
-void Backend::saveTable(const QUrl& fileUrl) {}
+void Backend::saveTable(const QUrl& fileUrl) {
+  if (waveform.empty() || fft_list.empty()) {
+    return;
+  }
+
+  if (fileUrl.isLocalFile()) {
+    {  // waveform
+      std::ofstream output_file(
+          std::regex_replace(fileUrl.toLocalFile().toStdString(), std::regex(".tsv"), "_waveform.tsv"));
+
+      output_file << "#time\tvalue\n";
+
+      for (const auto& p : waveform) {
+        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", _tableFilePrecision, p.x(), p.y()) << "\n";
+      }
+
+      output_file.close();
+    }
+
+    {  // fft
+      std::ofstream output_file(
+          std::regex_replace(fileUrl.toLocalFile().toStdString(), std::regex(".tsv"), "_fft.tsv"));
+
+      output_file << "#frequency\tvalue\n";
+
+      for (const auto& p : fft_list) {
+        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", _tableFilePrecision, p.x(), p.y()) << "\n";
+      }
+
+      output_file.close();
+    }
+  }
+}
 
 void Backend::setPlayerPosition(qint64 value) {
   time_axis = 0;

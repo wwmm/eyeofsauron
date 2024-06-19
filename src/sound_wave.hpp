@@ -14,6 +14,7 @@
 #include <QAudioDecoder>
 #include <QAudioOutput>
 #include <QAudioSource>
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -83,7 +84,7 @@ class Backend : public QObject {
   bool _showPlayerSlider = false;
   bool exiting = false;
 
-  int _tableFilePrecision = 3;
+  int _tableFilePrecision = 4;
 
   double _xAxisMinWave = 10000;
   double _xAxisMaxWave = 0;
@@ -113,6 +114,8 @@ class Backend : public QObject {
 
   std::vector<double> real_input;
   std::vector<double> decoder_buffer;
+
+  std::chrono::time_point<std::chrono::steady_clock> first_buffer_clock;
 
   void find_microphones();
   void process_buffer(const std::vector<double>& buffer, const int& sampling_rate);

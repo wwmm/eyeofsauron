@@ -69,6 +69,17 @@ Kirigami.ScrollablePage {
         }
     }
 
+    FileDialog {
+        id: fileDialogSaveTable
+
+        fileMode: FileDialog.SaveFile
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        nameFilters: ["TXT Table files (*.tsv)"]
+        onAccepted: {
+            EoSSoundBackend.saveTable(fileDialogSaveTable.selectedFile);
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
 
@@ -278,6 +289,9 @@ Kirigami.ScrollablePage {
             Kirigami.Action {
                 text: i18n("Save Table")
                 icon.name: "folder-table-symbolic"
+                onTriggered: {
+                    fileDialogSaveTable.open();
+                }
             },
             Kirigami.Action {
                 text: i18n("Reset Zoom")

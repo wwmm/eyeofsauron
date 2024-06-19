@@ -46,6 +46,8 @@ class MediaFileSource : public Source {
   QString duration;
 
   QString frame_rate;
+
+  QString audio_rate;
 };
 
 class MicSource : public Source {

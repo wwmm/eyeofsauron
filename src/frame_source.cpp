@@ -41,10 +41,15 @@ MediaFileSource::MediaFileSource(QUrl file_url) : Source(SourceType::MediaFile),
       float f_size_bytes = 0;
       float duration_ms = 0;
       float fps = 0;
+      float audio_sampling_rate = 0;
+
+      // file size
 
       util::str_to_num(f_size_str.toStdString(), f_size_bytes);
 
       file_size_mb = QString::fromStdString(std::format("{0:.1f}", f_size_bytes / 1024 / 1024));
+
+      // duration
 
       auto duration_str =
           QString::fromStdWString(MI.Get(Stream_General, 0, static_cast<String>(L"Duration"), Info_Text, Info_Name));
@@ -57,12 +62,23 @@ MediaFileSource::MediaFileSource(QUrl file_url) : Source(SourceType::MediaFile),
 
       duration = QString::fromStdString(std::format("{0:d}:{1:0>4.1f}", minutes, seconds));
 
+      // video fps
+
       auto frame_rate_str =
           QString::fromStdWString(MI.Get(Stream_General, 0, static_cast<String>(L"FrameRate"), Info_Text, Info_Name));
 
       util::str_to_num(frame_rate_str.toStdString(), fps);
 
       frame_rate = QString::fromStdString(std::format("{0:.1f}", fps));
+
+      // audio sampling rate
+
+      auto audio_rate_str =
+          QString::fromStdWString(MI.Get(Stream_Audio, 0, static_cast<String>(L"SamplingRate"), Info_Text, Info_Name));
+
+      util::str_to_num(audio_rate_str.toStdString(), audio_sampling_rate);
+
+      audio_rate = QString::fromStdString(std::format("{0:.1f} kHz", audio_sampling_rate / 1000));
 
       MI.Close();
     } else {
@@ -157,8 +173,9 @@ QVariant SourceModel::data(const QModelIndex& index, int role) const {
           auto file_size_mb = dynamic_cast<const MediaFileSource*>(it->get())->file_size_mb;
           auto duration = dynamic_cast<const MediaFileSource*>(it->get())->duration;
           auto frame_rate = dynamic_cast<const MediaFileSource*>(it->get())->frame_rate;
+          auto audio_rate = dynamic_cast<const MediaFileSource*>(it->get())->audio_rate;
 
-          value = frame_rate + " fps" + ", " + file_size_mb + " MiB" + ", " + duration;
+          value = frame_rate + " fps" + ", " + file_size_mb + " MiB" + ", " + duration + ", " + audio_rate;
 
           break;
         }
