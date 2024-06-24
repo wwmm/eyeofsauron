@@ -7,4 +7,4 @@ Using webcams and Middle-earth's power in your Physics classes
 
 ## Using the Tracker
 
-- Use the mouses's left button to draw a rectangle around the arget area. This will create a tracker instance for it.
+- Use the mouses left button to draw a rectangle around the arget area. This will create a tracker instance for it.
