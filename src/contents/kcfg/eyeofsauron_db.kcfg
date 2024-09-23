@@ -57,13 +57,13 @@
         <entry name="videoWidth" type="Int">
             <label>Video Preview Width</label>
             <default>800</default>
-            <min>640</min>
+            <min>40</min>
             <max>1920</max>
         </entry>
         <entry name="videoHeight" type="Int">
             <label>Video Preview Height</label>
             <default>600</default>
-            <min>480</min>
+            <min>30</min>
             <max>1080</max>
         </entry>
     </group>

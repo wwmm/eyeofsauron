@@ -82,7 +82,7 @@ FormCard.FormCardPage {
             unit: i18n("px")
             decimals: 0
             stepSize: 1
-            from: 640
+            from: 40
             to: 1920
             value: EoSdb.videoWidth
             onValueModified: (v) => {
@@ -95,7 +95,7 @@ FormCard.FormCardPage {
             unit: i18n("px")
             decimals: 0
             stepSize: 1
-            from: 480
+            from: 30
             to: 1080
             value: EoSdb.videoHeight
             onValueModified: (v) => {
