@@ -31,6 +31,18 @@ FormCard.FormCardPage {
             }
         }
 
+        EoSSwitch {
+            id: chartsUseOpenGL
+
+            label: i18n("Charts Use OpenGL Acceleration")
+            isChecked: EoSdb.chartsUseOpenGL
+            onCheckedChanged: {
+                if (isChecked !== EoSdb.chartsUseOpenGL)
+                    EoSdb.chartsUseOpenGL = isChecked;
+
+            }
+        }
+
     }
 
     FormCard.FormHeader {

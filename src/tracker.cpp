@@ -50,6 +50,8 @@ namespace tracker {
 
 Backend::Backend(QObject* parent)
     : QObject(parent),
+      _frameWidth(db::Main::videoWidth()),
+      _frameHeight(db::Main::videoHeight()),
       camera(std::make_unique<QCamera>()),
       camera_video_sink(std::make_unique<QVideoSink>()),
       capture_session(std::make_unique<QMediaCaptureSession>()),

@@ -20,6 +20,10 @@
             <label>Dark Chart Theme</label>
             <default>true</default>
         </entry>
+        <entry name="chartsUseOpenGL" type="Bool">
+            <label>Charts Use OpenGL Acceleration</label>
+            <default>false</default>
+        </entry>
     </group>
     <group name="Tracker">
         <entry name="trackingAlgorithm" type="Enum">

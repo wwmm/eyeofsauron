@@ -137,7 +137,7 @@ Kirigami.ScrollablePage {
                         name: i18n("Waveform")
                         axisX: axisTime
                         axisY: axisWaveform
-                        useOpenGL: true
+                        useOpenGL: EoSdb.chartsUseOpenGL
                     }
 
                 }
@@ -207,7 +207,7 @@ Kirigami.ScrollablePage {
                         name: i18n("Fourier Transform")
                         axisX: axisFreq
                         axisY: axisFFT
-                        useOpenGL: true
+                        useOpenGL: EoSdb.chartsUseOpenGL
                     }
 
                 }

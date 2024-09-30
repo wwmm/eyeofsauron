@@ -176,7 +176,7 @@ Kirigami.ScrollablePage {
                     function addSeries(axisName) {
                         let name = i18n(axisName + Math.floor(chart.count / 2));
                         let series = createSeries(ChartView.SeriesTypeLine, name, axisTime, axisPosition);
-                        series.useOpenGL = true;
+                        series.useOpenGL = EoSdb.chartsUseOpenGL;
                         if (axisName === "x")
                             series.visible = Qt.binding(function() {
                             return actionViewXdata.showChart;
