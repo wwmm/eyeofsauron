@@ -65,6 +65,21 @@ FormCard.FormCardPage {
             }
         }
 
+        FormCard.FormComboBoxDelegate {
+            id: imageScalingAlgorithm
+
+            text: i18n("Image Scaling Algorithm")
+            displayMode: FormCard.FormComboBoxDelegate.ComboBox
+            currentIndex: EoSdb.imageScalingAlgorithm
+            editable: false
+            model: [i18n("Fast"), i18n("Smooth")]
+            onActivated: (idx) => {
+                if (idx !== EoSdb.imageScalingAlgorithm)
+                    EoSdb.imageScalingAlgorithm = idx;
+
+            }
+        }
+
         EoSSwitch {
             id: showDateTime
 

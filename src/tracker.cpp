@@ -222,7 +222,6 @@ void Backend::selectSource(const int& index) {
 
       camera->setCameraDevice(dynamic_cast<const CameraSource*>(source.get())->device);
       camera->setCameraFormat(dynamic_cast<const CameraSource*>(source.get())->format);
-      camera->start();
 
       break;
     }
@@ -234,7 +233,6 @@ void Backend::selectSource(const int& index) {
       auto url = dynamic_cast<const MediaFileSource*>(source.get())->url;
 
       media_player->setSource(url);
-      media_player->play();
 
       break;
     }
@@ -407,9 +405,11 @@ void Backend::process_frame() {
     return;
   }
 
-  auto input_image = input_video_frame.toImage()
-                         .scaled(_frameWidth, _frameHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
-                         .convertedTo(QImage::Format_BGR888);
+  auto input_image =
+      input_video_frame.toImage()
+          .scaled(_frameWidth, _frameHeight, Qt::IgnoreAspectRatio,
+                  db::Main::imageScalingAlgorithm() == 0 ? Qt::FastTransformation : Qt::SmoothTransformation)
+          .convertedTo(QImage::Format_BGR888);
 
   // creating the output qvideoframe
 
@@ -440,38 +440,40 @@ void Backend::process_frame() {
 
   painter.drawImage(output_image.rect(), input_image);
 
-  // opencv stuff
-  // https://docs.opencv.org/3.4/d3/d63/classcv_1_1Mat.html#a51615ebf17a64c968df0bf49b4de6a3a
+  if (!trackers.empty()) {
+    // opencv stuff
+    // https://docs.opencv.org/3.4/d3/d63/classcv_1_1Mat.html#a51615ebf17a64c968df0bf49b4de6a3a
 
-  cv::Mat cv_frame(_frameHeight, _frameWidth, CV_8UC3, input_image.bits(), input_image.bytesPerLine());
+    cv::Mat cv_frame(_frameHeight, _frameWidth, CV_8UC3, input_image.bits(), input_image.bytesPerLine());
 
-  initial_time = (initial_time == 0) ? input_video_frame.startTime() : initial_time;
+    initial_time = (initial_time == 0) ? input_video_frame.startTime() : initial_time;
 
-  for (auto& [tracker, roi_n, initialized, data_tx, data_ty] : trackers) {
-    if (!initialized) {
-      tracker->init(cv_frame, roi_n);
+    for (auto& [tracker, roi_n, initialized, data_tx, data_ty] : trackers) {
+      if (!initialized) {
+        tracker->init(cv_frame, roi_n);
 
-      initialized = true;
-    } else {
-      tracker->update(cv_frame, roi_n);
-    }
+        initialized = true;
+      } else {
+        tracker->update(cv_frame, roi_n);
+      }
 
-    painter.drawRect(QRectF{roi_n.x, roi_n.y, roi_n.width, roi_n.height});
+      painter.drawRect(QRectF{roi_n.x, roi_n.y, roi_n.width, roi_n.height});
 
-    double xc = roi_n.x + roi_n.width * 0.5;
-    double yc = roi_n.y + roi_n.height * 0.5;
-    double t = static_cast<double>(input_video_frame.startTime() - initial_time) / 1000000.0;
+      double xc = roi_n.x + roi_n.width * 0.5;
+      double yc = roi_n.y + roi_n.height * 0.5;
+      double t = static_cast<double>(input_video_frame.startTime() - initial_time) / 1000000.0;
 
-    // changing the coordinate system origin to the bottom left corner
+      // changing the coordinate system origin to the bottom left corner
 
-    yc = _frameHeight - yc;
+      yc = _frameHeight - yc;
 
-    data_tx.append(QPointF(t, xc));
-    data_ty.append(QPointF(t, yc));
+      data_tx.append(QPointF(t, xc));
+      data_ty.append(QPointF(t, yc));
 
-    while (data_tx.size() > db::Main::chartDataPoints()) {
-      data_tx.removeFirst();
-      data_ty.removeFirst();
+      while (data_tx.size() > db::Main::chartDataPoints()) {
+        data_tx.removeFirst();
+        data_ty.removeFirst();
+      }
     }
   }
 

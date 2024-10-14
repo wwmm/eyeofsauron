@@ -85,84 +85,96 @@ Kirigami.ScrollablePage {
         anchors.fill: parent
 
         RowLayout {
-            VideoOutput {
-                id: videoOutput
+            ColumnLayout {
+                VideoOutput {
+                    id: videoOutput
 
-                implicitWidth: EoSTrackerBackend.frameWidth
-                implicitHeight: EoSTrackerBackend.frameHeight
-                Component.onCompleted: {
-                    EoSTrackerBackend.videoSink = videoOutput.videoSink;
+                    implicitWidth: EoSTrackerBackend.frameWidth
+                    implicitHeight: EoSTrackerBackend.frameHeight
+                    Component.onCompleted: {
+                        EoSTrackerBackend.videoSink = videoOutput.videoSink;
+                    }
+                    Component.onDestruction: EoSTrackerBackend.stop() // So we do not write to an invalid videoSink
+
+                    MouseArea {
+                        id: mouseArea
+
+                        property real x0: 0
+                        property real y0: 0
+
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        preventStealing: true
+                        onClicked: (event) => {
+                            if (event.button == Qt.RightButton) {
+                                let seriesIndex = EoSTrackerBackend.removeRoi(event.x, event.y);
+                                if (seriesIndex !== -1) {
+                                    chart.removeSeries(chart.series(seriesIndex)); // x
+                                    chart.removeSeries(chart.series(seriesIndex)); // y
+                                }
+                            }
+                        }
+                        onReleased: (event) => {
+                            if (event.button == Qt.LeftButton) {
+                                let width = event.x - x0;
+                                let height = event.y - y0;
+                                if (Math.abs(width) === 0 || Math.abs(height) === 0)
+                                    return ;
+
+                                if (width < 0) {
+                                    x0 = width + x0;
+                                    width *= -1;
+                                }
+                                if (height < 0) {
+                                    y0 = height + y0;
+                                    height *= -1;
+                                }
+                                chart.addSeries("x");
+                                chart.addSeries("y");
+                                EoSTrackerBackend.createNewRoi(x0, y0, width, height);
+                                EoSTrackerBackend.drawRoiSelection(false);
+                                event.accepted = true;
+                            }
+                        }
+                        onPositionChanged: (event) => {
+                            if (event.buttons & Qt.LeftButton) {
+                                let x = x0;
+                                let y = y0;
+                                let width = event.x - x;
+                                let height = event.y - y;
+                                if (Math.abs(width) === 0 || Math.abs(height) === 0)
+                                    return ;
+
+                                if (width < 0) {
+                                    x = width + x;
+                                    width *= -1;
+                                }
+                                if (height < 0) {
+                                    y = height + y;
+                                    height *= -1;
+                                }
+                                EoSTrackerBackend.newRoiSelection(x, y, width, height);
+                            }
+                        }
+                        onPressed: (event) => {
+                            if (event.button == Qt.LeftButton) {
+                                x0 = event.x;
+                                y0 = event.y;
+                                event.accepted = true;
+                                EoSTrackerBackend.drawRoiSelection(true);
+                            }
+                        }
+                    }
+
                 }
-                Component.onDestruction: EoSTrackerBackend.stop() // So we do not write to an invalid videoSink
 
-                MouseArea {
-                    id: mouseArea
+                Controls.Label {
+                    id: fileName
 
-                    property real x0: 0
-                    property real y0: 0
-
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    preventStealing: true
-                    onClicked: (event) => {
-                        if (event.button == Qt.RightButton) {
-                            let seriesIndex = EoSTrackerBackend.removeRoi(event.x, event.y);
-                            if (seriesIndex !== -1) {
-                                chart.removeSeries(chart.series(seriesIndex)); // x
-                                chart.removeSeries(chart.series(seriesIndex)); // y
-                            }
-                        }
-                    }
-                    onReleased: (event) => {
-                        if (event.button == Qt.LeftButton) {
-                            let width = event.x - x0;
-                            let height = event.y - y0;
-                            if (Math.abs(width) === 0 || Math.abs(height) === 0)
-                                return ;
-
-                            if (width < 0) {
-                                x0 = width + x0;
-                                width *= -1;
-                            }
-                            if (height < 0) {
-                                y0 = height + y0;
-                                height *= -1;
-                            }
-                            chart.addSeries("x");
-                            chart.addSeries("y");
-                            EoSTrackerBackend.createNewRoi(x0, y0, width, height);
-                            EoSTrackerBackend.drawRoiSelection(false);
-                            event.accepted = true;
-                        }
-                    }
-                    onPositionChanged: (event) => {
-                        if (event.buttons & Qt.LeftButton) {
-                            let x = x0;
-                            let y = y0;
-                            let width = event.x - x;
-                            let height = event.y - y;
-                            if (Math.abs(width) === 0 || Math.abs(height) === 0)
-                                return ;
-
-                            if (width < 0) {
-                                x = width + x;
-                                width *= -1;
-                            }
-                            if (height < 0) {
-                                y = height + y;
-                                height *= -1;
-                            }
-                            EoSTrackerBackend.newRoiSelection(x, y, width, height);
-                        }
-                    }
-                    onPressed: (event) => {
-                        if (event.button == Qt.LeftButton) {
-                            x0 = event.x;
-                            y0 = event.y;
-                            event.accepted = true;
-                            EoSTrackerBackend.drawRoiSelection(true);
-                        }
-                    }
+                    text: "file name"
+                    color: Kirigami.Theme.disabledTextColor
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
                 }
 
             }

@@ -44,6 +44,18 @@
             </choices>
             <default>0</default> <!-- MOSSE -->
         </entry>
+        <entry name="imageScalingAlgorithm" type="Enum">
+            <label>Image Scaling Algorithm</label>
+            <choices>
+                <choice name="fast">
+                    <label>Fast</label>
+                </choice>
+                <choice name="smooth">
+                    <label>Smooth</label>
+                </choice>
+            </choices>
+            <default>0</default> <!-- fast -->
+        </entry>
         <entry name="showDateTime" type="Bool">
             <label>Show Date and Time</label>
             <default>true</default>

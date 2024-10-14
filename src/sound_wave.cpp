@@ -19,8 +19,6 @@
 #include <cstddef>
 #include <format>
 #include <fstream>
-#include <iomanip>
-#include <ios>
 #include <memory>
 #include <mutex>
 #include <numbers>
@@ -205,8 +203,6 @@ void Backend::selectSource(const int& index) {
 
       decoder->setSource(url);
 
-      decoder->start();
-
       break;
     }
     case Microphone: {
@@ -223,8 +219,6 @@ void Backend::selectSource(const int& index) {
       std::lock_guard<std::mutex> microphone_lock_guard(microphone_mutex);
 
       microphone = std::make_unique<QAudioSource>(device, format);
-
-      microphone->start(io_device.get());
 
       break;
     }
