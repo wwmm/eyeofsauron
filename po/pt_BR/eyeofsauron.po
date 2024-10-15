@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/wwmm/eyeofsauron/issues\n"
-"POT-Creation-Date: 2024-06-19 11:26-0300\n"
+"POT-Creation-Date: 2024-10-15 20:44-0300\n"
 "PO-Revision-Date: 2024-05-02 02:27-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -43,43 +43,54 @@ msgstr "Geral"
 msgid "Show the Tray Icon"
 msgstr "Mostrar o ícone da bandeja"
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:20
-#. i18n: ectx: label, entry (darkChartTheme), group (Window)
-#: src/contents/ui/PreferencesPage.qml:25 rc.cpp:12
+#: src/contents/ui/PreferencesPage.qml:25
 msgid "Dark Chart Theme"
 msgstr ""
 
-#: src/contents/ui/PreferencesPage.qml:37 src/contents/ui/Tracker.qml:18
+#: src/contents/ui/PreferencesPage.qml:37
+msgid "Charts Use OpenGL Acceleration"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:49 src/contents/ui/Tracker.qml:18
 #, fuzzy
 msgid "Tracker"
 msgstr "Rastreador de Objetos"
 
-#: src/contents/ui/PreferencesPage.qml:44
+#: src/contents/ui/PreferencesPage.qml:56
 msgid "Tracking Algorithm"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:44
-#. i18n: ectx: label, entry (showDateTime), group (Tracker)
-#: src/contents/ui/PreferencesPage.qml:59 rc.cpp:30
+#: src/contents/ui/PreferencesPage.qml:71
+msgid "Image Scaling Algorithm"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:75
+#, fuzzy
+msgid "Fast"
+msgstr "FastGame"
+
+#: src/contents/ui/PreferencesPage.qml:75
+msgid "Smooth"
+msgstr ""
+
+#: src/contents/ui/PreferencesPage.qml:86
 msgid "Show Date and Time"
 msgstr ""
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:48
-#. i18n: ectx: label, entry (showFps), group (Tracker)
-#: src/contents/ui/PreferencesPage.qml:71 rc.cpp:33
+#: src/contents/ui/PreferencesPage.qml:98
 msgid "Show FPS"
 msgstr ""
 
-#: src/contents/ui/PreferencesPage.qml:81
+#: src/contents/ui/PreferencesPage.qml:108
 msgid "Video Width"
 msgstr ""
 
-#: src/contents/ui/PreferencesPage.qml:82
-#: src/contents/ui/PreferencesPage.qml:95
+#: src/contents/ui/PreferencesPage.qml:109
+#: src/contents/ui/PreferencesPage.qml:122
 msgid "px"
 msgstr ""
 
-#: src/contents/ui/PreferencesPage.qml:94
+#: src/contents/ui/PreferencesPage.qml:121
 msgid "Video Height"
 msgstr ""
 
@@ -106,64 +117,64 @@ msgctxt "@action:button"
 msgid "Stop"
 msgstr "Parar"
 
-#: src/contents/ui/SoundWave.qml:105 src/contents/ui/Tracker.qml:213
+#: src/contents/ui/SoundWave.qml:119 src/contents/ui/Tracker.qml:228
 msgid "Time [s]"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:114
+#: src/contents/ui/SoundWave.qml:128
 msgid "Amplitude"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:137
+#: src/contents/ui/SoundWave.qml:151
 msgid "Waveform"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:174
+#: src/contents/ui/SoundWave.qml:188
 msgid "Frequency [Hz]"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:184
+#: src/contents/ui/SoundWave.qml:198
 msgid "Amplitude²"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:207
+#: src/contents/ui/SoundWave.qml:221
 msgid "Fourier Transform"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:269
+#: src/contents/ui/SoundWave.qml:285
 msgid "Time Window"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:270
+#: src/contents/ui/SoundWave.qml:286
 msgid "s"
 msgstr ""
 
-#: src/contents/ui/SoundWave.qml:283
+#: src/contents/ui/SoundWave.qml:299
 #, fuzzy
 msgid "Save Charts"
 msgstr "Salvar Gráfico"
 
-#: src/contents/ui/SoundWave.qml:290 src/contents/ui/Tracker.qml:344
+#: src/contents/ui/SoundWave.qml:306 src/contents/ui/Tracker.qml:359
 msgid "Save Table"
 msgstr "Salvar Tabela"
 
-#: src/contents/ui/SoundWave.qml:297 src/contents/ui/Tracker.qml:351
+#: src/contents/ui/SoundWave.qml:313 src/contents/ui/Tracker.qml:366
 msgid "Reset Zoom"
 msgstr ""
 
-#: src/contents/ui/SourceMenu.qml:33
+#: src/contents/ui/SourceMenu.qml:34
 msgid "No Source Available"
 msgstr ""
 
-#: src/contents/ui/SourceMenu.qml:99
+#: src/contents/ui/SourceMenu.qml:101
 msgid "Remove this Source"
 msgstr ""
 
-#: src/contents/ui/SourceMenu.qml:137
+#: src/contents/ui/SourceMenu.qml:139
 msgid "Add Video File"
 msgstr ""
 
-#: src/contents/ui/SourceMenu.qml:137
+#: src/contents/ui/SourceMenu.qml:139
 msgid "Add Audio File"
 msgstr ""
 
@@ -171,31 +182,31 @@ msgstr ""
 msgid "Video Source"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:204
+#: src/contents/ui/Tracker.qml:219
 msgid "Position [px]"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:289
+#: src/contents/ui/Tracker.qml:304
 msgid "History"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:290
+#: src/contents/ui/Tracker.qml:305
 msgid "points"
 msgstr "pontos"
 
-#: src/contents/ui/Tracker.qml:308
+#: src/contents/ui/Tracker.qml:323
 msgid "x"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:325
+#: src/contents/ui/Tracker.qml:340
 msgid "y"
 msgstr ""
 
-#: src/contents/ui/Tracker.qml:337
+#: src/contents/ui/Tracker.qml:352
 msgid "Save Chart"
 msgstr "Salvar Gráfico"
 
-#: src/contents/ui/Tracker.qml:358
+#: src/contents/ui/Tracker.qml:373
 #, fuzzy
 msgid "Remove Trackers"
 msgstr "Rastreador de Objetos"
@@ -222,81 +233,6 @@ msgctxt "@info:credit"
 msgid "Developer"
 msgstr "Desenvolvedor"
 
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:8
-#. i18n: ectx: label, entry (width), group (Window)
-#: rc.cpp:3
-#, fuzzy
-msgid "Width of the main window"
-msgstr "Largura da Janela principal."
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:12
-#. i18n: ectx: label, entry (height), group (Window)
-#: rc.cpp:6
-#, fuzzy
-msgid "Height of the main window"
-msgstr "Altura da janela principal."
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:16
-#. i18n: ectx: label, entry (showTrayIcon), group (Window)
-#: rc.cpp:9
-#, fuzzy
-msgid "Show the tray icon"
-msgstr "Mostrar o ícone da bandeja."
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:26
-#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
-#: rc.cpp:15
-msgid "Traking Algorithm"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:29
-#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
-#: rc.cpp:18
-msgid "KCF"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:32
-#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
-#: rc.cpp:21
-msgid "MOSSE"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:35
-#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
-#: rc.cpp:24
-msgid "TLD"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:38
-#. i18n: ectx: label, entry (trackingAlgorithm), group (Tracker)
-#: rc.cpp:27
-msgid "MIL"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:52
-#. i18n: ectx: label, entry (chartDataPoints), group (Tracker)
-#: rc.cpp:36
-msgid "Number of Data Points in the Chart"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:58
-#. i18n: ectx: label, entry (videoWidth), group (Tracker)
-#: rc.cpp:39
-msgid "Video Preview Width"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:64
-#. i18n: ectx: label, entry (videoHeight), group (Tracker)
-#: rc.cpp:42
-msgid "Video Preview Height"
-msgstr ""
-
-#. i18n: file: src/contents/kcfg/eyeofsauron_db.kcfg:72
-#. i18n: ectx: label, entry (chartTimeWindow), group (SoundWave)
-#: rc.cpp:45
-msgid "Time Window in Seconds"
-msgstr ""
-
 #: com.github.wwmm.eyeofsauron.desktop.template.h:1
 msgid "Eye Of Sauron"
 msgstr "Olho de Sauron"
@@ -308,6 +244,18 @@ msgstr "Rastreador de Objetos"
 #: com.github.wwmm.eyeofsauron.desktop.template.h:3
 msgid "Using webcams and the power of the Middle-earth in your Physics classes"
 msgstr ""
+
+#, fuzzy
+#~ msgid "Width of the main window"
+#~ msgstr "Largura da Janela principal."
+
+#, fuzzy
+#~ msgid "Height of the main window"
+#~ msgstr "Altura da janela principal."
+
+#, fuzzy
+#~ msgid "Show the tray icon"
+#~ msgstr "Mostrar o ícone da bandeja."
 
 #~ msgid "Points"
 #~ msgstr "Pontos"
@@ -359,9 +307,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Last used preset."
 #~ msgstr "Última Predefinição Utilizada: "
-
-#~ msgid "FastGame"
-#~ msgstr "FastGame"
 
 #~ msgid "System Settings Tweak"
 #~ msgstr "Ajustador de Configurações do Sistema"

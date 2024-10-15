@@ -284,7 +284,7 @@ Kirigami.ScrollablePage {
                 displayComponent: EoSSpinBox {
                     label: i18n("Time Window")
                     unit: i18n("s")
-                    decimals: 2
+                    decimals: 3
                     stepSize: 0.001
                     from: 0.001
                     to: 3600
