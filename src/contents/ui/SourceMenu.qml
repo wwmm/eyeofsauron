@@ -13,6 +13,8 @@ Kirigami.OverlaySheet {
     property var model: null
     property string backendName
 
+    signal sourceNameChanged(string value)
+
     showCloseButton: false
     implicitWidth: Kirigami.Units.gridUnit * 30
     implicitHeight: root.height * 0.75
@@ -57,9 +59,10 @@ Kirigami.OverlaySheet {
                 sourcesListView.currentIndex = index;
             }
             onHighlightedChanged: {
-                if (highlighted)
+                if (highlighted) {
                     backend.selectSource(index);
-
+                    control.sourceNameChanged(model.name);
+                }
             }
 
             contentItem: Kirigami.ActionToolBar {

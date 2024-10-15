@@ -55,6 +55,9 @@ Kirigami.ScrollablePage {
         backend: EoSTrackerBackend
         model: EosTrackerSourceModel
         backendName: "tracker"
+        onSourceNameChanged: (name) => {
+            fileName.text = name;
+        }
     }
 
     FileDialog {
@@ -171,7 +174,7 @@ Kirigami.ScrollablePage {
                 Controls.Label {
                     id: fileName
 
-                    text: "file name"
+                    text: ""
                     color: Kirigami.Theme.disabledTextColor
                     elide: Text.ElideRight
                     wrapMode: Text.NoWrap
