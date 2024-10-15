@@ -15,7 +15,6 @@ Kirigami.OverlaySheet {
 
     signal sourceNameChanged(string value)
 
-    showCloseButton: false
     implicitWidth: Kirigami.Units.gridUnit * 30
     implicitHeight: root.height * 0.75
 
