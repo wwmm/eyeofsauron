@@ -68,13 +68,15 @@ Backend::Backend(QObject* parent)
     std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
 
     if (!pause_preview && !exiting) {
-      QMetaObject::invokeMethod(
-          this,
-          [this, frame] {
-            input_video_frame = frame;
-            process_frame();
-          },
-          Qt::QueuedConnection);
+      // QMetaObject::invokeMethod(
+      //     this,
+      //     [this, frame] {
+      //       input_video_frame = frame;
+      //       process_frame();
+      //     },
+      //     Qt::QueuedConnection);
+      input_video_frame = frame;
+      process_frame();
     }
   });
 
@@ -82,13 +84,15 @@ Backend::Backend(QObject* parent)
     std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
 
     if (!pause_preview && !exiting) {
-      QMetaObject::invokeMethod(
-          this,
-          [this, frame] {
-            input_video_frame = frame;
-            process_frame();
-          },
-          Qt::QueuedConnection);
+      // QMetaObject::invokeMethod(
+      //     this,
+      //     [this, frame] {
+      //       input_video_frame = frame;
+      //       process_frame();
+      //     },
+      //     Qt::QueuedConnection);
+      input_video_frame = frame;
+      process_frame();
     }
   });
 
