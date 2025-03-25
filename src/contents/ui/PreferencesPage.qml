@@ -43,6 +43,18 @@ FormCard.FormCardPage {
             }
         }
 
+        EoSSpinBox {
+            label: i18n("Table File Precision")
+            decimals: 0
+            stepSize: 1
+            from: 0
+            to: 10
+            value: EoSdb.tableFilePrecision
+            onValueModified: (v) => {
+                EoSdb.tableFilePrecision = v;
+            }
+        }
+
     }
 
     FormCard.FormHeader {

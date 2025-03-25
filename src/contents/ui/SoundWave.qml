@@ -231,7 +231,7 @@ Kirigami.ScrollablePage {
                         horizontalAlignment: Text.AlignHCenter
                         color: Kirigami.Theme.textColor
                         text: {
-                            return `x = ${mouseAreaFFT.mouseX.toExponential(5)} \t y = ${mouseAreaFFT.mouseY.toExponential(5)}`;
+                            return `x = ${mouseAreaFFT.mouseX.toExponential(EoSdb.tableFilePrecision)} \t y = ${mouseAreaFFT.mouseY.toExponential(EoSdb.tableFilePrecision)}`;
                         }
                     }
 

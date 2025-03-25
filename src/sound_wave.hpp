@@ -48,8 +48,6 @@ class Backend : public QObject {
 
   Q_PROPERTY(double yAxisMaxFFT MEMBER _yAxisMaxFFT NOTIFY yAxisMaxFFTChanged)
 
-  Q_PROPERTY(int tableFilePrecision MEMBER _tableFilePrecision NOTIFY tableFilePrecisionChanged)
-
  public:
   Backend(QObject* parent = nullptr);
 
@@ -66,7 +64,6 @@ class Backend : public QObject {
   Q_INVOKABLE void setPlayerPosition(qint64 value);
 
  signals:
-  void tableFilePrecisionChanged();
   void xAxisMinWaveChanged();
   void xAxisMaxWaveChanged();
   void yAxisMinWaveChanged();
@@ -83,8 +80,6 @@ class Backend : public QObject {
  private:
   bool _showPlayerSlider = false;
   bool exiting = false;
-
-  int _tableFilePrecision = 4;
 
   double _xAxisMinWave = 10000;
   double _xAxisMaxWave = 0;

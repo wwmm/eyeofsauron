@@ -252,7 +252,7 @@ Kirigami.ScrollablePage {
                     horizontalAlignment: Text.AlignHCenter
                     color: Kirigami.Theme.textColor
                     text: {
-                        return `t = ${chartMouseArea.mouseX.toFixed(1)} \t p = ${chartMouseArea.mouseY.toFixed(1)}`;
+                        return `t = ${chartMouseArea.mouseX.toFixed(EoSdb.tableFilePrecision)} \t p = ${chartMouseArea.mouseY.toFixed(EoSdb.tableFilePrecision)}`;
                     }
                 }
 

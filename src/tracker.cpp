@@ -463,8 +463,8 @@ void Backend::process_frame() {
 
       painter.drawRect(QRectF{roi_n.x, roi_n.y, roi_n.width, roi_n.height});
 
-      double xc = roi_n.x + roi_n.width * 0.5;
-      double yc = roi_n.y + roi_n.height * 0.5;
+      double xc = roi_n.x + (roi_n.width * 0.5);
+      double yc = roi_n.y + (roi_n.height * 0.5);
       double t = static_cast<double>(input_video_frame.startTime() - initial_time) / 1000000.0;
 
       // changing the coordinate system origin to the bottom left corner
@@ -635,7 +635,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
 
     std::ofstream output_file(fileUrl.toLocalFile().toStdString());
 
-    output_file << std::fixed << std::setprecision(_tableFilePrecision) << "#time";
+    output_file << std::fixed << std::setprecision(db::Main::tableFilePrecision()) << "#time";
 
     for (size_t k = 0; k < trackers.size(); k++) {
       output_file << std::format("\tx{0}\ty{0}", k);
@@ -645,7 +645,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
 
     for (const auto& row : table) {
       for (const auto& v : row) {
-        output_file << std::format("{0:.{1}f}", v, _tableFilePrecision) << "\t";
+        output_file << std::format("{0:.{1}f}", v, db::Main::tableFilePrecision()) << "\t";
       }
 
       output_file << "\n";

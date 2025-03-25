@@ -240,7 +240,7 @@ void Backend::calc_fft(const int& sampling_rate) {
     return;
   }
 
-  fft_list.resize(waveform.size() / 2U + 1U);
+  fft_list.resize((waveform.size() / 2U) + 1U);
 
   real_input.resize(0);
 
@@ -265,7 +265,7 @@ void Backend::calc_fft(const int& sampling_rate) {
   fftw_execute(plan);
 
   for (uint i = 0U; i < fft_list.size(); i++) {
-    double sqr = complex_output[i][0] * complex_output[i][0] + complex_output[i][1] * complex_output[i][1];
+    double sqr = (complex_output[i][0] * complex_output[i][0]) + (complex_output[i][1] * complex_output[i][1]);
 
     sqr /= static_cast<double>(fft_list.size() * fft_list.size());
 
@@ -388,7 +388,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
       output_file << "#time\tvalue\n";
 
       for (const auto& p : waveform) {
-        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", _tableFilePrecision, p.x(), p.y()) << "\n";
+        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", db::Main::tableFilePrecision(), p.x(), p.y()) << "\n";
       }
 
       output_file.close();
@@ -401,7 +401,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
       output_file << "#frequency\tvalue\n";
 
       for (const auto& p : fft_list) {
-        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", _tableFilePrecision, p.x(), p.y()) << "\n";
+        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", db::Main::tableFilePrecision(), p.x(), p.y()) << "\n";
       }
 
       output_file.close();

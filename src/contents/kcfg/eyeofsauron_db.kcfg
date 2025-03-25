@@ -24,6 +24,10 @@
             <label>Charts Use OpenGL Acceleration</label>
             <default>false</default>
         </entry>
+        <entry name="tableFilePrecision" type="Int">
+            <label>Precision used for the numbers saved to the table file</label>
+            <default>4</default>
+        </entry>
     </group>
     <group name="Tracker">
         <entry name="trackingAlgorithm" type="Enum">

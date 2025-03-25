@@ -47,8 +47,6 @@ class Backend : public QObject {
 
   Q_PROPERTY(double yAxisMax MEMBER _yAxisMax NOTIFY yAxisMaxChanged)
 
-  Q_PROPERTY(int tableFilePrecision MEMBER _tableFilePrecision NOTIFY tableFilePrecisionChanged)
-
   Q_PROPERTY(QVideoSink* videoSink MEMBER _videoSink NOTIFY videoSinkChanged)
 
  public:
@@ -74,7 +72,6 @@ class Backend : public QObject {
   void videoSinkChanged();
   void frameWidthChanged();
   void frameHeightChanged();
-  void tableFilePrecisionChanged();
   void xAxisMinChanged();
   void xAxisMaxChanged();
   void yAxisMinChanged();
@@ -96,7 +93,6 @@ class Backend : public QObject {
 
   int _frameWidth = 800;
   int _frameHeight = 600;
-  int _tableFilePrecision = 3;
 
   double _xAxisMin = 10000;
   double _xAxisMax = 0;
