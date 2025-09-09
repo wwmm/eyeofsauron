@@ -208,6 +208,10 @@ void Backend::append(const QUrl& videoUrl) {
 }
 
 void Backend::selectSource(const int& index) {
+  if (sourceModel.getList().empty()) {
+    return;
+  }
+
   auto source = sourceModel.get_source(index);
 
   media_player->stop();

@@ -33,7 +33,6 @@ Kirigami.OverlaySheet {
             visible: sourcesListView.count === 0
             text: i18n("No Source Available")
         }
-
     }
 
     Component {
@@ -64,6 +63,17 @@ Kirigami.OverlaySheet {
                 }
             }
 
+            Kirigami.PromptDialog {
+                id: deleteDialog
+
+                title: i18n("Remove Source")
+                subtitle: i18n("Are you sure you want to remove this source?")
+                standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+                onAccepted: {
+                    control.model.removeSource(index);
+                }
+            }
+
             contentItem: Kirigami.ActionToolBar {
                 actions: [
                     Kirigami.Action {
@@ -91,11 +101,8 @@ Kirigami.OverlaySheet {
                                     text: sourceSubtitle
                                     visible: !Common.isEmpty(sourceSubtitle)
                                 }
-
                             }
-
                         }
-
                     },
                     Kirigami.Action {
                         text: i18n("Remove this Source")
@@ -103,7 +110,7 @@ Kirigami.OverlaySheet {
                         visible: sourceType === "media_file"
                         displayHint: Kirigami.DisplayHint.AlwaysHide
                         onTriggered: {
-                            control.model.removeSource(index);
+                            deleteDialog.open();
                         }
                     }
                 ]
@@ -114,11 +121,8 @@ Kirigami.OverlaySheet {
                     right: parent.right
                     rightMargin: Kirigami.Units.smallSpacing
                 }
-
             }
-
         }
-
     }
 
     FileDialog {
@@ -150,7 +154,5 @@ Kirigami.OverlaySheet {
             right: parent.right
             rightMargin: Kirigami.Units.smallSpacing
         }
-
     }
-
 }

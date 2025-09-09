@@ -182,6 +182,10 @@ void Backend::append(const QUrl& mediaUrl) {
 }
 
 void Backend::selectSource(const int& index) {
+  if (sourceModel.getList().empty()) {
+    return;
+  }
+
   auto source = sourceModel.get_source(index);
 
   if (microphone != nullptr) {
