@@ -56,6 +56,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBV4L2 libv4l2)
 pkg_check_modules(LIBMEDIAINFO libmediainfo)
 
+qt_policy(SET QTP0001 NEW)
+
 ki18n_install(po)
 
 file(GLOB KCFG_FILES ${PROJECT_SOURCE_DIR}/src/contents/kcfg/*.kcfg)
