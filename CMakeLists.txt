@@ -7,13 +7,14 @@ set(APPLICATION_NAME "eye of sauron")
 set(COMPONENT_NAME "eyeofsauron")
 set(ORGANIZATION_NAME "WWMM")
 set(ORGANIZATION_DOMAIN "com.github.wwmm")
+set(APPLICATION_ID "com.github.wwmm.eyeofsauron")
+set(APPLICATION_NAME "Eye of Sauron")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(QT_DEFAULT_MAJOR_VERSION 6)
-set(QT_MAJOR_VERSION ${QT_DEFAULT_MAJOR_VERSION})
 
 set(QT_QML_GENERATE_QMLLS_INI ON)
 
@@ -27,7 +28,7 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 
-find_package(Qt${QT_MAJOR_VERSION} REQUIRED NO_MODULE COMPONENTS
+find_package(Qt6 REQUIRED NO_MODULE COMPONENTS
     Core
     Quick
     Qml
@@ -38,12 +39,13 @@ find_package(Qt${QT_MAJOR_VERSION} REQUIRED NO_MODULE COMPONENTS
     Multimedia
 )
 
-find_package(KF${QT_MAJOR_VERSION} REQUIRED COMPONENTS
-    Kirigami
-    I18n
+find_package(KF6 REQUIRED COMPONENTS
     CoreAddons
     Config
     ConfigWidgets
+    IconThemes
+    I18n
+    Kirigami
 )
 
 find_package(Threads REQUIRED)

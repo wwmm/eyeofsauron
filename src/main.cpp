@@ -1,7 +1,9 @@
 #include <kaboutdata.h>
 #include <klocalizedcontext.h>
+#include <qguiapplication.h>
 #include <qhashfunctions.h>
 #include <qlockfile.h>
+#include <qnamespace.h>
 #include <qobject.h>
 #include <qqml.h>
 #include <qqmlapplicationengine.h>
@@ -11,8 +13,10 @@
 #include <qtenvironmentvariables.h>
 #include <qurl.h>
 #include <KAboutData>
+#include <KIconTheme>
 #include <KLocalizedString>
 #include <QApplication>
+#include <QIcon>
 #include <QtQml>
 #include <memory>
 #include "config.h"
@@ -21,7 +25,7 @@
 #include "tracker.hpp"
 #include "util.hpp"
 
-auto get_lock_file() -> std::unique_ptr<QLockFile> {
+static auto get_lock_file() -> std::unique_ptr<QLockFile> {
   auto lockFile = std::make_unique<QLockFile>(QString::fromStdString(
       QStandardPaths::writableLocation(QStandardPaths::TempLocation).toStdString() + "/eyeofsauron.lock"));
 
@@ -53,7 +57,7 @@ auto get_lock_file() -> std::unique_ptr<QLockFile> {
   return lockFile;
 }
 
-void construct_about_window() {
+static void construct_about_window() {
   KAboutData aboutData(QStringLiteral(COMPONENT_NAME), i18nc("@title", APPLICATION_NAME),
                        QStringLiteral(PROJECT_VERSION),
                        i18n("Using webcams and Middle-earth's power in your Physics classes"), KAboutLicense::GPL_V3,
@@ -73,18 +77,28 @@ void construct_about_window() {
 }
 
 int main(int argc, char* argv[]) {
+  QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+
   auto lockFile = get_lock_file();
 
   if (!lockFile->isLocked()) {
     return -1;
   }
 
+  KIconTheme::initTheme();
+
+  // Set the desktop app ID before QApplication startup so portal integration
+  // does not try to re-register a different/late app ID on the same bus.
+  QGuiApplication::setDesktopFileName(QStringLiteral(APPLICATION_ID));
+
+  QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral(APPLICATION_ID)));
+
   QApplication app(argc, argv);
 
   KLocalizedString::setApplicationDomain(APPLICATION_DOMAIN);
   QCoreApplication::setOrganizationName(QStringLiteral(ORGANIZATION_NAME));
   QCoreApplication::setOrganizationDomain(QStringLiteral(ORGANIZATION_DOMAIN));
-  QCoreApplication::setApplicationName(QStringLiteral("eyeofsauron"));
+  QCoreApplication::setApplicationName(QStringLiteral(APPLICATION_ID));
 
   if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE")) {
     QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));

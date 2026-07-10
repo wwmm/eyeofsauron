@@ -16,7 +16,7 @@ Kirigami.ApplicationWindow {
     height: EoSdb.height
     pageStack.initialPage: tracker
     pageStack.globalToolBar.style: Kirigami.Settings.isMobile ? Kirigami.ApplicationHeaderStyle.Titles : Kirigami.ApplicationHeaderStyle.Auto
-    title: i18nc("@title:window", "Eye Of Sauron")
+    title: i18nc("@title:window", "Eye of Sauron")
     onWidthChanged: {
         EoSdb.width = applicationWindow().width;
     }

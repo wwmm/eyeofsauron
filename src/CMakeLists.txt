@@ -1,4 +1,4 @@
-configure_file(config.h.in config.h)
+configure_file(config.h.in config.h @ONLY)
 
 add_subdirectory(contents)
 
@@ -47,18 +47,19 @@ target_include_directories(eyeofsauron PRIVATE
 )
 
 target_link_libraries(eyeofsauron PRIVATE
-    Qt${QT_MAJOR_VERSION}::Core
-    Qt${QT_MAJOR_VERSION}::Quick
-    Qt${QT_MAJOR_VERSION}::Qml
-    Qt${QT_MAJOR_VERSION}::Gui
-    Qt${QT_MAJOR_VERSION}::QuickControls2
-    Qt${QT_MAJOR_VERSION}::Widgets
-    Qt${QT_MAJOR_VERSION}::Charts
-    Qt${QT_MAJOR_VERSION}::Multimedia
-    KF${QT_MAJOR_VERSION}::I18n
-    KF${QT_MAJOR_VERSION}::CoreAddons
-    KF${QT_MAJOR_VERSION}::ConfigCore
-    KF${QT_MAJOR_VERSION}::ConfigGui
+    Qt6::Core
+    Qt6::Quick
+    Qt6::Qml
+    Qt6::Gui
+    Qt6::QuickControls2
+    Qt6::Widgets
+    Qt6::Charts
+    Qt6::Multimedia
+    KF6::I18n
+    KF6::CoreAddons
+    KF6::ConfigCore
+    KF6::ConfigGui
+    KF6::IconThemes
     ${OpenCV_LIBS}
     ${FFTW3_LIBRARIES}
     ${LIBV4L2_LIBRARIES}
