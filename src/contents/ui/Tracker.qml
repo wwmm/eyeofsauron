@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import EoSTrackerBackend
 import EoSdb
 import EosTrackerSourceModel
@@ -9,8 +11,7 @@ import QtQuick.Controls as Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import org.kde.kirigamiaddons.delegates as Delegates
-import org.kde.kirigamiaddons.formcard as FormCard
+import eos.ui
 
 Kirigami.ScrollablePage {
     id: tracker
@@ -55,7 +56,7 @@ Kirigami.ScrollablePage {
         backend: EoSTrackerBackend
         model: EosTrackerSourceModel
         backendName: "tracker"
-        onSourceNameChanged: (name) => {
+        onSourceNameChanged: name => {
             fileName.text = name;
         }
     }
@@ -67,7 +68,7 @@ Kirigami.ScrollablePage {
         currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
         nameFilters: ["PNG files (*.png)"]
         onAccepted: {
-            chart.grabToImage(function(result) {
+            chart.grabToImage(function (result) {
                 result.saveToFile(fileDialogSaveChart.selectedFile);
             });
         }
@@ -108,7 +109,7 @@ Kirigami.ScrollablePage {
                         anchors.fill: parent
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         preventStealing: true
-                        onClicked: (event) => {
+                        onClicked: event => {
                             if (event.button == Qt.RightButton) {
                                 let seriesIndex = EoSTrackerBackend.removeRoi(event.x, event.y);
                                 if (seriesIndex !== -1) {
@@ -117,12 +118,12 @@ Kirigami.ScrollablePage {
                                 }
                             }
                         }
-                        onReleased: (event) => {
+                        onReleased: event => {
                             if (event.button == Qt.LeftButton) {
                                 let width = event.x - x0;
                                 let height = event.y - y0;
                                 if (Math.abs(width) === 0 || Math.abs(height) === 0)
-                                    return ;
+                                    return;
 
                                 if (width < 0) {
                                     x0 = width + x0;
@@ -139,14 +140,14 @@ Kirigami.ScrollablePage {
                                 event.accepted = true;
                             }
                         }
-                        onPositionChanged: (event) => {
+                        onPositionChanged: event => {
                             if (event.buttons & Qt.LeftButton) {
                                 let x = x0;
                                 let y = y0;
                                 let width = event.x - x;
                                 let height = event.y - y;
                                 if (Math.abs(width) === 0 || Math.abs(height) === 0)
-                                    return ;
+                                    return;
 
                                 if (width < 0) {
                                     x = width + x;
@@ -159,7 +160,7 @@ Kirigami.ScrollablePage {
                                 EoSTrackerBackend.newRoiSelection(x, y, width, height);
                             }
                         }
-                        onPressed: (event) => {
+                        onPressed: event => {
                             if (event.button == Qt.LeftButton) {
                                 x0 = event.x;
                                 y0 = event.y;
@@ -168,7 +169,6 @@ Kirigami.ScrollablePage {
                             }
                         }
                     }
-
                 }
 
                 Controls.Label {
@@ -179,7 +179,6 @@ Kirigami.ScrollablePage {
                     elide: Text.ElideRight
                     wrapMode: Text.NoWrap
                 }
-
             }
 
             ColumnLayout {
@@ -193,13 +192,13 @@ Kirigami.ScrollablePage {
                         let series = createSeries(ChartView.SeriesTypeLine, name, axisTime, axisPosition);
                         series.useOpenGL = EoSdb.chartsUseOpenGL;
                         if (axisName === "x")
-                            series.visible = Qt.binding(function() {
-                            return actionViewXdata.showChart;
-                        });
+                            series.visible = Qt.binding(function () {
+                                return actionViewXdata.showChart;
+                            });
                         else if (axisName === "y")
-                            series.visible = Qt.binding(function() {
-                            return actionViewYdata.showChart;
-                        });
+                            series.visible = Qt.binding(function () {
+                                return actionViewYdata.showChart;
+                            });
                     }
 
                     antialiasing: true
@@ -244,7 +243,6 @@ Kirigami.ScrollablePage {
                         chart: chart
                         zoomRect: zoomRect
                     }
-
                 }
 
                 Text {
@@ -255,9 +253,7 @@ Kirigami.ScrollablePage {
                         return `t = ${chartMouseArea.mouseX.toFixed(EoSdb.tableFilePrecision)} \t p = ${chartMouseArea.mouseY.toFixed(EoSdb.tableFilePrecision)}`;
                     }
                 }
-
             }
-
         }
 
         RowLayout {
@@ -291,9 +287,7 @@ Kirigami.ScrollablePage {
                     return `${m}:${ms.padStart(4, 0)}`;
                 }
             }
-
         }
-
     }
 
     footer: Kirigami.ActionToolBar {
@@ -308,11 +302,10 @@ Kirigami.ScrollablePage {
                     from: 2
                     to: 1000
                     value: EoSdb.chartDataPoints
-                    onValueModified: (v) => {
+                    onValueModified: v => {
                         EoSdb.chartDataPoints = v;
                     }
                 }
-
             },
             Kirigami.Action {
                 id: actionViewXdata
@@ -326,10 +319,8 @@ Kirigami.ScrollablePage {
                         actionViewXdata.showChart = checked;
                         if (EoSTrackerBackend.xDataVisible !== checked)
                             EoSTrackerBackend.xDataVisible = checked;
-
                     }
                 }
-
             },
             Kirigami.Action {
                 id: actionViewYdata
@@ -343,10 +334,8 @@ Kirigami.ScrollablePage {
                         actionViewYdata.showChart = checked;
                         if (EoSTrackerBackend.yDataVisible !== checked)
                             EoSTrackerBackend.yDataVisible = checked;
-
                     }
                 }
-
             },
             Kirigami.Action {
                 text: i18n("Save Chart")
@@ -379,5 +368,4 @@ Kirigami.ScrollablePage {
             }
         ]
     }
-
 }

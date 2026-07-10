@@ -1,10 +1,12 @@
-import "Common.js" as Common
+pragma ComponentBehavior: Bound
+
 import QtCore
 import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import eos.ui
 
 Kirigami.OverlaySheet {
     id: control
@@ -41,10 +43,12 @@ Kirigami.OverlaySheet {
         Controls.ItemDelegate {
             id: listItemDelegate
 
-            property string sourceType: model.sourceType
-            property string sourceName: model.name
-            property string sourceSubtitle: model.subtitle
-            property string sourceIcon: model.icon
+            required property int index
+            required property string sourceType
+            required property string sourceName
+            required property string sourceSubtitle
+            required property string sourceIcon
+
             property int wrapMode: Text.WrapAnywhere
             property int elide: Text.ElideRight
             property bool selected: listItemDelegate.highlighted || listItemDelegate.down
@@ -58,8 +62,8 @@ Kirigami.OverlaySheet {
             }
             onHighlightedChanged: {
                 if (highlighted) {
-                    backend.selectSource(index);
-                    control.sourceNameChanged(model.name);
+                    control.backend.selectSource(listItemDelegate.index);
+                    control.sourceNameChanged(listItemDelegate.sourceName);
                 }
             }
 
@@ -70,14 +74,14 @@ Kirigami.OverlaySheet {
                 subtitle: i18n("Are you sure you want to remove this source?")
                 standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
                 onAccepted: {
-                    control.model.removeSource(index);
+                    control.model.removeSource(listItemDelegate.index);
                 }
             }
 
             contentItem: Kirigami.ActionToolBar {
                 actions: [
                     Kirigami.Action {
-                        text: sourceName
+                        text: listItemDelegate.sourceName
                         enabled: false
                         displayHint: Kirigami.DisplayHint.KeepVisible
 
@@ -85,7 +89,7 @@ Kirigami.OverlaySheet {
                             spacing: Kirigami.Units.smallSpacing
 
                             Kirigami.Icon {
-                                source: sourceIcon
+                                source: listItemDelegate.sourceIcon
                             }
 
                             ColumnLayout {
@@ -93,13 +97,13 @@ Kirigami.OverlaySheet {
 
                                 Controls.Label {
                                     wrapMode: Text.WordWrap
-                                    text: sourceName
+                                    text: listItemDelegate.sourceName
                                 }
 
                                 Controls.Label {
                                     wrapMode: Text.WordWrap
-                                    text: sourceSubtitle
-                                    visible: !Common.isEmpty(sourceSubtitle)
+                                    text: listItemDelegate.sourceSubtitle
+                                    visible: !Common.isEmpty(listItemDelegate.sourceSubtitle)
                                 }
                             }
                         }
@@ -107,7 +111,7 @@ Kirigami.OverlaySheet {
                     Kirigami.Action {
                         text: i18n("Remove this Source")
                         icon.name: "delete"
-                        visible: sourceType === "media_file"
+                        visible: listItemDelegate.sourceType === "media_file"
                         displayHint: Kirigami.DisplayHint.AlwaysHide
                         onTriggered: {
                             deleteDialog.open();
@@ -130,9 +134,9 @@ Kirigami.OverlaySheet {
 
         fileMode: FileDialog.OpenFile
         currentFolder: StandardPaths.standardLocations(StandardPaths.MoviesLocation)[0]
-        nameFilters: backendName === "tracker" ? ["Video files (*.*)"] : ["Audio files (*.*)"]
+        nameFilters: control.backendName === "tracker" ? ["Video files (*.*)"] : ["Audio files (*.*)"]
         onAccepted: {
-            backend.append(fileDialog.selectedFile);
+            control.backend.append(fileDialog.selectedFile);
         }
     }
 
@@ -140,8 +144,8 @@ Kirigami.OverlaySheet {
         alignment: Qt.AlignCenter
         actions: [
             Kirigami.Action {
-                text: backendName === "tracker" ? i18n("Add Video File") : i18n("Add Audio File")
-                icon.name: backendName === "tracker" ? "video-symbolic" : "emblem-music-symbolic"
+                text: control.backendName === "tracker" ? i18n("Add Video File") : i18n("Add Audio File")
+                icon.name: control.backendName === "tracker" ? "video-symbolic" : "emblem-music-symbolic"
                 onTriggered: {
                     fileDialog.open();
                 }

@@ -6,6 +6,29 @@ add_executable(eyeofsauron)
 
 kde_target_enable_exceptions(eyeofsauron PRIVATE)
 
+kconfig_add_kcfg_files(eyeofsauron GENERATE_MOC ${KCFGC_FILES})
+
+qt_policy(SET QTP0004 NEW)
+
+set_source_files_properties(
+    contents/ui/Common.qml
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
+qt_add_qml_module(eyeofsauron
+    URI eos.ui
+    VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    QML_FILES
+        contents/ui/ChartMouseArea.qml
+        contents/ui/Common.qml
+        contents/ui/EoSSpinBox.qml
+        contents/ui/EoSSwitch.qml
+        contents/ui/Main.qml
+        contents/ui/PreferencesPage.qml
+        contents/ui/SoundWave.qml
+        contents/ui/SourceMenu.qml
+        contents/ui/Tracker.qml
+)
+
 target_sources(eyeofsauron PRIVATE
     frame_source.cpp
     io_device.cpp
@@ -42,7 +65,6 @@ target_link_libraries(eyeofsauron PRIVATE
     ${LIBMEDIAINFO_LIBRARIES}
 )
 
-kconfig_add_kcfg_files(eyeofsauron GENERATE_MOC ${KCFGC_FILES})
 
 # install(FILES ${KCFG_FILES} DESTINATION ${KDE_INSTALL_KCFGDIR})
 

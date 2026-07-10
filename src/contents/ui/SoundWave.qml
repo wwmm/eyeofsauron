@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import EoSSoundBackend
 import EoSdb
 import EosSoundSourceModel
@@ -42,7 +44,7 @@ Kirigami.ScrollablePage {
         backend: EoSSoundBackend
         model: EosSoundSourceModel
         backendName: "sound_wave"
-        onSourceNameChanged: (name) => {
+        onSourceNameChanged: name => {
             fileName.text = name;
         }
     }
@@ -63,10 +65,10 @@ Kirigami.ScrollablePage {
         currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
         nameFilters: ["PNG files (*.png)"]
         onAccepted: {
-            chartWaveForm.grabToImage(function(result) {
+            chartWaveForm.grabToImage(function (result) {
                 result.saveToFile(fileDialogSaveChart.selectedFile.toString().replace(".png", "_waveform.png"));
             });
-            chartFFT.grabToImage(function(result) {
+            chartFFT.grabToImage(function (result) {
                 result.saveToFile(fileDialogSaveChart.selectedFile.toString().replace(".png", "_fft.png"));
             });
         }
@@ -153,7 +155,6 @@ Kirigami.ScrollablePage {
                             axisY: axisWaveform
                             useOpenGL: EoSdb.chartsUseOpenGL
                         }
-
                     }
 
                     Text {
@@ -164,7 +165,6 @@ Kirigami.ScrollablePage {
                             return `x = ${mouseAreaWaveForm.mouseX.toExponential(5)} \t y = ${mouseAreaWaveForm.mouseY.toExponential(5)}`;
                         }
                     }
-
                 }
 
                 ColumnLayout {
@@ -223,7 +223,6 @@ Kirigami.ScrollablePage {
                             axisY: axisFFT
                             useOpenGL: EoSdb.chartsUseOpenGL
                         }
-
                     }
 
                     Text {
@@ -234,11 +233,8 @@ Kirigami.ScrollablePage {
                             return `x = ${mouseAreaFFT.mouseX.toExponential(EoSdb.tableFilePrecision)} \t y = ${mouseAreaFFT.mouseY.toExponential(EoSdb.tableFilePrecision)}`;
                         }
                     }
-
                 }
-
             }
-
         }
 
         RowLayout {
@@ -272,9 +268,7 @@ Kirigami.ScrollablePage {
                     return `${m}:${ms.padStart(4, 0)}`;
                 }
             }
-
         }
-
     }
 
     footer: Kirigami.ActionToolBar {
@@ -289,11 +283,10 @@ Kirigami.ScrollablePage {
                     from: 0.001
                     to: 3600
                     value: EoSdb.chartTimeWindow
-                    onValueModified: (v) => {
+                    onValueModified: v => {
                         EoSdb.chartTimeWindow = v;
                     }
                 }
-
             },
             Kirigami.Action {
                 text: i18n("Save Charts")
@@ -319,5 +312,4 @@ Kirigami.ScrollablePage {
             }
         ]
     }
-
 }

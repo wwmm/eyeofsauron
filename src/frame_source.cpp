@@ -58,7 +58,7 @@ MediaFileSource::MediaFileSource(QUrl file_url) : Source(SourceType::MediaFile),
 
       int minutes = std::floor(duration_ms / 60000);
 
-      float seconds = duration_ms / 1000 - minutes * 60;
+      float seconds = (duration_ms / 1000) - (minutes * 60);
 
       duration = QString::fromStdString(std::format("{0:d}:{1:0>4.1f}", minutes, seconds));
 
@@ -94,8 +94,10 @@ int SourceModel::rowCount(const QModelIndex& /*parent*/) const {
 }
 
 QHash<int, QByteArray> SourceModel::roleNames() const {
-  return {
-      {Roles::SourceType, "sourceType"}, {Roles::Name, "name"}, {Roles::Subtitle, "subtitle"}, {Roles::Icon, "icon"}};
+  return {{Roles::SourceType, "sourceType"},
+          {Roles::Name, "sourceName"},
+          {Roles::Subtitle, "sourceSubtitle"},
+          {Roles::Icon, "sourceIcon"}};
 }
 
 QVariant SourceModel::data(const QModelIndex& index, int role) const {

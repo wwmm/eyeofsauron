@@ -10,12 +10,12 @@ https://bugreports.qt.io/browse/QTBUG-67349
 
  */
 
-import "Common.js" as Common
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard as FormCard
+import eos.ui
 
 FormCard.AbstractFormDelegate {
     id: control
@@ -110,9 +110,7 @@ FormCard.AbstractFormDelegate {
                     bottom: Math.min(spinbox.from, spinbox.to) * spinbox.decimalFactor
                     top: Math.max(spinbox.from, spinbox.to) * spinbox.decimalFactor
                 }
-
             }
-
         }
 
         Kirigami.InlineMessage {
@@ -124,7 +122,5 @@ FormCard.AbstractFormDelegate {
             text: control.statusMessage
             type: control.status
         }
-
     }
-
 }

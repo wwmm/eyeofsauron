@@ -37,7 +37,5 @@ FormCard.AbstractFormDelegate {
             Layout.leftMargin: Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
             enabled: control.enabled
         }
-
     }
-
 }

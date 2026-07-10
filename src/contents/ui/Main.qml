@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import AboutEoS
 import EoSdb
 import Qt.labs.platform
@@ -5,7 +7,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import org.kde.kirigamiaddons.formcard as FormCard
+import eos.ui
 
 Kirigami.ApplicationWindow {
     id: root
@@ -24,7 +26,6 @@ Kirigami.ApplicationWindow {
     onVisibleChanged: {
         if (!root.visible)
             EoSdb.save();
-
     }
 
     Tracker {
@@ -47,7 +48,6 @@ Kirigami.ApplicationWindow {
             implicitHeight: Kirigami.Units.gridUnit * 21
             aboutData: AboutEoS
         }
-
     }
 
     Kirigami.OverlayDrawer {
@@ -65,9 +65,7 @@ Kirigami.ApplicationWindow {
                 indeterminate: true
                 Layout.fillWidth: true
             }
-
         }
-
     }
 
     SystemTrayIcon {
@@ -92,17 +90,13 @@ Kirigami.ApplicationWindow {
                 text: i18n("Quit")
                 onTriggered: Qt.quit()
             }
-
         }
-
     }
 
     Component {
         id: preferencesPage
 
-        PreferencesPage {
-        }
-
+        PreferencesPage {}
     }
 
     globalDrawer: Kirigami.GlobalDrawer {
@@ -119,7 +113,8 @@ Kirigami.ApplicationWindow {
                 checked: tracker.visible
                 onTriggered: {
                     if (!tracker.visible) {
-                        while (pageStack.depth > 0)pageStack.pop()
+                        while (pageStack.depth > 0)
+                            pageStack.pop();
                         pageStack.push(tracker);
                     }
                 }
@@ -130,7 +125,8 @@ Kirigami.ApplicationWindow {
                 checked: soundWave.visible
                 onTriggered: {
                     if (!soundWave.visible) {
-                        while (pageStack.depth > 0)pageStack.pop()
+                        while (pageStack.depth > 0)
+                            pageStack.pop();
                         pageStack.push(soundWave);
                     }
                 }
@@ -181,11 +177,7 @@ Kirigami.ApplicationWindow {
                         }
                     ]
                 }
-
             }
-
         }
-
     }
-
 }
