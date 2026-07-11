@@ -114,14 +114,12 @@ int main(int argc, char* argv[]) {
 
   // loading classes
 
-  tracker::Backend tracker;
+  tracker::Backend::self();
   sound::Backend sound;
 
   QQmlApplicationEngine engine;
 
   engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
-
-  // engine.load(QUrl(QStringLiteral("qrc:/ui/Main.qml")));
 
   engine.loadFromModule("eos.ui", "Main");
 

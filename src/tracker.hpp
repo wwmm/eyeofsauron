@@ -1,10 +1,15 @@
 #pragma once
 
 #include <qabstractseries.h>
+#include <qassert.h>
+#include <qjsengine.h>
 #include <qlist.h>
 #include <qobject.h>
 #include <qpoint.h>
+#include <qqmlengine.h>
+#include <qqmlintegration.h>
 #include <qtmetamacros.h>
+#include <qtpreprocessorsupport.h>
 #include <qtypes.h>
 #include <qurl.h>
 #include <QCamera>
@@ -24,6 +29,9 @@ namespace tracker {
 
 class Backend : public QObject {
   Q_OBJECT
+
+  QML_NAMED_ELEMENT(EoSTrackerBackend)
+  QML_SINGLETON
 
   Q_PROPERTY(bool xDataVisible MEMBER _xDataVisible NOTIFY xDataVisibleChanged)
 
@@ -50,9 +58,41 @@ class Backend : public QObject {
   Q_PROPERTY(QVideoSink* videoSink MEMBER _videoSink NOTIFY videoSinkChanged)
 
  public:
-  Backend(QObject* parent = nullptr);
+  explicit Backend(QObject* parent = nullptr);
 
+  /**
+   * Deleting the default constructor because we want Qt to call our custom create method.
+   * If this is not done qml will create its own class instance.
+   */
+  Backend() = delete;
+
+  Backend(const Backend&) = delete;
+  auto operator=(const Backend&) -> Backend& = delete;
+  Backend(const Backend&&) = delete;
+  auto operator=(const Backend&&) -> Backend& = delete;
   ~Backend() override;
+
+  static Backend& self() {
+    static Backend m(nullptr);
+    return m;
+  }
+
+  inline static Backend* singletonInstance = nullptr;
+
+  // Singleton provider for QML
+  static Backend* create(QQmlEngine* qmlEngine, QJSEngine* jsEngine) {
+    Q_UNUSED(jsEngine)
+
+    // The engine has to have the same thread affinity as the singleton.
+
+    Q_ASSERT(qmlEngine->thread() == self().thread());
+
+    // Explicitly specify C++ ownership so that the engine doesn't delete the instance.
+
+    QJSEngine::setObjectOwnership(&self(), QJSEngine::CppOwnership);
+
+    return &self();
+  }
 
   Q_INVOKABLE void start();
   Q_INVOKABLE void pause();

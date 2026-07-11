@@ -17,6 +17,8 @@ set_source_files_properties(
 qt_add_qml_module(eyeofsauron
     URI eos.ui
     VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    SOURCES
+        tracker.hpp
     QML_FILES
         contents/ui/ChartMouseArea.qml
         contents/ui/Common.qml

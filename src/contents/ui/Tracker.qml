@@ -1,6 +1,5 @@
 pragma ComponentBehavior: Bound
 
-import EoSTrackerBackend
 import EoSdb
 import EosTrackerSourceModel
 import QtCharts

@@ -71,7 +71,7 @@ Backend::Backend(QObject* parent)
 
     auto input_data = std::span<const float>(qaudio_buffer.constData<float>(), qaudio_buffer.sampleCount());
 
-    std::copy(input_data.begin(), input_data.end(), decoder_buffer.begin());
+    std::ranges::copy(input_data, decoder_buffer.begin());
 
     if (qaudio_buffer.startTime() == 0) {
       first_buffer_clock = std::chrono::steady_clock::now();

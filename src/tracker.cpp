@@ -57,7 +57,7 @@ Backend::Backend(QObject* parent)
       capture_session(std::make_unique<QMediaCaptureSession>()),
       media_player(std::make_unique<QMediaPlayer>()),
       media_player_video_sink(std::make_unique<QVideoSink>()) {
-  qmlRegisterSingletonInstance<Backend>("EoSTrackerBackend", VERSION_MAJOR, VERSION_MINOR, "EoSTrackerBackend", this);
+  singletonInstance = this;
 
   qmlRegisterSingletonInstance<SourceModel>("EosTrackerSourceModel", VERSION_MAJOR, VERSION_MINOR,
                                             "EosTrackerSourceModel", &sourceModel);
