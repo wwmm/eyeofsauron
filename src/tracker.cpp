@@ -521,6 +521,10 @@ void Backend::process_frame() {
 
 void Backend::updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y, const int& index) {
   if (series_x != nullptr && series_y != nullptr) {
+    if (index < 0 || index >= static_cast<int>(trackers.size())) {
+      return;
+    }
+
     auto xySeries_x = dynamic_cast<QXYSeries*>(series_x);
     auto xySeries_y = dynamic_cast<QXYSeries*>(series_y);
 
