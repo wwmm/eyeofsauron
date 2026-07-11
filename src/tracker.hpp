@@ -57,6 +57,8 @@ class Backend : public QObject {
 
   Q_PROPERTY(QVideoSink* videoSink MEMBER _videoSink NOTIFY videoSinkChanged)
 
+  Q_PROPERTY(SourceModel* sourceModel MEMBER sourceModel CONSTANT)
+
  public:
   explicit Backend(QObject* parent = nullptr);
 
@@ -151,7 +153,7 @@ class Backend : public QObject {
 
   QRectF rect_selection = {0.0, 0.0, 0.0, 0.0};
 
-  SourceModel sourceModel;
+  SourceModel* sourceModel = nullptr;
 
   std::unique_ptr<QCamera> camera;
   std::unique_ptr<QVideoSink> camera_video_sink;

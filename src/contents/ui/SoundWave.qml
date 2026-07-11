@@ -1,8 +1,5 @@
 pragma ComponentBehavior: Bound
 
-import EoSSoundBackend
-import EoSdb
-import EosSoundSourceModel
 import QtCharts
 import QtCore
 import QtQuick
@@ -42,7 +39,7 @@ Kirigami.ScrollablePage {
         id: sourceMenu
 
         backend: EoSSoundBackend
-        model: EosSoundSourceModel
+        model: EoSSoundBackend.sourceModel
         backendName: "sound_wave"
         onSourceNameChanged: name => {
             fileName.text = name;
@@ -109,7 +106,7 @@ Kirigami.ScrollablePage {
                         implicitHeight: 480
                         implicitWidth: 640
                         antialiasing: true
-                        theme: EoSdb.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
+                        theme: DbMain.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
                         localizeNumbers: true
 
                         ValueAxis {
@@ -133,7 +130,7 @@ Kirigami.ScrollablePage {
                         Rectangle {
                             id: zoomRectWaveForm
 
-                            color: EoSdb.darkChartTheme === true ? "aquamarine" : "crimson"
+                            color: DbMain.darkChartTheme === true ? "aquamarine" : "crimson"
                             opacity: 0.25
                             visible: false
                             width: 0
@@ -153,7 +150,7 @@ Kirigami.ScrollablePage {
                             name: i18n("Waveform")
                             axisX: axisTime
                             axisY: axisWaveform
-                            useOpenGL: EoSdb.chartsUseOpenGL
+                            useOpenGL: DbMain.chartsUseOpenGL
                         }
                     }
 
@@ -176,7 +173,7 @@ Kirigami.ScrollablePage {
                         implicitHeight: 480
                         implicitWidth: 640
                         antialiasing: true
-                        theme: EoSdb.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
+                        theme: DbMain.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
                         localizeNumbers: true
 
                         LogValueAxis {
@@ -201,7 +198,7 @@ Kirigami.ScrollablePage {
                         Rectangle {
                             id: zoomRectFFT
 
-                            color: EoSdb.darkChartTheme === true ? "aquamarine" : "crimson"
+                            color: DbMain.darkChartTheme === true ? "aquamarine" : "crimson"
                             opacity: 0.25
                             visible: false
                             width: 0
@@ -221,7 +218,7 @@ Kirigami.ScrollablePage {
                             name: i18n("Fourier Transform")
                             axisX: axisFreq
                             axisY: axisFFT
-                            useOpenGL: EoSdb.chartsUseOpenGL
+                            useOpenGL: DbMain.chartsUseOpenGL
                         }
                     }
 
@@ -230,7 +227,7 @@ Kirigami.ScrollablePage {
                         horizontalAlignment: Text.AlignHCenter
                         color: Kirigami.Theme.textColor
                         text: {
-                            return `x = ${mouseAreaFFT.mouseX.toExponential(EoSdb.tableFilePrecision)} \t y = ${mouseAreaFFT.mouseY.toExponential(EoSdb.tableFilePrecision)}`;
+                            return `x = ${mouseAreaFFT.mouseX.toExponential(DbMain.tableFilePrecision)} \t y = ${mouseAreaFFT.mouseY.toExponential(DbMain.tableFilePrecision)}`;
                         }
                     }
                 }
@@ -282,9 +279,9 @@ Kirigami.ScrollablePage {
                     stepSize: 0.001
                     from: 0.001
                     to: 3600
-                    value: EoSdb.chartTimeWindow
+                    value: DbMain.chartTimeWindow
                     onValueModified: v => {
-                        EoSdb.chartTimeWindow = v;
+                        DbMain.chartTimeWindow = v;
                     }
                 }
             },

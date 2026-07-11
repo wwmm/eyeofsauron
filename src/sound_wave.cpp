@@ -36,11 +36,13 @@
 namespace sound {
 
 Backend::Backend(QObject* parent)
-    : QObject(parent), io_device(std::make_unique<IODevice>()), decoder(std::make_unique<QAudioDecoder>()) {
-  qmlRegisterSingletonInstance<Backend>("EoSSoundBackend", VERSION_MAJOR, VERSION_MINOR, "EoSSoundBackend", this);
+    : QObject(parent),
+      sourceModel(new SourceModel()),
+      io_device(std::make_unique<IODevice>()),
+      decoder(std::make_unique<QAudioDecoder>()) {
+  singletonInstance = this;
 
-  qmlRegisterSingletonInstance<SourceModel>("EosSoundSourceModel", VERSION_MAJOR, VERSION_MINOR, "EosSoundSourceModel",
-                                            &sourceModel);
+  sourceModel->setParent(this);
 
   connect(io_device.get(), &IODevice::bufferChanged, [this](const std::vector<double>& buffer) {
     std::lock_guard<std::mutex> microphone_lock_guard(microphone_mutex);
@@ -177,16 +179,16 @@ void Backend::stop() {
 
 void Backend::append(const QUrl& mediaUrl) {
   if (mediaUrl.isLocalFile()) {
-    sourceModel.append(std::make_shared<MediaFileSource>(mediaUrl));
+    sourceModel->append(std::make_shared<MediaFileSource>(mediaUrl));
   }
 }
 
 void Backend::selectSource(const int& index) {
-  if (sourceModel.getList().empty()) {
+  if (sourceModel->getList().empty()) {
     return;
   }
 
-  auto source = sourceModel.get_source(index);
+  auto source = sourceModel->get_source(index);
 
   if (microphone != nullptr) {
     microphone->stop();
@@ -234,7 +236,7 @@ void Backend::selectSource(const int& index) {
 void Backend::find_microphones() {
   for (const auto& device : QMediaDevices::audioInputs()) {
     if (!device.isNull()) {
-      sourceModel.append(std::make_shared<MicSource>(device));
+      sourceModel->append(std::make_shared<MicSource>(device));
     }
   }
 }
@@ -298,7 +300,7 @@ void Backend::process_buffer(const std::vector<double>& buffer, const int& sampl
     time_axis += dt;
   }
 
-  while ((waveform.size() - 1) * dt > db::Main::chartTimeWindow()) {
+  while ((waveform.size() - 1) * dt > DbMain::chartTimeWindow()) {
     waveform.removeFirst();
     waveform.removeFirst();
   }
@@ -392,7 +394,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
       output_file << "#time\tvalue\n";
 
       for (const auto& p : waveform) {
-        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", db::Main::tableFilePrecision(), p.x(), p.y()) << "\n";
+        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", DbMain::tableFilePrecision(), p.x(), p.y()) << "\n";
       }
 
       output_file.close();
@@ -405,7 +407,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
       output_file << "#frequency\tvalue\n";
 
       for (const auto& p : fft_list) {
-        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", db::Main::tableFilePrecision(), p.x(), p.y()) << "\n";
+        output_file << std::format("{1:.{0}e}\t{2:.{0}e}", DbMain::tableFilePrecision(), p.x(), p.y()) << "\n";
       }
 
       output_file.close();
@@ -413,7 +415,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
   }
 }
 
-void Backend::setPlayerPosition(qint64 value) {
+void Backend::setPlayerPosition([[maybe_unused]] qint64 value) {
   time_axis = 0;
 
   // decoder->setPosition(value);

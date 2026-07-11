@@ -108,14 +108,12 @@ int main(int argc, char* argv[]) {
 
   // Registering kcfg settings
 
-  auto db = db::Main::self();
-
-  qmlRegisterSingletonInstance("EoSdb", VERSION_MAJOR, VERSION_MINOR, "EoSdb", db);
+  auto db = DbMain::self();
 
   // loading classes
 
   tracker::Backend::self();
-  sound::Backend sound;
+  sound::Backend::self();
 
   QQmlApplicationEngine engine;
 

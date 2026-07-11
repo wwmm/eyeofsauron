@@ -19,6 +19,7 @@ qt_add_qml_module(eyeofsauron
     VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     SOURCES
         tracker.hpp
+        frame_source.hpp
     QML_FILES
         contents/ui/ChartMouseArea.qml
         contents/ui/Common.qml

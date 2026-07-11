@@ -1,7 +1,5 @@
 pragma ComponentBehavior: Bound
 
-import EoSdb
-import EosTrackerSourceModel
 import QtCharts
 import QtCore
 import QtMultimedia
@@ -53,7 +51,7 @@ Kirigami.ScrollablePage {
         id: sourceMenu
 
         backend: EoSTrackerBackend
-        model: EosTrackerSourceModel
+        model: EoSTrackerBackend.sourceModel
         backendName: "tracker"
         onSourceNameChanged: name => {
             fileName.text = name;
@@ -189,7 +187,7 @@ Kirigami.ScrollablePage {
                     function addSeries(axisName) {
                         let name = i18n(axisName + Math.floor(chart.count / 2));
                         let series = createSeries(ChartView.SeriesTypeLine, name, axisTime, axisPosition);
-                        series.useOpenGL = EoSdb.chartsUseOpenGL;
+                        series.useOpenGL = DbMain.chartsUseOpenGL;
                         if (axisName === "x")
                             series.visible = Qt.binding(function () {
                                 return actionViewXdata.showChart;
@@ -205,7 +203,7 @@ Kirigami.ScrollablePage {
                     Layout.fillHeight: true
                     implicitHeight: 480
                     implicitWidth: 640
-                    theme: EoSdb.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
+                    theme: DbMain.darkChartTheme === true ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
                     localizeNumbers: true
 
                     ValueAxis {
@@ -229,7 +227,7 @@ Kirigami.ScrollablePage {
                     Rectangle {
                         id: zoomRect
 
-                        color: EoSdb.darkChartTheme === true ? "aquamarine" : "crimson"
+                        color: DbMain.darkChartTheme === true ? "aquamarine" : "crimson"
                         opacity: 0.25
                         visible: false
                         width: 0
@@ -249,7 +247,7 @@ Kirigami.ScrollablePage {
                     horizontalAlignment: Text.AlignHCenter
                     color: Kirigami.Theme.textColor
                     text: {
-                        return `t = ${chartMouseArea.mouseX.toFixed(EoSdb.tableFilePrecision)} \t p = ${chartMouseArea.mouseY.toFixed(EoSdb.tableFilePrecision)}`;
+                        return `t = ${chartMouseArea.mouseX.toFixed(DbMain.tableFilePrecision)} \t p = ${chartMouseArea.mouseY.toFixed(DbMain.tableFilePrecision)}`;
                     }
                 }
             }
@@ -300,9 +298,9 @@ Kirigami.ScrollablePage {
                     stepSize: 1
                     from: 2
                     to: 1000
-                    value: EoSdb.chartDataPoints
+                    value: DbMain.chartDataPoints
                     onValueModified: v => {
-                        EoSdb.chartDataPoints = v;
+                        DbMain.chartDataPoints = v;
                     }
                 }
             },

@@ -7,6 +7,7 @@
 #include <qhash.h>
 #include <qlist.h>
 #include <qnamespace.h>
+#include <qqmlintegration.h>
 #include <qstring.h>
 #include <qtmetamacros.h>
 #include <qurl.h>
@@ -58,7 +59,9 @@ class MicSource : public Source {
 };
 
 class SourceModel : public QAbstractListModel {
-  Q_OBJECT;
+  Q_OBJECT
+
+  QML_NAMED_ELEMENT(EoSSourceModel)
 
  public:
   enum Roles { SourceType = Qt::UserRole, Name, Subtitle, Icon = Qt::DecorationRole };

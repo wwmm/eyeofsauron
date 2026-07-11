@@ -1,4 +1,3 @@
-import EoSdb
 import org.kde.kirigamiaddons.formcard as FormCard
 
 FormCard.FormCardPage {
@@ -11,11 +10,10 @@ FormCard.FormCardPage {
             id: showTrayIcon
 
             label: i18n("Show the Tray Icon")
-            isChecked: EoSdb.showTrayIcon
+            isChecked: DbMain.showTrayIcon
             onCheckedChanged: {
-                if (isChecked !== EoSdb.showTrayIcon)
-                    EoSdb.showTrayIcon = isChecked;
-
+                if (isChecked !== DbMain.showTrayIcon)
+                    DbMain.showTrayIcon = isChecked;
             }
         }
 
@@ -23,11 +21,10 @@ FormCard.FormCardPage {
             id: darkChartTheme
 
             label: i18n("Dark Chart Theme")
-            isChecked: EoSdb.darkChartTheme
+            isChecked: DbMain.darkChartTheme
             onCheckedChanged: {
-                if (isChecked !== EoSdb.darkChartTheme)
-                    EoSdb.darkChartTheme = isChecked;
-
+                if (isChecked !== DbMain.darkChartTheme)
+                    DbMain.darkChartTheme = isChecked;
             }
         }
 
@@ -35,11 +32,10 @@ FormCard.FormCardPage {
             id: chartsUseOpenGL
 
             label: i18n("Charts Use OpenGL Acceleration")
-            isChecked: EoSdb.chartsUseOpenGL
+            isChecked: DbMain.chartsUseOpenGL
             onCheckedChanged: {
-                if (isChecked !== EoSdb.chartsUseOpenGL)
-                    EoSdb.chartsUseOpenGL = isChecked;
-
+                if (isChecked !== DbMain.chartsUseOpenGL)
+                    DbMain.chartsUseOpenGL = isChecked;
             }
         }
 
@@ -49,12 +45,11 @@ FormCard.FormCardPage {
             stepSize: 1
             from: 0
             to: 10
-            value: EoSdb.tableFilePrecision
-            onValueModified: (v) => {
-                EoSdb.tableFilePrecision = v;
+            value: DbMain.tableFilePrecision
+            onValueModified: v => {
+                DbMain.tableFilePrecision = v;
             }
         }
-
     }
 
     FormCard.FormHeader {
@@ -67,13 +62,12 @@ FormCard.FormCardPage {
 
             text: i18n("Tracking Algorithm")
             displayMode: FormCard.FormComboBoxDelegate.ComboBox
-            currentIndex: EoSdb.trackingAlgorithm
+            currentIndex: DbMain.trackingAlgorithm
             editable: false
             model: ["KCF", "MOSSE", "TLD", "MIL"]
-            onActivated: (idx) => {
-                if (idx !== EoSdb.trackingAlgorithm)
-                    EoSdb.trackingAlgorithm = idx;
-
+            onActivated: idx => {
+                if (idx !== DbMain.trackingAlgorithm)
+                    DbMain.trackingAlgorithm = idx;
             }
         }
 
@@ -82,13 +76,12 @@ FormCard.FormCardPage {
 
             text: i18n("Image Scaling Algorithm")
             displayMode: FormCard.FormComboBoxDelegate.ComboBox
-            currentIndex: EoSdb.imageScalingAlgorithm
+            currentIndex: DbMain.imageScalingAlgorithm
             editable: false
             model: [i18n("Fast"), i18n("Smooth")]
-            onActivated: (idx) => {
-                if (idx !== EoSdb.imageScalingAlgorithm)
-                    EoSdb.imageScalingAlgorithm = idx;
-
+            onActivated: idx => {
+                if (idx !== DbMain.imageScalingAlgorithm)
+                    DbMain.imageScalingAlgorithm = idx;
             }
         }
 
@@ -96,11 +89,10 @@ FormCard.FormCardPage {
             id: showDateTime
 
             label: i18n("Show Date and Time")
-            isChecked: EoSdb.showDateTime
+            isChecked: DbMain.showDateTime
             onCheckedChanged: {
-                if (isChecked !== EoSdb.showDateTime)
-                    EoSdb.showDateTime = isChecked;
-
+                if (isChecked !== DbMain.showDateTime)
+                    DbMain.showDateTime = isChecked;
             }
         }
 
@@ -108,11 +100,10 @@ FormCard.FormCardPage {
             id: showFps
 
             label: i18n("Show FPS")
-            isChecked: EoSdb.showFps
+            isChecked: DbMain.showFps
             onCheckedChanged: {
-                if (isChecked !== EoSdb.showFps)
-                    EoSdb.showFps = isChecked;
-
+                if (isChecked !== DbMain.showFps)
+                    DbMain.showFps = isChecked;
             }
         }
 
@@ -123,9 +114,9 @@ FormCard.FormCardPage {
             stepSize: 1
             from: 40
             to: 1920
-            value: EoSdb.videoWidth
-            onValueModified: (v) => {
-                EoSdb.videoWidth = v;
+            value: DbMain.videoWidth
+            onValueModified: v => {
+                DbMain.videoWidth = v;
             }
         }
 
@@ -136,12 +127,10 @@ FormCard.FormCardPage {
             stepSize: 1
             from: 30
             to: 1080
-            value: EoSdb.videoHeight
-            onValueModified: (v) => {
-                EoSdb.videoHeight = v;
+            value: DbMain.videoHeight
+            onValueModified: v => {
+                DbMain.videoHeight = v;
             }
         }
-
     }
-
 }

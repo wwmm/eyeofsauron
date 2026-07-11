@@ -50,8 +50,9 @@ namespace tracker {
 
 Backend::Backend(QObject* parent)
     : QObject(parent),
-      _frameWidth(db::Main::videoWidth()),
-      _frameHeight(db::Main::videoHeight()),
+      _frameWidth(DbMain::videoWidth()),
+      _frameHeight(DbMain::videoHeight()),
+      sourceModel(new SourceModel()),
       camera(std::make_unique<QCamera>()),
       camera_video_sink(std::make_unique<QVideoSink>()),
       capture_session(std::make_unique<QMediaCaptureSession>()),
@@ -59,8 +60,7 @@ Backend::Backend(QObject* parent)
       media_player_video_sink(std::make_unique<QVideoSink>()) {
   singletonInstance = this;
 
-  qmlRegisterSingletonInstance<SourceModel>("EosTrackerSourceModel", VERSION_MAJOR, VERSION_MINOR,
-                                            "EosTrackerSourceModel", &sourceModel);
+  sourceModel->setParent(this);
 
   connect(this, &Backend::videoSinkChanged, [this]() { draw_offline_image(); });
 
@@ -108,18 +108,18 @@ Backend::Backend(QObject* parent)
     Q_EMIT playerDurationChanged();
   });
 
-  connect(db::Main::self(), &db::Main::videoWidthChanged, [this]() {
+  connect(DbMain::self(), &DbMain::videoWidthChanged, [this]() {
     std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
 
-    _frameWidth = db::Main::videoWidth();
+    _frameWidth = DbMain::videoWidth();
 
     Q_EMIT frameWidthChanged();
   });
 
-  connect(db::Main::self(), &db::Main::videoHeightChanged, [this]() {
+  connect(DbMain::self(), &DbMain::videoHeightChanged, [this]() {
     std::lock_guard<std::mutex> trackers_lock_guard(trackers_mutex);
 
-    _frameHeight = db::Main::videoHeight();
+    _frameHeight = DbMain::videoHeight();
 
     Q_EMIT frameHeightChanged();
   });
@@ -203,16 +203,16 @@ void Backend::stop() {
 
 void Backend::append(const QUrl& videoUrl) {
   if (videoUrl.isLocalFile()) {
-    sourceModel.append(std::make_shared<MediaFileSource>(videoUrl));
+    sourceModel->append(std::make_shared<MediaFileSource>(videoUrl));
   }
 }
 
 void Backend::selectSource(const int& index) {
-  if (sourceModel.getList().empty()) {
+  if (sourceModel->getList().empty()) {
     return;
   }
 
-  auto source = sourceModel.get_source(index);
+  auto source = sourceModel->get_source(index);
 
   media_player->stop();
   camera->stop();
@@ -253,7 +253,7 @@ void Backend::selectSource(const int& index) {
 }
 
 void Backend::find_best_camera_resolution() {
-  sourceModel.reset();
+  sourceModel->reset();
 
   for (const QCameraDevice& cameraDevice : QMediaDevices::videoInputs()) {
     auto formats = cameraDevice.videoFormats();
@@ -275,7 +275,7 @@ void Backend::find_best_camera_resolution() {
       auto resolution = std::format("{0}x{1}:{2}", formats.front().resolution().width(),
                                     formats.front().resolution().height(), formats.begin()->maxFrameRate());
 
-      sourceModel.append(std::make_shared<CameraSource>(cameraDevice, formats.front()));
+      sourceModel->append(std::make_shared<CameraSource>(cameraDevice, formats.front()));
 
       util::debug(cameraDevice.description().toStdString() + " -> " + resolution);
 
@@ -335,20 +335,20 @@ void Backend::createNewRoi(double x, double y, double width, double height) {
 
   cv::Ptr<cv::legacy::Tracker> tracker;
 
-  switch (db::Main::trackingAlgorithm()) {
-    case db::Main::EnumTrackingAlgorithm::mosse: {
+  switch (DbMain::trackingAlgorithm()) {
+    case DbMain::EnumTrackingAlgorithm::mosse: {
       tracker = cv::legacy::TrackerMOSSE::create();
       break;
     }
-    case db::Main::EnumTrackingAlgorithm::kcf: {
+    case DbMain::EnumTrackingAlgorithm::kcf: {
       tracker = cv::legacy::TrackerKCF::create();
       break;
     }
-    case db::Main::EnumTrackingAlgorithm::tld: {
+    case DbMain::EnumTrackingAlgorithm::tld: {
       tracker = cv::legacy::TrackerTLD::create();
       break;
     }
-    case db::Main::EnumTrackingAlgorithm::mil: {
+    case DbMain::EnumTrackingAlgorithm::mil: {
       tracker = cv::legacy::TrackerMIL::create();
       break;
     }
@@ -416,7 +416,7 @@ void Backend::process_frame() {
   auto input_image =
       input_video_frame.toImage()
           .scaled(_frameWidth, _frameHeight, Qt::IgnoreAspectRatio,
-                  db::Main::imageScalingAlgorithm() == 0 ? Qt::FastTransformation : Qt::SmoothTransformation)
+                  DbMain::imageScalingAlgorithm() == 0 ? Qt::FastTransformation : Qt::SmoothTransformation)
           .convertedTo(QImage::Format_BGR888);
 
   // creating the output qvideoframe
@@ -478,7 +478,7 @@ void Backend::process_frame() {
       data_tx.append(QPointF(t, xc));
       data_ty.append(QPointF(t, yc));
 
-      while (data_tx.size() > db::Main::chartDataPoints()) {
+      while (data_tx.size() > DbMain::chartDataPoints()) {
         data_tx.removeFirst();
         data_ty.removeFirst();
       }
@@ -487,13 +487,13 @@ void Backend::process_frame() {
 
   painter.setPen(QColorConstants::Red);
 
-  if (db::Main::showFps()) {
+  if (DbMain::showFps()) {
     painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignBottom,
                      QString::fromStdString(std::format(
                          "{0:.0f} fps", 1000000.0 / (input_video_frame.endTime() - input_video_frame.startTime()))));
   }
 
-  if (db::Main::showDateTime()) {
+  if (DbMain::showDateTime()) {
     painter.drawText(output_image.rect(), Qt::AlignLeft | Qt::AlignTop, QDateTime::currentDateTime().toString());
   }
 
@@ -639,7 +639,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
 
     std::ofstream output_file(fileUrl.toLocalFile().toStdString());
 
-    output_file << std::fixed << std::setprecision(db::Main::tableFilePrecision()) << "#time";
+    output_file << std::fixed << std::setprecision(DbMain::tableFilePrecision()) << "#time";
 
     for (size_t k = 0; k < trackers.size(); k++) {
       output_file << std::format("\tx{0}\ty{0}", k);
@@ -649,7 +649,7 @@ void Backend::saveTable(const QUrl& fileUrl) {
 
     for (const auto& row : table) {
       for (const auto& v : row) {
-        output_file << std::format("{0:.{1}f}", v, db::Main::tableFilePrecision()) << "\t";
+        output_file << std::format("{0:.{1}f}", v, DbMain::tableFilePrecision()) << "\t";
       }
 
       output_file << "\n";

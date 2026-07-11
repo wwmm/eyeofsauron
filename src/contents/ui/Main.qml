@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import AboutEoS
-import EoSdb
 import Qt.labs.platform
 import QtQuick
 import QtQuick.Controls as Controls
@@ -12,20 +11,20 @@ import eos.ui
 Kirigami.ApplicationWindow {
     id: root
 
-    width: EoSdb.width
-    height: EoSdb.height
+    width: DbMain.width
+    height: DbMain.height
     pageStack.initialPage: tracker
     pageStack.globalToolBar.style: Kirigami.Settings.isMobile ? Kirigami.ApplicationHeaderStyle.Titles : Kirigami.ApplicationHeaderStyle.Auto
     title: i18nc("@title:window", "Eye of Sauron")
     onWidthChanged: {
-        EoSdb.width = applicationWindow().width;
+        DbMain.width = applicationWindow().width;
     }
     onHeightChanged: {
-        EoSdb.height = applicationWindow().height;
+        DbMain.height = applicationWindow().height;
     }
     onVisibleChanged: {
         if (!root.visible)
-            EoSdb.save();
+            DbMain.save();
     }
 
     Tracker {
@@ -71,7 +70,7 @@ Kirigami.ApplicationWindow {
     SystemTrayIcon {
         id: tray
 
-        visible: EoSdb.showTrayIcon
+        visible: DbMain.showTrayIcon
         icon.name: "eyeofsauron"
         onActivated: {
             if (!root.visible) {
