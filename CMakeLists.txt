@@ -30,13 +30,14 @@ include(KDECompilerSettings NO_POLICY_SCOPE)
 
 find_package(Qt6 REQUIRED NO_MODULE COMPONENTS
     Core
-    Quick
-    Qml
+    Charts
+    Graphs
     Gui
+    Multimedia
+    Qml
+    Quick
     QuickControls2
     Widgets
-    Charts
-    Multimedia
 )
 
 find_package(KF6 REQUIRED COMPONENTS

@@ -179,10 +179,24 @@ Kirigami.ScrollablePage {
             }
 
             ColumnLayout {
+                EoSGraph {
+                    id: graph
+
+                    visible: false
+
+                    antialiasing: true
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: 480
+                    implicitWidth: 640
+                }
+
                 ChartView {
                     id: chart
 
                     property real rangeMargin: 0.01
+
+                    visible: true
 
                     function addSeries(axisName) {
                         let name = i18n(axisName + Math.floor(chart.count / 2));

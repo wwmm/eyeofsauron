@@ -23,6 +23,7 @@ qt_add_qml_module(eyeofsauron
     QML_FILES
         contents/ui/ChartMouseArea.qml
         contents/ui/Common.qml
+        contents/ui/EoSGraph.qml
         contents/ui/EoSSpinBox.qml
         contents/ui/EoSSwitch.qml
         contents/ui/Main.qml
@@ -51,17 +52,18 @@ target_include_directories(eyeofsauron PRIVATE
 
 target_link_libraries(eyeofsauron PRIVATE
     Qt6::Core
-    Qt6::Quick
-    Qt6::Qml
+    Qt6::Charts
     Qt6::Gui
+    Qt6::Graphs
+    Qt6::Multimedia
+    Qt6::Qml
+    Qt6::Quick
     Qt6::QuickControls2
     Qt6::Widgets
-    Qt6::Charts
-    Qt6::Multimedia
-    KF6::I18n
     KF6::CoreAddons
     KF6::ConfigCore
     KF6::ConfigGui
+    KF6::I18n
     KF6::IconThemes
     ${OpenCV_LIBS}
     ${FFTW3_LIBRARIES}
