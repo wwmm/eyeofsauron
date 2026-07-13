@@ -14,6 +14,7 @@
 #include <qurl.h>
 #include <QCamera>
 #include <QMediaPlayer>
+#include <QSplineSeries>
 #include <QVideoSink>
 #include <memory>
 #include <mutex>
@@ -107,6 +108,7 @@ class Backend : public QObject {
   Q_INVOKABLE int removeRoi(double x, double y);
   Q_INVOKABLE void removeAllTrackers();
   Q_INVOKABLE void updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y, const int& index);
+  Q_INVOKABLE void updateGSeries(QSplineSeries* series_x, QSplineSeries* series_y, const int& index);
   Q_INVOKABLE void saveTable(const QUrl& fileUrl);
   Q_INVOKABLE void setPlayerPosition(qint64 value);
 

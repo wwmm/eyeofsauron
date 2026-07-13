@@ -14,6 +14,7 @@
 #include <qqml.h>
 #include <qrect.h>
 #include <qsize.h>
+#include <qsplineseries.h>
 #include <qstring.h>
 #include <qtmetamacros.h>
 #include <qtypes.h>
@@ -540,6 +541,22 @@ void Backend::updateSeries(QAbstractSeries* series_x, QAbstractSeries* series_y,
   } else {
     util::warning("series_x or series_y is null!");
   }
+}
+
+void Backend::updateGSeries(QSplineSeries* series_x, QSplineSeries* series_y, const int& index) {
+  if (index < 0 || index >= static_cast<int>(trackers.size())) {
+    return;
+  }
+
+  auto& [tracker, roi_n, initialized, data_tx, data_ty] = trackers[index];
+
+  if (data_tx.empty() || data_ty.empty()) {
+    return;
+  }
+
+  // Use replace instead of clear + append, it's optimized for performance
+  series_x->replace(data_tx);
+  series_y->replace(data_ty);
 }
 
 void Backend::update_chart_range() {

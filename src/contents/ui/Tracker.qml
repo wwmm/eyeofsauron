@@ -39,6 +39,10 @@ Kirigami.ScrollablePage {
 
     Connections {
         function onUpdateChart() {
+            // for (let n = 0; n < graph.getSeriesCount(); n += 2) {
+            //     EoSTrackerBackend.updateGSeries(graph.getSeries(n), graph.getSeries(n + 1), Math.floor(n / 2));
+            // }
+
             for (let n = 0; n < chart.count; n += 2) {
                 EoSTrackerBackend.updateSeries(chart.series(n), chart.series(n + 1), Math.floor(n / 2));
             }
@@ -112,6 +116,9 @@ Kirigami.ScrollablePage {
                                 if (seriesIndex !== -1) {
                                     chart.removeSeries(chart.series(seriesIndex)); // x
                                     chart.removeSeries(chart.series(seriesIndex)); // y
+
+                                    graph.removeSeries(seriesIndex); // x
+                                    graph.removeSeries(seriesIndex); // y
                                 }
                             }
                         }
@@ -130,8 +137,13 @@ Kirigami.ScrollablePage {
                                     y0 = height + y0;
                                     height *= -1;
                                 }
+
+                                graph.addTrackerSeries("x");
+                                graph.addTrackerSeries("y");
+
                                 chart.addSeries("x");
                                 chart.addSeries("y");
+
                                 EoSTrackerBackend.createNewRoi(x0, y0, width, height);
                                 EoSTrackerBackend.drawRoiSelection(false);
                                 event.accepted = true;
@@ -196,7 +208,7 @@ Kirigami.ScrollablePage {
 
                     property real rangeMargin: 0.01
 
-                    visible: true
+                    visible: !graph.visible
 
                     function addSeries(axisName) {
                         let name = i18n(axisName + Math.floor(chart.count / 2));
@@ -374,6 +386,8 @@ Kirigami.ScrollablePage {
                 icon.name: "delete-symbolic"
                 onTriggered: {
                     EoSTrackerBackend.removeAllTrackers();
+
+                    graph.removeAllSeries();
                     chart.removeAllSeries();
                 }
             }

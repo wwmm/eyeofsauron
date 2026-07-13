@@ -69,7 +69,7 @@ Item {
         SplineSeries {}
     }
 
-    function addSeries(axisName) {
+    function addTrackerSeries(axisName: string) {
         let name = axisName + Math.floor(graph.seriesList.length / 2);
 
         let series = splineComponent.createObject(graph, {
@@ -86,6 +86,30 @@ Item {
         //     series.visible = Qt.binding(function () {
         //         return actionViewYdata.showChart;
         //     });
+    }
+
+    function removeSeries(index: int) {
+        if (index >= 0 && index < graph.seriesList.length) {
+            graph.removeSeries(index);
+        }
+    }
+
+    function removeAllSeries() {
+        while (graph.seriesList.length > 0) {
+            graph.removeSeries(0);
+        }
+    }
+
+    function getSeriesCount(): int {
+        return graph.seriesList.length;
+    }
+
+    function getSeries(index: int): SplineSeries {
+        if (index >= 0 && index < graph.seriesList.length) {
+            return graph.seriesList[index];
+        }
+
+        return null;
     }
 
     function updateData(inputData: list<point>) {
@@ -253,8 +277,9 @@ Item {
                 max: widgetRoot.logarithmicHorizontalAxis !== true ? widgetRoot.xMax : widgetRoot.xMaxLog
                 // gridVisible: DbGraph.gridVisible
                 // subGridVisible: DbGraph.gridVisible
-                lineVisible: false
-                visible: false
+                visible: true
+                lineVisible: true
+                titleVisible: true
                 labelDecimals: 0
             }
 
@@ -263,10 +288,10 @@ Item {
                 labelFormat: "%.1e"
                 // gridVisible: DbGraph.gridVisible
                 // subGridVisible: DbGraph.gridVisible
-                lineVisible: false
-                visible: false
-                labelsVisible: false
-                titleVisible: false
+                visible: true
+                lineVisible: true
+                labelsVisible: true
+                titleVisible: true
                 min: widgetRoot.logarithmicVerticalAxis !== true ? widgetRoot.yMin : widgetRoot.yMinLog
                 max: widgetRoot.logarithmicVerticalAxis !== true ? widgetRoot.yMax : widgetRoot.yMaxLog
             }
