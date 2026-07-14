@@ -21,6 +21,8 @@ Item {
     property real yMin: 0
     property real yMax: 1
     property real yDataOffset: 0
+    property string xTitle: ""
+    property string yTitle: ""
     property string xUnit: ""
     property string yUnit: ""
     property int pointsCount: 0
@@ -67,6 +69,14 @@ Item {
         id: splineComponent
 
         SplineSeries {}
+    }
+
+    function addSeries(name: string) {
+        let series = splineComponent.createObject(graph, {
+            name: name
+        });
+
+        graph.addSeries(series);
     }
 
     function addTrackerSeries(axisName: string) {
@@ -203,9 +213,11 @@ Item {
             }
         }
 
-        // if (splineSeries.visible === true) {
-        //     splineSeries.replace(processedData);
-        // }
+        let series = graph.seriesList;
+
+        for (let n = 0; n < graph.seriesList.length; n++) {
+            series[n].replace(processedData);
+        }
     }
 
     function mapToValueX(mouseX: real): real {
@@ -262,36 +274,35 @@ Item {
             id: graph
 
             antialiasing: true
-            marginBottom: 0
-            marginTop: 0
-            marginLeft: 0
-            marginRight: 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             axisX: horizontalAxis
 
             ValueAxis {
                 id: horizontalAxis
+                titleText: `${widgetRoot.xTitle} [${widgetRoot.xUnit}]`
                 labelFormat: "%.1f"
                 min: widgetRoot.logarithmicHorizontalAxis !== true ? widgetRoot.xMin : widgetRoot.xMinLog
                 max: widgetRoot.logarithmicHorizontalAxis !== true ? widgetRoot.xMax : widgetRoot.xMaxLog
-                // gridVisible: DbGraph.gridVisible
-                // subGridVisible: DbGraph.gridVisible
                 visible: true
+                gridVisible: false
+                subGridVisible: false
                 lineVisible: true
+                labelsVisible: true
                 titleVisible: true
                 labelDecimals: 0
             }
 
             axisY: ValueAxis {
                 id: verticalAxis
+                titleText: `${widgetRoot.yTitle} [${widgetRoot.yUnit}]`
+                titleVisible: false
                 labelFormat: "%.1e"
-                // gridVisible: DbGraph.gridVisible
-                // subGridVisible: DbGraph.gridVisible
                 visible: true
+                gridVisible: false
+                subGridVisible: false
                 lineVisible: true
                 labelsVisible: true
-                titleVisible: true
                 min: widgetRoot.logarithmicVerticalAxis !== true ? widgetRoot.yMin : widgetRoot.yMinLog
                 max: widgetRoot.logarithmicVerticalAxis !== true ? widgetRoot.yMax : widgetRoot.yMaxLog
             }

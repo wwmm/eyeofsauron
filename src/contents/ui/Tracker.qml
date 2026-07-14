@@ -201,6 +201,12 @@ Kirigami.ScrollablePage {
                     Layout.fillHeight: true
                     implicitHeight: 480
                     implicitWidth: 640
+                    xTitle: i18n("Time")
+                    yTitle: i18n("Position")
+                    xUnit: i18n("s")
+                    yUnit: i18n("px")
+                    logarithmicHorizontalAxis: false
+                    logarithmicVerticalAxis: false
                 }
 
                 ChartView {

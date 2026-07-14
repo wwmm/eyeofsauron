@@ -52,6 +52,14 @@ Kirigami.ScrollablePage {
             EoSSoundBackend.updateSeriesFFT(chartFFT.series(0));
         }
 
+        function onUpdateWaveform(waveform) {
+            graphWaveform.updateData(waveform);
+        }
+
+        function onUpdateFFT(fft_list) {
+            graphFFT.updateData(fft_list);
+        }
+
         target: EoSSoundBackend
     }
 
@@ -98,8 +106,32 @@ Kirigami.ScrollablePage {
 
             RowLayout {
                 ColumnLayout {
+                    EoSGraph {
+                        id: graphWaveform
+
+                        visible: false
+
+                        antialiasing: true
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitHeight: 480
+                        implicitWidth: 640
+                        xTitle: i18n("Time")
+                        yTitle: i18n("Amplitude")
+                        xUnit: i18n("s")
+                        yUnit: i18n("a.u.")
+                        logarithmicHorizontalAxis: false
+                        logarithmicVerticalAxis: false
+
+                        Component.onCompleted: {
+                            graphWaveform.addSeries(i18n("Waveform"));
+                        }
+                    }
+
                     ChartView {
                         id: chartWaveForm
+
+                        visible: !graphWaveform.visible
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -165,8 +197,32 @@ Kirigami.ScrollablePage {
                 }
 
                 ColumnLayout {
+                    EoSGraph {
+                        id: graphFFT
+
+                        visible: false
+
+                        antialiasing: true
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitHeight: 480
+                        implicitWidth: 640
+                        xTitle: i18n("Frequency")
+                        yTitle: i18n("Amplitude²")
+                        xUnit: i18n("Hz")
+                        yUnit: i18n("a.u.")
+                        logarithmicHorizontalAxis: false
+                        logarithmicVerticalAxis: false
+
+                        Component.onCompleted: {
+                            graphFFT.addSeries(i18n("Fourier Transform"));
+                        }
+                    }
+
                     ChartView {
                         id: chartFFT
+
+                        visible: !graphFFT.visible
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true

@@ -117,6 +117,8 @@ class Backend : public QObject {
   void playerDurationChanged();
   void showPlayerSliderChanged();
   void updateChart();
+  void updateWaveform(QList<QPointF> newData);
+  void updateFFT(QList<QPointF> newData);
 
  private:
   bool _showPlayerSlider = false;

@@ -311,6 +311,8 @@ void Backend::process_buffer(const std::vector<double>& buffer, const int& sampl
   update_fft_chart_range();
 
   Q_EMIT updateChart();
+  Q_EMIT updateWaveform(waveform);
+  Q_EMIT updateFFT(fft_list);
 }
 
 void Backend::update_waveform_chart_range() {
