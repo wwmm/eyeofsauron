@@ -122,8 +122,8 @@ Item {
         return null;
     }
 
-    function updateData(inputData: list<point>) {
-        if (!inputData || inputData.length === 0) {
+    function updateData(seriesIndex: int, inputData: list<point>) {
+        if (!inputData || inputData.length < 2) {
             return;
         }
 
@@ -213,10 +213,8 @@ Item {
             }
         }
 
-        let series = graph.seriesList;
-
-        for (let n = 0; n < graph.seriesList.length; n++) {
-            series[n].replace(processedData);
+        if (graph.seriesList.length > 0) {
+            graph.seriesList[seriesIndex].replace(processedData);
         }
     }
 

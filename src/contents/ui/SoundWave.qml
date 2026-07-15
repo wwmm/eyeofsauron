@@ -53,11 +53,11 @@ Kirigami.ScrollablePage {
         }
 
         function onUpdateWaveform(waveform) {
-            graphWaveform.updateData(waveform);
+            graphWaveform.updateData(0, waveform);
         }
 
         function onUpdateFFT(fft_list) {
-            graphFFT.updateData(fft_list);
+            graphFFT.updateData(0, fft_list);
         }
 
         target: EoSSoundBackend

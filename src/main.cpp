@@ -1,5 +1,6 @@
 #include <kaboutdata.h>
 #include <klocalizedcontext.h>
+#include <klocalizedqmlcontext.h>
 #include <qguiapplication.h>
 #include <qhashfunctions.h>
 #include <qlockfile.h>
@@ -117,7 +118,7 @@ int main(int argc, char* argv[]) {
 
   QQmlApplicationEngine engine;
 
-  engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
+  KLocalization::setupLocalizedContext(&engine);
 
   engine.loadFromModule("eos.ui", "Main");
 

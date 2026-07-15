@@ -126,6 +126,7 @@ class Backend : public QObject {
   void playerDurationChanged();
   void showPlayerSliderChanged();
   void updateChart();
+  void updateTrackerGraph(int index, QList<QPointF> newDataX, QList<QPointF> newDataY);
 
  private:
   bool _xDataVisible = true;

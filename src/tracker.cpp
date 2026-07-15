@@ -457,6 +457,8 @@ void Backend::process_frame() {
 
     initial_time = (initial_time == 0) ? input_video_frame.startTime() : initial_time;
 
+    uint tracker_index = 0;
+
     for (auto& [tracker, roi_n, initialized, data_tx, data_ty] : trackers) {
       if (!initialized) {
         tracker->init(cv_frame, roi_n);
@@ -483,6 +485,10 @@ void Backend::process_frame() {
         data_tx.removeFirst();
         data_ty.removeFirst();
       }
+
+      Q_EMIT updateTrackerGraph(tracker_index, data_tx, data_ty);
+
+      tracker_index++;
     }
   }
 
