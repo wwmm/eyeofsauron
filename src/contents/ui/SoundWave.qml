@@ -361,6 +361,9 @@ Kirigami.ScrollablePage {
                 onTriggered: {
                     chartWaveForm.zoomReset();
                     chartFFT.zoomReset();
+
+                    graphWaveform.resetZoom();
+                    graphFFT.resetZoom();
                 }
             }
         ]

@@ -246,20 +246,19 @@ Item {
         }
     }
 
+    function resetZoom() {
+        horizontalAxis.zoom = 1.0;
+        horizontalAxis.pan = 0.0;
+
+        verticalAxis.zoom = 1.0;
+        verticalAxis.pan = 0.0;
+    }
+
     GraphsTheme {
         id: qtTheme
 
         colorScheme: widgetRoot.colorScheme
         theme: widgetRoot.colorTheme
-
-        // Component.onCompleted: {
-        //     console.log("plot area: " + plotAreaBackgroundColor);
-        //     console.log("backgroundColor: " + backgroundColor);
-        //     console.log("seriesColors: " + seriesColors);
-        //     console.log("labelTextColor: " + labelTextColor);
-        //     console.log("labelBackgroundColor: " + labelBackgroundColor);
-        //     console.log("borderColors: " + borderColors);
-        // }
     }
 
     ColumnLayout {
@@ -275,9 +274,12 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             axisX: horizontalAxis
+            zoomStyle: GraphsView.ZoomStyle.None
+            zoomAreaEnabled: true
 
             ValueAxis {
                 id: horizontalAxis
+
                 titleText: `${widgetRoot.xTitle} [${widgetRoot.xUnit}]`
                 labelFormat: "%.1f"
                 min: widgetRoot.logarithmicHorizontalAxis !== true ? widgetRoot.xMin : widgetRoot.xMinLog
@@ -293,6 +295,7 @@ Item {
 
             axisY: ValueAxis {
                 id: verticalAxis
+
                 titleText: `${widgetRoot.yTitle} [${widgetRoot.yUnit}]`
                 titleVisible: false
                 labelFormat: "%.1e"
@@ -310,63 +313,63 @@ Item {
     }
 
     // Coordinate display label
-    Controls.Label {
-        id: coordinateLabel
-        visible: false
-        padding: Kirigami.Units.smallSpacing
-        background: Rectangle {
-            color: Kirigami.Theme.backgroundColor
-            border.color: Kirigami.Theme.textColor
-            border.width: 1
-            radius: Kirigami.Units.smallSpacing
-            opacity: 0.9
-        }
-        color: Kirigami.Theme.textColor
-        font.pointSize: Kirigami.Theme.smallFont.pointSize
-    }
+    // Controls.Label {
+    //     id: coordinateLabel
+    //     visible: false
+    //     padding: Kirigami.Units.smallSpacing
+    //     background: Rectangle {
+    //         color: Kirigami.Theme.backgroundColor
+    //         border.color: Kirigami.Theme.textColor
+    //         border.width: 1
+    //         radius: Kirigami.Units.smallSpacing
+    //         opacity: 0.9
+    //     }
+    //     color: Kirigami.Theme.textColor
+    //     font.pointSize: Kirigami.Theme.smallFont.pointSize
+    // }
 
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
-        onPositionChanged: function (mouse) {
-            // Calculating the label x coordinate
+    // MouseArea {
+    //     anchors.fill: parent
+    //     hoverEnabled: true
+    //     onPositionChanged: function (mouse) {
+    //         // Calculating the label x coordinate
 
-            let labelX = mouse.x + widgetRoot.coordLabelOffset;
+    //         let labelX = mouse.x + widgetRoot.coordLabelOffset;
 
-            if (labelX + coordinateLabel.width > widgetRoot.width) {
-                labelX = widgetRoot.width - coordinateLabel.width - widgetRoot.coordLabelOffset;
-            } else if (x < 0) {
-                labelX = widgetRoot.coordLabelOffset;
-            }
+    //         if (labelX + coordinateLabel.width > widgetRoot.width) {
+    //             labelX = widgetRoot.width - coordinateLabel.width - widgetRoot.coordLabelOffset;
+    //         } else if (x < 0) {
+    //             labelX = widgetRoot.coordLabelOffset;
+    //         }
 
-            coordinateLabel.x = labelX;
+    //         coordinateLabel.x = labelX;
 
-            // Calculating the y coordinate
+    //         // Calculating the y coordinate
 
-            let labelY = mouse.y - coordinateLabel.height - widgetRoot.coordLabelOffset;
+    //         let labelY = mouse.y - coordinateLabel.height - widgetRoot.coordLabelOffset;
 
-            if (labelY < 0) {
-                labelY = widgetRoot.coordLabelOffset;
-            } else if (labelY + coordinateLabel.height > widgetRoot.height) {
-                labelY = widgetRoot.height - coordinateLabel.height - widgetRoot.coordLabelOffset;
-            }
+    //         if (labelY < 0) {
+    //             labelY = widgetRoot.coordLabelOffset;
+    //         } else if (labelY + coordinateLabel.height > widgetRoot.height) {
+    //             labelY = widgetRoot.height - coordinateLabel.height - widgetRoot.coordLabelOffset;
+    //         }
 
-            coordinateLabel.y = labelY;
+    //         coordinateLabel.y = labelY;
 
-            const dataX = widgetRoot.mapToValueX(mouse.x);
-            const dataY = widgetRoot.mapToValueY(mouse.y) - widgetRoot.yDataOffset;
+    //         const dataX = widgetRoot.mapToValueX(mouse.x);
+    //         const dataY = widgetRoot.mapToValueY(mouse.y) - widgetRoot.yDataOffset;
 
-            // const newText = `${Number(dataX).toLocaleString(Qt.locale(), 'f', widgetRoot.xAxisDecimals)} ${widgetRoot.xUnit}`;
-            const newText = `x: ${Number(dataX).toLocaleString(Qt.locale(), 'f', widgetRoot.xAxisDecimals)} ${widgetRoot.xUnit}, y: ${Number(dataY).toLocaleString(Qt.locale(), 'f', widgetRoot.yAxisDecimals)} ${widgetRoot.yUnit}`;
+    //         // const newText = `${Number(dataX).toLocaleString(Qt.locale(), 'f', widgetRoot.xAxisDecimals)} ${widgetRoot.xUnit}`;
+    //         const newText = `x: ${Number(dataX).toLocaleString(Qt.locale(), 'f', widgetRoot.xAxisDecimals)} ${widgetRoot.xUnit}, y: ${Number(dataY).toLocaleString(Qt.locale(), 'f', widgetRoot.yAxisDecimals)} ${widgetRoot.yUnit}`;
 
-            if (coordinateLabel.text !== newText) {
-                coordinateLabel.text = newText;
-            }
+    //         if (coordinateLabel.text !== newText) {
+    //             coordinateLabel.text = newText;
+    //         }
 
-            coordinateLabel.visible = true;
-        }
-        onExited: {
-            coordinateLabel.visible = false;
-        }
-    }
+    //         coordinateLabel.visible = true;
+    //     }
+    //     onExited: {
+    //         coordinateLabel.visible = false;
+    //     }
+    // }
 }
