@@ -49,8 +49,8 @@ Kirigami.ScrollablePage {
         }
 
         function onUpdateTrackerGraph(trackerIndex, newDataX, newDataY) {
-            graph.updateData(trackerIndex, newDataX);
-            graph.updateData(trackerIndex + 1, newDataY);
+            // graph.updateData(trackerIndex, newDataX);
+            // graph.updateData(trackerIndex + 1, newDataY);
         }
 
         target: EoSTrackerBackend
